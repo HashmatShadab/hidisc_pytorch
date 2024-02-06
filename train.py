@@ -89,6 +89,9 @@ def train_one_epoch(epoch, train_loader, model,
         # adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
         # adv_losses = criterion(adv_outputs, targets)
         # adv_loss = adv_losses["sum_loss"]
+        # if using Dual Stream model, then use the following line
+        # model(inputs, 'normal') for clean images and model(inputs, 'pgd') for adversarial images
+        # also fopr attack pass model(images + delta, 'pgd')
 
 
         clean_outputs = model(im_reshaped)
