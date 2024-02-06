@@ -1,62 +1,27 @@
-import argparse
 import json
-import os
-
 import logging
+import os
+from functools import partial
+from typing import Dict, Any
+
+import dill
 import hydra
+import numpy as np
+import torch
+import wandb
 from hydra.utils import get_original_cwd
 from omegaconf import OmegaConf
 
-
-import numpy as np
-import torch
-import torch.nn as nn
-import dill
-import wandb
-
-from helpers import init_distributed_mode, get_rank, is_main_process, get_mean_std, get_world_size
+from common import get_dataloaders
+from helpers import init_distributed_mode, get_rank, is_main_process, get_world_size
+from losses.hidisc import HiDiscLoss
+from models import MLP, resnet_backbone, ContrastiveLearningNetwork
+from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from validate import validate_clean
 
-from models import MLP, resnet_backbone, ContrastiveLearningNetwork
-from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
-from losses.hidisc import HiDiscLoss
-from common import (setup_output_dirs, parse_args, get_exp_name,
-                                 config_loggers, get_optimizer_func,
-                                 get_scheduler_func, get_dataloaders)
-
-
 log = logging.getLogger(__name__)
-
-"""
-ImageNet Training:
-Epochs: 30
-Batch Size: 256
-Optimizer: SGD
-Learning Rate: 0.001
-Momentum: 0.9
-Weight Decay: 0.0001
-Column ablation of fixed width = 19
-Augmnetation: RandomResizedCrop(224), RandomHorizontalFlip(), ColorJitter()
-
-CIFAR-10 Training:
-Epochs: 30
-Batch Size: 128
-Optimizer: SGD
-Learning Rate: 10E-2
-Scheduler: StepLR(10, 0.1)
-Momentum: 0.9
-Weight Decay: 5 x 10E-4
-Column ablation of fixed width = 4
-Augmnetation: RandomHorizontalFlip()
-Column ablation and then upsampling to 224x224
-
-"""
-from functools import partial
-from typing import Dict, Any
-import torchmetrics
-
 
 class HiDiscModel(torch.nn.Module):
 

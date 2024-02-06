@@ -1,25 +1,6 @@
-
-
-import os
-
-import dill
-import torch
-import torch as ch
-from torchvision import models
-
-import torch.nn as nn
-import fine_tunify
-from custom_classifier_models.vision_transformer import (deit_tiny_patch16_224,
-                                                         deit_small_patch16_224,
-                                                         deit_base_patch16_224,
-                                                         deit_base_patch16_384,
-                                                         deit_tiny_patch4_32,
-                                                         deit_small_patch4_32,
-                                                         deit_base_patch4_32)
-
-
-from clip.clip_models import get_clip_image_model
 import logging
+
+import torch
 
 log = logging.getLogger(__name__)
 

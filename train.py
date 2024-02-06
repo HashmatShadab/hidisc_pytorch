@@ -1,7 +1,9 @@
-import torch
-from helpers import  accuracy, MetricLogger, plot_grid
 import logging
+
+import torch
 import torchvision
+
+from helpers import MetricLogger
 
 log = logging.getLogger(__name__)
 def plot_grid(w, save=False, name="grid.png"):
@@ -13,7 +15,6 @@ def plot_grid(w, save=False, name="grid.png"):
     plt.show()
 
 
-import torch
 
 
 def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 255, iters=2):
@@ -56,6 +57,7 @@ def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 
 
 def train_one_epoch(epoch, train_loader, model,
                     optimizer, criterion, scheduler, print_freq=50):
+
     """
     :param epoch: The current epoch number.
     :param train_loader: The data loader for training data.
@@ -67,6 +69,7 @@ def train_one_epoch(epoch, train_loader, model,
     :return: A dictionary containing the averaged metrics from the training epoch.
 
     """
+
     # Distributed metric logger
     metric_logger = MetricLogger(delimiter="  ")
     header = f'Train: Epoch {epoch}'
