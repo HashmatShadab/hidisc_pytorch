@@ -1,8 +1,16 @@
 import torch
 from helpers import  accuracy, MetricLogger, plot_grid
 import logging
+import torchvision
 
 log = logging.getLogger(__name__)
+def plot_grid(w, save=False, name="grid.png"):
+    import matplotlib.pyplot as plt
+    grid_img = torchvision.utils.make_grid(w)
+    plt.imshow(grid_img.permute(1,2,0).cpu())
+    if save:
+        plt.savefig(name)
+    plt.show()
 
 
 
@@ -21,6 +29,7 @@ def train_one_epoch(epoch, train_loader, model,
 
         # Move the tensors to the GPUs
         im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
+        orig_im = batch['base_image'].reshape(-1, *batch['base_image'].shape[-3:])
         im_reshaped = im_reshaped.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
         targets = targets.reshape(-1, 1)

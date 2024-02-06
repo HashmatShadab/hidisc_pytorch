@@ -242,6 +242,7 @@ class HiDiscDataset(Dataset):
 
         self.data_root_ = data_root
         self.transform_ = transform
+        self.base_transform = Compose(get_srh_base_aug())
         self.target_transform_ = target_transform
         self.check_images_exist_ = check_images_exist
         self.num_slide_samples_ = num_slide_samples
@@ -408,7 +409,9 @@ class HiDiscDataset(Dataset):
                 [self.transform_(im) for _ in range(self.num_transforms_)])
             for im in images
         ])
-        return xformed_im, imps_take
+
+        base_im = torch.stack([self.base_transform(im) for im in images])
+        return xformed_im, imps_take, base_im
 
     def __getitem__(self, idx: int) -> PatchData:
         """Retrieve patches from patient as specified by idx"""
@@ -423,13 +426,14 @@ class HiDiscDataset(Dataset):
 
         images = [self.read_images_slide(patient[i]) for i in slide_idx]
         im = torch.stack([i[0] for i in images])
+        base_im = torch.stack([i[2] for i in images])
         imp = [i[1] for i in images]
 
         target = self.class_to_idx_[target]
         if self.target_transform_ is not None:
             target = self.target_transform_(target)
 
-        return {"image": im, "label": target, "path": [imp]}
+        return {"image": im, "label": target, "path": [imp], "base_image": base_im}
 
     def __len__(self):
         return len(self.instances_)

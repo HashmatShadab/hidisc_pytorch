@@ -136,4 +136,4 @@ def get_strong_aug(augs, rand_prob) -> List:
 
 def get_srh_aug_list(augs, rand_prob=0.5) -> List:
     """Combine base and strong augmentations for OpenSRH training"""
-    return get_srh_base_aug() + get_strong_aug(augs, rand_prob)
+    return get_srh_base_aug()  + get_strong_aug(augs, rand_prob)
