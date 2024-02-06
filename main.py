@@ -20,6 +20,7 @@ from train import train_one_epoch
 from validate import validate_clean
 
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
+from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
 from losses.hidisc import HiDiscLoss
 from common import (setup_output_dirs, parse_args, get_exp_name,
                                  config_loggers, get_optimizer_func,
@@ -65,6 +66,8 @@ class HiDiscModel(torch.nn.Module):
 
         if cf["model"]["backbone"] == "resnet50":
             bb = partial(resnet_backbone, arch=cf["model"]["backbone"])
+        elif cf["model"]["backbone"] == "resnet50_multi_bn":
+            bb = partial(resnet50_multi_bn)
         else:
             raise NotImplementedError()
 
@@ -75,16 +78,10 @@ class HiDiscModel(torch.nn.Module):
         self.model = ContrastiveLearningNetwork(bb, mlp)
 
 
-    # def forward_step(self, batch):
-    #     im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-    #     pred = self.model(im_reshaped)
-    #     return pred.reshape(*batch["image"].shape[:4], pred.shape[-1])
-
 
     def forward(self, img):
+
         pred = self.model(img)
-
-
         return pred
 
 
@@ -190,9 +187,9 @@ def main(args):
     for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
-                                      optimizer=optimizer, criterion=criterion)
-        if scheduler:
-            scheduler.step()
+                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler)
+        # if scheduler:
+        #     scheduler.step()
 
         #  Save the checkpoints
         # save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats, train_stats,
