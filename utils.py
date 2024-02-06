@@ -4,7 +4,8 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 import random
-
+import os
+import dill
 
 
 def pgd_attack(model, images, labels, device, eps=8. / 255., alpha=2. / 255., iters=20, advFlag=None, forceEval=True, randomInit=True):
@@ -91,3 +92,57 @@ def setup_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
+
+
+def save_checkpoints(epoch, model, optimizer, scheduler, train_stats,
+                      name='checkpoint.pth'):
+    """
+    Save model, optimizer and scheduler to a checkpoint file inside out_dir.
+
+    """
+    print("Saving checkpoint to: ", os.path.join(os.getcwd(), name))
+    torch.save({
+        'epoch': epoch,
+        'model': model.state_dict(),
+        'optimizer': optimizer.state_dict(),
+        'schedule': scheduler.state_dict() if scheduler else None,
+        'loss': train_stats['loss'],
+    },
+        f"{name}")
+
+def restart_from_checkpoint(checkpoint_name, model, optimizer,
+                            scheduler):
+    """
+    New script for this codebase
+    Loads model, optimizer and scheduler from a checkpoint. If the checkpoint is not found
+    in the out_dir, returns 0 epoch.
+
+    """
+    if not os.path.isfile(checkpoint_name):
+        print(f"Restarting: No checkpoints found in {os.getcwd()}")
+        return 0, 0
+
+    # open checkpoint file
+    checkpoint = torch.load(checkpoint_name, pickle_module=dill)
+    start_epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
+
+    print(f"=> Restarting from checkpoint {os.path.join(os.getcwd(), checkpoint_name)} (Epoch{start_epoch})")
+    if "model" in checkpoint and checkpoint['model'] is not None:
+        model_weights = checkpoint["model"]
+        # remove the module from the keys
+        model_weights = {k.replace("module.model.model", "module.model"): v for k, v in model_weights.items()}
+        msg = model.load_state_dict(model_weights, strict=False)
+        print("Load model with msg: ", msg)
+
+    if "optimizer" in checkpoint and checkpoint['optimizer'] is not None:
+        msg = optimizer.load_state_dict(checkpoint['optimizer'])
+        print("Load optimizer with msg: ", msg)
+
+    if "schedule" in checkpoint and checkpoint['schedule'] is not None:
+        msg = scheduler.load_state_dict(checkpoint['schedule'])
+        print("Load scheduler with msg: ", msg)
+    else:
+        print("No scheduler in checkpoint")
+
+    return start_epoch, loss

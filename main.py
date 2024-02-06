@@ -20,11 +20,25 @@ from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from validate import validate_clean
+from utils import save_checkpoints, restart_from_checkpoint
 
 log = logging.getLogger(__name__)
 
 class HiDiscModel(torch.nn.Module):
+    """
+    HiDiscModel
 
+    This class represents a High-dimensional Contrastive Learning Model. It is a subclass of `torch.nn.Module`.
+
+    Attributes:
+        cf_ (Dict[str, Any]): A dictionary containing the configuration parameters for the model.
+        model (ContrastiveLearningNetwork): The main model used for high-dimensional contrastive learning.
+
+    Methods:
+        __init__(self, cf: Dict[str, Any]): Initializes the HiDiscModel object.
+        forward(self, img): Performs forward pass on the input image.
+
+    """
     def __init__(self, cf: Dict[str, Any]):
         super().__init__()
         self.cf_ = cf
@@ -54,6 +68,11 @@ class HiDiscModel(torch.nn.Module):
 
 @hydra.main(version_base=None, config_path="conf", config_name="main")
 def main(args):
+
+    """
+    Entry point of the program.
+    """
+
     log.info("Info level message")
     # log.debug("Debug level message")
 
@@ -94,6 +113,7 @@ def main(args):
 
     start_epoch = 0
     if  args.eval_only and not args.model.restart_from_ckpt:
+
         """
         Loads only model weights for evaluation.
         if restart_from_ckpt, then model weights will be loaded from the output dir,
@@ -111,13 +131,6 @@ def main(args):
         log.info("Load model with msg: ", msg)
 
 
-
-    """
-    
-    Freeze the model layers if needed. It only works for resnet models.
-    By default it is -1 and returns None, which means no layers are frozen.
-    
-    """
     update_params = None
     parma_list = model.parameters() if update_params is None else update_params
 
@@ -137,10 +150,9 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
                                                           find_unused_parameters=args.distributed.find_unused_params)
 
-    # start_epoch, best_smooth_acc, best_certified_acc, best_clean_std_acc = restart_from_checkpoint(args.out_dir,
-    #                                                                                                "checkpoint.pth",
-    #                                                                                                model, optimizer,
-    #                                                                                                scheduler)
+    start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
+    args.training.num_epochs = args.training.num_epochs - start_epoch
+
     # Perform evaluation and exit if `eval_only` is set
     if args.eval_only:
         # Validate the model
@@ -149,7 +161,7 @@ def main(args):
 
 
     # Training loop
-    for epoch in range(start_epoch, args.training.num_epochs):
+    for epoch in range(args.training.num_epochs):
         # Train for one epoch
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler)
@@ -157,11 +169,8 @@ def main(args):
         #     scheduler.step()
 
         #  Save the checkpoints
-        # save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats, train_stats,
-        #                   name='checkpoint.pth', outdir=args.out_dir)
-
-
-
+        save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                           name='checkpoint.pth')
 
 
         # Log the epoch stats
