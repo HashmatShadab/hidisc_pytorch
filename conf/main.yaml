@@ -106,7 +106,7 @@ training:
         temperature: 0.07
         base_temperature: 0.07
         contrast_mode: all
-  batch_size: 2
+  batch_size: 10
   num_epochs: 40000
   optimizer: adamw # [sgd, adam, adamw]
   learn_rate: 1.0e-3

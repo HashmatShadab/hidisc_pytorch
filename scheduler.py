@@ -38,6 +38,7 @@ def get_cosine_schedule_with_warmup(optimizer: torch.optim.Optimizer,
     def lr_lambda(current_step):
         if current_step < num_warmup_steps:
             return float(current_step) / float(max(1, num_warmup_steps))
+
         progress = float(current_step - num_warmup_steps) / float(
             max(1, num_training_steps - num_warmup_steps))
         return max(
