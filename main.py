@@ -12,7 +12,7 @@ import wandb
 from hydra.utils import get_original_cwd
 from omegaconf import OmegaConf
 
-from common import get_dataloaders
+from datasets.loaders import get_dataloaders
 from helpers import init_distributed_mode, get_rank, is_main_process, get_world_size
 from losses.hidisc import HiDiscLoss
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork

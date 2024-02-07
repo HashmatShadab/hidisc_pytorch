@@ -38,6 +38,18 @@ def plot_grid(w, norm=False):
 
 
 
+def convert_epoch_to_iter(unit: str, steps: int, num_it_per_ep: int) -> int:
+    """Converts number of epochs / iterations to number of iterations."""
+    if unit == "epoch":
+        return num_it_per_ep * steps  # per epoch
+    elif unit == "iter":
+        return steps
+    else:
+        NotImplementedError("unit must be one of [epoch, iter]")
+
+
+
+
 def accuracy(output, target, topk=(1,)):
     """Computes the accuracy over the k top predictions for the specified values of k"""
     with torch.no_grad():
