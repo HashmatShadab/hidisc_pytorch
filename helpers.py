@@ -8,10 +8,20 @@ from collections import defaultdict, deque
 import torchvision
 import torch
 import matplotlib.pyplot as plt
+import numpy as np
+import random
 
 import logging
 
 log = logging.getLogger(__name__)
+
+
+def setup_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
 
 def get_mean_std(normalize):
     if normalize is None:

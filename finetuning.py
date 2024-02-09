@@ -21,7 +21,7 @@ from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
 from scheduler import make_optimizer_and_schedule
 from utils import save_checkpoints, restart_from_checkpoint
 import torch
-from helpers import  accuracy, MetricLogger
+from helpers import  accuracy, MetricLogger, setup_seed
 log = logging.getLogger(__name__)
 
 
@@ -75,6 +75,8 @@ def main(args):
 
     log.info(f"Current working directory : {os.getcwd()}")
     log.info(f"Orig working directory    : {get_original_cwd()}")
+
+    setup_seed(args['infra']['seed'])
 
     # Initialize DDP if needed
     init_distributed_mode(args.distributed)

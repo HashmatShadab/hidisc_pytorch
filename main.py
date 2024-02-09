@@ -13,7 +13,7 @@ from hydra.utils import get_original_cwd
 from omegaconf import OmegaConf
 
 from datasets.loaders import get_dataloaders
-from helpers import init_distributed_mode, get_rank, is_main_process, get_world_size
+from helpers import init_distributed_mode, get_rank, is_main_process, get_world_size, setup_seed
 from losses.hidisc import HiDiscLoss
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
@@ -63,6 +63,10 @@ class HiDiscModel(torch.nn.Module):
         pred = self.model(img)
         return pred
 
+    def get_features(self, img):
+        out = self.model.bb(img)
+        return out
+
 
 
 
@@ -79,6 +83,8 @@ def main(args):
 
     log.info(f"Current working directory : {os.getcwd()}")
     log.info(f"Orig working directory    : {get_original_cwd()}")
+
+    setup_seed(args['infra']['seed'])
 
     # Initialize DDP if needed
     init_distributed_mode(args.distributed)
