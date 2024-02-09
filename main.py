@@ -19,7 +19,7 @@ from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
-from validate import validate_clean
+from ft_validate import validate_clean
 from utils import save_checkpoints, restart_from_checkpoint
 
 log = logging.getLogger(__name__)
@@ -111,26 +111,6 @@ def main(args):
         return total
     log.info(f'==> [Number of parameters of the model is {get_n_params(model)}]')
 
-    start_epoch = 0
-    if  args.eval_only and not args.model.restart_from_ckpt:
-
-        """
-        Loads only model weights for evaluation.
-        if restart_from_ckpt, then model weights will be loaded from the output dir,
-        no need to pass the checkpoints path.
-         
-        """
-        checkpoint = torch.load(args.model.checkpoints_path, pickle_module=dill)
-        start_epoch = checkpoint["epoch"]
-        log.info(f"Evaluating Model from {args.model.checkpoints_path}, Epoch : {start_epoch}")
-        model_weights = checkpoint["model"]
-        # remove the module from the keys
-        model_weights = {k.replace("module.", ""): v for k, v in model_weights.items()}
-        model_weights = {k.replace("model.model", "model"): v for k, v in model_weights.items()}
-        msg = model.load_state_dict(model_weights, strict=False)
-        log.info("Load model with msg: ", msg)
-
-
     update_params = None
     parma_list = model.parameters() if update_params is None else update_params
 
@@ -150,6 +130,7 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
                                                           find_unused_parameters=args.distributed.find_unused_params)
 
+    start_epoch = 0
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
     args.training.num_epochs = args.training.num_epochs - start_epoch
 
