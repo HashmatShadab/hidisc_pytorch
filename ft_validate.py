@@ -19,7 +19,7 @@ def validate_clean(val_loader, model, criterion):
             targets = targets.to("cuda", non_blocking=True)
 
             # Forward pass to the network
-            outputs, final_inp = model(images, target=targets, make_adv=False)
+            outputs = model(images)
 
 
             # Calculate loss
@@ -42,28 +42,3 @@ def validate_clean(val_loader, model, criterion):
 
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
-
-def evaluate_standard_accuracy(model, val_loader, criterion, args):
-
-    """
-    Results will be evaluated on full size image, no ablated input will be passed, so no tokens will be dropped
-    """
-
-    if args.distributed:
-        model.module.normalizer.do_ablation = False
-        model.module.normalizer.return_mask = False
-    else:
-        model.normalizer.do_ablation = False
-        model.normalizer.return_mask = False
-
-    test_stats_clean = validate_clean(val_loader=val_loader, model=model,
-                                      criterion=criterion)
-
-    if args.distributed:
-        model.module.normalizer.do_ablation = True
-        model.module.normalizer.return_mask = True
-    else:
-        model.normalizer.do_ablation = True
-        model.normalizer.return_mask = True
-
-    return test_stats_clean
