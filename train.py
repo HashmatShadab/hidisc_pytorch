@@ -72,7 +72,8 @@ def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 
 
 def train_one_epoch(epoch, train_loader, model,
                     optimizer, criterion, scheduler, print_freq=50, attack_type='pgd',
-                    attack_eps=1/255, attack_alpha=1/255, attack_iters=7, dual_bn=False):
+                    attack_eps=1/255, attack_alpha=1/255, attack_iters=7, dual_bn=False,
+                    dynamic_aug=False, dynamic_weight_lamda=0.5, dynamic_strength=1.0):
 
     """
     :param epoch: The current epoch number.
@@ -98,7 +99,7 @@ def train_one_epoch(epoch, train_loader, model,
 
         # Move the tensors to the GPUs
         im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-        orig_im = batch['base_image'].reshape(-1, *batch['base_image'].shape[-3:])
+        # orig_im = batch['base_image'].reshape(-1, *batch['base_image'].shape[-3:])
         im_reshaped = im_reshaped.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
         targets = targets.reshape(-1, 1)
@@ -122,7 +123,13 @@ def train_one_epoch(epoch, train_loader, model,
         clean_losses = criterion(clean_outputs, targets)
         clean_loss = clean_losses["sum_loss"]
 
-        total_loss = clean_loss + adv_loss
+        if dynamic_aug:
+            weight = dynamic_weight_lamda*(1 - dynamic_strength)
+        else:
+            weight = 0.0
+
+        total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
+
 
         optimizer.zero_grad()
         total_loss.backward()

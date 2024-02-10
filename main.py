@@ -157,7 +157,10 @@ def main(args):
                                       attack_type=args.training.attack.anme, eps=args.training.attack.eps,
                                       alpha=args.training.attack.alpha,
                                       iters=args.training.attack.iters,
-                                      dual_bn=dual_bn
+                                      dual_bn=dual_bn,
+                                      dynamic_aug=args['data']['dynamic_aug'],
+                                      dynamic_strength=strength,
+                                      dynamic_weight_lamda = args['training']['dynamic_weight_lamda'],
                                       )
 
         #  Save the checkpoints
