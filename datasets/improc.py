@@ -19,6 +19,7 @@ from torchvision.transforms import (
     RandomSolarize, ColorJitter, RandomAdjustSharpness, GaussianBlur,
     RandomAffine, RandomResizedCrop)
 
+from torchvision import transforms
 
 class GetThirdChannel(torch.nn.Module):
     """Computes the third channel of SRH image
@@ -47,6 +48,9 @@ class GetThirdChannel(torch.nn.Module):
 
         return torch.stack((ch1, ch2, ch3), dim=0)
 
+    def __repr__(self):
+        return self.__class__.__name__ + f"(subtracted_base={self.subtracted_base})"
+
 
 class MinMaxChop(torch.nn.Module):
     """Clamps the images to float (0,1) range."""
@@ -59,6 +63,8 @@ class MinMaxChop(torch.nn.Module):
     def __call__(self, image: torch.Tensor) -> torch.Tensor:
         return image.clamp(self.min_, self.max_)
 
+    def __repr__(self):
+        return self.__class__.__name__ + f"(min_val={self.min_}, max_val={self.max_})"
 
 class GaussianNoise(torch.nn.Module):
     """Adds guassian noise to images."""
@@ -74,6 +80,9 @@ class GaussianNoise(torch.nn.Module):
         noisy = tensor + torch.randn(tensor.size()) * var
         noisy = torch.clamp(noisy, min=0., max=1.)
         return noisy
+
+    def __repr__(self):
+        return self.__class__.__name__ + f"(min_var={self.min_var}, max_var={self.max_var})"
 
 
 def process_read_im(imp: str) -> torch.Tensor:
@@ -134,6 +143,37 @@ def get_strong_aug(augs, rand_prob) -> List:
     return [callable_dict[a["which"]](**a["params"]) for a in augs]
 
 
-def get_srh_aug_list(augs, rand_prob=0.5) -> List:
+def get_srh_aug_list(augs, rand_prob=0.5, dyanamic_aug=False, strength=1.0) -> List:
     """Combine base and strong augmentations for OpenSRH training"""
-    return get_srh_base_aug()  + get_strong_aug(augs, rand_prob)
+    if dyanamic_aug:
+        return get_dynamic_augs(augs, rand_prob, strength)
+    else:
+        return get_srh_base_aug()  + get_strong_aug(augs, rand_prob)
+
+
+
+def get_dynamic_augs(augs, rand_prob, strength) -> List:
+    """Strong augmentations for OpenSRH training"""
+
+    u16_min = (0, 0)
+    u16_max = (65536, 65536)  # 2^16
+
+    base_aug = [Normalize(u16_min, u16_max), GetThirdChannel(), MinMaxChop()]
+
+    random_horiz_flip = RandomHorizontalFlip(p=rand_prob)
+    random_vert_flip = RandomVerticalFlip(p=rand_prob)
+    gaussian_noise = transforms.RandomApply([GaussianNoise(min_var=0.01 * strength, max_var=0.1 * strength)], p=rand_prob * strength)
+    color_jitter = transforms.RandomApply([transforms.ColorJitter(0.4 * strength, 0.4 * strength, 0.4 * strength, 0.1 * strength)], p=rand_prob * strength)
+    autocontrast = RandomAutocontrast(p=rand_prob * strength)
+    solarize = RandomSolarize(threshold=0.2, p=rand_prob * strength)
+    sharpness = RandomAdjustSharpness(sharpness_factor=2, p=rand_prob * strength)
+    gaussian_blur = transforms.RandomApply([GaussianBlur(kernel_size=(5,5), sigma=(1.0 * strength, 1.0 * strength))], p=rand_prob * strength)
+    random_affine = transforms.RandomApply([RandomAffine(degrees=(-10.0*strength, 10.0*strength), translate=(0.1 * strength, 0.3 * strength))], p=rand_prob * strength)
+    random_resized_crop = transforms.RandomApply([RandomResizedCrop(size=(300,300), scale=(0.08, 1.0), ratio=(0.75, 1.333))], p=rand_prob * strength)
+    random_erasing = RandomErasing(p=rand_prob * strength, scale=(0.02*strength, 0.33*strength), ratio=(0.3*strength, 3.3*strength), value=0, inplace=False)
+
+    strong_aug = [random_horiz_flip, random_vert_flip, gaussian_noise, color_jitter, autocontrast, solarize, sharpness, gaussian_blur, random_affine, random_resized_crop, random_erasing]
+
+    return base_aug + strong_aug
+
+
