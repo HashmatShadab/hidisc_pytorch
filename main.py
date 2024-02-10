@@ -136,20 +136,16 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
                                                           find_unused_parameters=args.distributed.find_unused_params)
 
-    start_epoch = 0
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
-    args.training.num_epochs = args.training.num_epochs - start_epoch
-
-    # Perform evaluation and exit if `eval_only` is set
-    if args.eval_only:
-        # Validate the model
-        validate_clean(validation_loader, model, criterion)
-        return  # Safe exit
-
 
     # Training loop
-    for epoch in range(args.training.num_epochs):
+    for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
+        if args['data']['dynamic_aug']:
+            K = 50
+            strength = 1.0 - int((epoch/K)) * K / args.training.num_epochs
+            train_loader, _ = get_dataloaders(args, strength=strength, dynamic_aug=True)
+
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler,
                                       attack_type=args.training.attack.anme, eps=args.training.attack.eps,
