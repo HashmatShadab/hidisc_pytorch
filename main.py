@@ -145,6 +145,7 @@ def main(args):
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
 
     # Training loop
+    strength = 1.0
     for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
         if args['data']['dynamic_aug']:
@@ -154,13 +155,13 @@ def main(args):
 
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler,
-                                      attack_type=args.training.attack.anme, eps=args.training.attack.eps,
-                                      alpha=args.training.attack.alpha,
-                                      iters=args.training.attack.iters,
+                                      attack_type=args.training.attack.name, attack_eps=args.training.attack.eps,
+                                      attack_alpha=args.training.attack.alpha,
+                                      attack_iters=args.training.attack.iters,
                                       dual_bn=dual_bn,
                                       dynamic_aug=args['data']['dynamic_aug'],
                                       dynamic_strength=strength,
-                                      dynamic_weight_lamda = args['training']['dynamic_weight_lamda'],
+                                      dynamic_weights_lamda=args['training']['dynamic_weights_lamda'],
                                       )
 
         #  Save the checkpoints

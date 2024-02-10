@@ -73,7 +73,7 @@ def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 
 def train_one_epoch(epoch, train_loader, model,
                     optimizer, criterion, scheduler, print_freq=50, attack_type='pgd',
                     attack_eps=1/255, attack_alpha=1/255, attack_iters=7, dual_bn=False,
-                    dynamic_aug=False, dynamic_weight_lamda=0.5, dynamic_strength=1.0):
+                    dynamic_aug=False, dynamic_weights_lamda=0.5, dynamic_strength=1.0):
 
     """
     :param epoch: The current epoch number.
@@ -124,7 +124,7 @@ def train_one_epoch(epoch, train_loader, model,
         clean_loss = clean_losses["sum_loss"]
 
         if dynamic_aug:
-            weight = dynamic_weight_lamda*(1 - dynamic_strength)
+            weight = dynamic_weights_lamda*(1 - dynamic_strength)
         else:
             weight = 0.0
 
