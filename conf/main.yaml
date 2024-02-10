@@ -97,7 +97,7 @@ model:
 
 
 training:
-  dynamic_weights_lamda: 2/3
+  dynamic_weights_lamda: 0.66
   objective:
     which: hidisc
     params:
