@@ -50,8 +50,12 @@ class ContrastiveLearningNetwork(torch.nn.Module):
         self.bb = backbone()
         self.proj = proj()
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        bb_out = self.bb(x)
+    def forward(self, x: torch.Tensor, bn_name) -> torch.Tensor:
+
+        if bn_name is not None:
+            x = self.bb(x, bn_name)
+        else:
+            bb_out = self.bb(x)
         #bb_out_norm = torch.nn.functional.normalize(bb_out, p=2.0, dim=1)
         proj_out = self.proj(bb_out)
         proj_out_norm = torch.nn.functional.normalize(proj_out, p=2.0, dim=1)

@@ -58,13 +58,18 @@ class HiDiscModel(torch.nn.Module):
 
 
 
-    def forward(self, img):
+    def forward(self, img, bn_name=None):
 
-        pred = self.model(img)
+        pred = self.model(img, bn_name)
+
         return pred
 
-    def get_features(self, img):
-        out = self.model.bb(img)
+    def get_features(self, img, bn_name=None):
+
+        if bn_name is not None:
+            out = self.model.bb(img, bn_name)
+        else:
+            out = self.model.bb(img)
         return out
 
 
@@ -107,6 +112,7 @@ def main(args):
     train_loader, validation_loader = get_dataloaders(args)
 
     model = HiDiscModel(args)
+    dual_bn = True if args.model.backbone == "resnet50_multi_bn" else False
     model.to(device="cuda")
 
 
@@ -151,6 +157,7 @@ def main(args):
                                       attack_type=args.training.attack.anme, eps=args.training.attack.eps,
                                       alpha=args.training.attack.alpha,
                                       iters=args.training.attack.iters,
+                                      dual_bn=dual_bn
                                       )
 
         #  Save the checkpoints
