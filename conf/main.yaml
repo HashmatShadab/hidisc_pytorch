@@ -110,6 +110,11 @@ training:
   num_epochs: 40000
   optimizer: adamw # [sgd, adam, adamw]
   learn_rate: 1.0e-3
+  attack:
+      name: "pgd"
+      eps: 8.0
+      alpha: 2.0
+      iters: 5
   scheduler:
     which: cos_warmup
     params:

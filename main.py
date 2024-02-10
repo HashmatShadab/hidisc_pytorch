@@ -151,13 +151,18 @@ def main(args):
     for epoch in range(args.training.num_epochs):
         # Train for one epoch
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
-                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler)
-        # if scheduler:
-        #     scheduler.step()
+                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler,
+                                      attack_type=args.training.attack.anme, eps=args.training.attack.eps,
+                                      alpha=args.training.attack.alpha,
+                                      iters=args.training.attack.iters,
+                                      )
 
         #  Save the checkpoints
         save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
-                           name='checkpoint.pth')
+                           name=f'checkpoint_{epoch+1}.pth')
+
+        save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                           name=f'checkpoint.pth')
 
 
         # Log the epoch stats
@@ -174,7 +179,7 @@ def main(args):
 
 
     if is_main_process():
-       log.info("Hiiii")
+       log.info("Training completed successfully")
 
 if __name__ == "__main__":
     best_certified_accuracy = main()
