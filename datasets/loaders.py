@@ -6,12 +6,21 @@ from torchvision.transforms import Compose
 import torch
 
 
-def get_dataloaders(cf):
+def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
     """Create dataloader for contrastive experiments."""
+
+    if dynamic_aug:
+        train_transform = Compose(get_srh_aug_list(cf["data"]["train_augmentation"], dyanamic_aug=True, strength=strength))
+        val_transform = Compose(get_srh_aug_list(cf["data"]["valid_augmentation"]))
+
+    else:
+        train_transform = Compose(get_srh_aug_list(cf["data"]["train_augmentation"]))
+        val_transform = Compose(get_srh_aug_list(cf["data"]["valid_augmentation"]))
+
     train_dset = HiDiscDataset(
         data_root=cf["data"]["db_root"],
         studies="train",
-        transform=Compose(get_srh_aug_list(cf["data"]["train_augmentation"])),
+        transform=train_transform,
         balance_study_per_class=cf["data"]["balance_study_per_class"],
         num_slide_samples=cf["data"]["hidisc"]["num_slide_samples"],
         num_patch_samples=cf["data"]["hidisc"]["num_patch_samples"],
@@ -19,7 +28,7 @@ def get_dataloaders(cf):
     val_dset = HiDiscDataset(
         data_root=cf["data"]["db_root"],
         studies="val",
-        transform=Compose(get_srh_aug_list(cf["data"]["valid_augmentation"])),
+        transform=val_transform,
         balance_study_per_class=False,
         num_slide_samples=cf["data"]["hidisc"]["num_slide_samples"],
         num_patch_samples=cf["data"]["hidisc"]["num_patch_samples"],
