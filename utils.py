@@ -106,7 +106,7 @@ def save_checkpoints(epoch, model, optimizer, scheduler, train_stats,
         'model': model.state_dict(),
         'optimizer': optimizer.state_dict(),
         'schedule': scheduler.state_dict() if scheduler else None,
-        'loss': train_stats['loss'],
+        'loss': train_stats['total_loss'],
     },
         f"{name}")
 
