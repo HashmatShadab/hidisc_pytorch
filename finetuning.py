@@ -56,9 +56,13 @@ class FineTuneModel(torch.nn.Module):
         self.linear_head = torch.nn.Linear(in_features=backbone.num_out, out_features=num_classes)
 
 
-    def forward(self, img):
+    def forward(self, img, bn_name=None):
 
-        features = self.bb(img)
+        if bn_name is not None:
+            features = self.bb(img, bn_name)
+        else:
+            features = self.bb(img)
+
         logits = self.linear_head(features)
 
         return logits
@@ -99,6 +103,7 @@ def main(args):
     train_loader, validation_loader = get_dataloaders(args)
 
     model = FineTuneModel(args, num_classes=7)
+    dual_bn = True if args.model.backbone == "resnet50_multi_bn" else False
     model.to(device="cuda")
 
     def get_n_params(model):
@@ -168,9 +173,9 @@ def main(args):
     for epoch in range(args.training.num_epochs):
         # Train for one epoch
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
-                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler)
+                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler, dual_bn=dual_bn)
 
-        val_stats = validate_clean(validation_loader, model, criterion)
+        val_stats = validate_clean(validation_loader, model, criterion, dual_bn=dual_bn)
         # if scheduler:
         #     scheduler.step()
 
@@ -196,7 +201,7 @@ def main(args):
 
 
 def train_one_epoch(epoch, train_loader, model,
-                    optimizer, criterion, scheduler, print_freq=50):
+                    optimizer, criterion, scheduler, print_freq=50, dual_bn=False):
 
     """
     :param epoch: The current epoch number.
@@ -236,7 +241,7 @@ def train_one_epoch(epoch, train_loader, model,
         # also fopr attack pass model(images + delta, 'pgd')
 
 
-        clean_outputs = model(im_reshaped)
+        clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
 
         clean_loss = criterion(clean_outputs, targets)
 
@@ -271,7 +276,7 @@ def train_one_epoch(epoch, train_loader, model,
 
 
 
-def validate_clean(val_loader, model, criterion):
+def validate_clean(val_loader, model, criterion, dual_bn=False):
     # Distributed metric logger
     metric_logger = MetricLogger(delimiter="  ")
     header = 'Test:'
@@ -289,7 +294,7 @@ def validate_clean(val_loader, model, criterion):
             targets = batch["label"].to("cuda", non_blocking=True)
 
             # Forward pass to the network
-            outputs = model(im_reshaped)
+            outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
 
 
             # Calculate loss

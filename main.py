@@ -58,13 +58,18 @@ class HiDiscModel(torch.nn.Module):
 
 
 
-    def forward(self, img):
+    def forward(self, img, bn_name=None):
 
-        pred = self.model(img)
+        pred = self.model(img, bn_name)
+
         return pred
 
-    def get_features(self, img):
-        out = self.model.bb(img)
+    def get_features(self, img, bn_name=None):
+
+        if bn_name is not None:
+            out = self.model.bb(img, bn_name)
+        else:
+            out = self.model.bb(img)
         return out
 
 
@@ -107,6 +112,7 @@ def main(args):
     train_loader, validation_loader = get_dataloaders(args)
 
     model = HiDiscModel(args)
+    dual_bn = True if args.model.backbone == "resnet50_multi_bn" else False
     model.to(device="cuda")
 
 
@@ -136,25 +142,22 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
                                                           find_unused_parameters=args.distributed.find_unused_params)
 
-    start_epoch = 0
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
-    args.training.num_epochs = args.training.num_epochs - start_epoch
-
-    # Perform evaluation and exit if `eval_only` is set
-    if args.eval_only:
-        # Validate the model
-        validate_clean(validation_loader, model, criterion)
-        return  # Safe exit
-
 
     # Training loop
-    for epoch in range(args.training.num_epochs):
+    for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
+        if args['data']['dynamic_aug']:
+            K = 50
+            strength = 1.0 - int((epoch/K)) * K / args.training.num_epochs
+            train_loader, _ = get_dataloaders(args, strength=strength, dynamic_aug=True)
+
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler,
                                       attack_type=args.training.attack.anme, eps=args.training.attack.eps,
                                       alpha=args.training.attack.alpha,
                                       iters=args.training.attack.iters,
+                                      dual_bn=dual_bn
                                       )
 
         #  Save the checkpoints
