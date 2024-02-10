@@ -37,9 +37,10 @@ def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
     dataloader_callable = partial(torch.utils.data.DataLoader,
                                   batch_size=cf['training']['batch_size'],
                                   drop_last=False,
-                                  pin_memory=True,
-                                  num_workers=get_num_worker(),
-                                  persistent_workers=True)
+                                  pin_memory=True)
+                                  # num_workers=get_num_worker(),
+                                  # persistent_workers=True)
+
 
     return dataloader_callable(train_dset,
                                shuffle=True), dataloader_callable(val_dset,
