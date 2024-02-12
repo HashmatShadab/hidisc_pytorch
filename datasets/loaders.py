@@ -4,7 +4,7 @@ import os
 from functools import partial
 from torchvision.transforms import Compose
 import torch
-
+from helpers import get_world_size, get_rank
 
 def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
     """Create dataloader for contrastive experiments."""
@@ -34,17 +34,24 @@ def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
         num_patch_samples=cf["data"]["hidisc"]["num_patch_samples"],
         num_transforms=cf["data"]["hidisc"]["num_transforms"])
 
-    dataloader_callable = partial(torch.utils.data.DataLoader,
-                                  batch_size=cf['training']['batch_size'],
-                                  drop_last=False,
-                                  pin_memory=True)
-                                  # num_workers=get_num_worker(),
-                                  # persistent_workers=True)
 
 
-    return dataloader_callable(train_dset,
-                               shuffle=True), dataloader_callable(val_dset,
-                                                                  shuffle=True)
+    if cf['distributed']['distributed']:
+        num_tasks = get_world_size()
+        global_rank = get_rank()
+        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dset, num_replicas=num_tasks, rank=global_rank, shuffle=True)
+        val_sampler = torch.utils.data.distributed.DistributedSampler(val_dset, num_replicas=num_tasks, rank=global_rank, shuffle=True)
+        train_loader = torch.utils.data.DataLoader(train_dset, batch_size=cf['training']['batch_size'], sampler=train_sampler, drop_last=False)
+        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], sampler=val_sampler, drop_last=False)
+
+
+    else:
+
+        train_loader = torch.utils.data.DataLoader(train_dset, batch_size=cf['training']['batch_size'], shuffle=True, drop_last=False)
+        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], shuffle=True, drop_last=False)
+
+    return train_loader, val_loader
+
 
 
 
