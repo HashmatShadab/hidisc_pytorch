@@ -167,8 +167,9 @@ def main(args):
                                       )
 
         #  Save the checkpoints
-        save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
-                           name=f'checkpoint_{epoch+1}.pth')
+        if (epoch + 1) % args.training.save_checkpoint_interval == 0:
+            save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                               name=f'checkpoint_{epoch+1}.pth')
 
         save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
                            name=f'checkpoint.pth')
