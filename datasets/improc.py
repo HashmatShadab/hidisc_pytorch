@@ -238,4 +238,4 @@ def get_dynamic_augs(rand_prob, strength):
     log.info(
         f"RandomErasing with probability {rand_prob * strength}, Erasing scale: {0.02 * strength}, {0.33 * strength}, Erasing ratio: {0.3 * strength}, {3.3 * strength}")
 
-    return transforms.Compose(strong_aug)
+    return strong_aug

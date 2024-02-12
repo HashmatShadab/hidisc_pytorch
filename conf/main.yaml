@@ -10,11 +10,11 @@ eval_only:
 
 
 wandb:
-  project: "my_project"
-  entity: "my_entity"
+  project: "HiDisc"
+  entity: "hashmatshadab"
   mode: "online"
   use:
-  exp_name: "my_exp"
+  exp_name: "main"
 
 
 data:

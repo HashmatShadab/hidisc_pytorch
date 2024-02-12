@@ -26,6 +26,8 @@ def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 
     # delta = torch.clamp(delta, 0 - images, 1 - images)
     # delta.requires_grad = True
 
+    log.info(f"PGD Attack Model is in train mode: {model.training}")
+
     delta = torch.rand_like(images) * eps * 2 - eps
     delta = torch.nn.Parameter(delta)
 
@@ -61,6 +63,8 @@ def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 
         # d = torch.clamp(d, 0 - images_, 1 - images_)
         # delta.data[:, :, :, :] = d
         # delta.grad.zero_()
+        # log the loss at each iteration
+        log.info(f"PGD Attack Loss {_}: {loss.item()}")
 
     # Create final adversarial images
     adv_images = images + delta
@@ -105,15 +109,21 @@ def train_one_epoch(epoch, train_loader, model,
         targets = targets.reshape(-1, 1)
 
         if attack_type == 'pgd':
+            # put model in eval mode to generate adversarial examples
+            model.eval()
             adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
                                     alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
             adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
             adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
             adv_losses = criterion(adv_outputs, targets)
             adv_loss = adv_losses["sum_loss"]
+            # put model back in train mode
+            # print to check if model is back in train mode
+            model.train()
+            logging.info(f"Model is in train mode: {model.training}")
         else:
             adv_loss = 0
-            logging.info("No attack type specified,  Adv loss set to 0.0")
+            log.info("No attack type specified,  Adv loss set to 0.0")
 
 
 
@@ -142,21 +152,24 @@ def train_one_epoch(epoch, train_loader, model,
         # Update the metric logger with clean and adversarial losses
         metric_logger.update(total_loss=total_loss.item())
         metric_logger.update(clean_loss=clean_loss.item())
-        metric_logger.update(adv_loss=adv_loss.item())
 
         # Update the metric logger with individual losses from clean loss
         metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
         metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
         metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
 
+        # Update the metric logger with the weight coefficient
+        metric_logger.update(weight_coefficent=weight)
+
         # Update the metric logger with individual losses from adversarial loss
         if attack_type == 'pgd':
-
+            metric_logger.update(adv_loss=adv_loss.item())
             metric_logger.update(adv_patient_loss=adv_losses["patient_loss"].item())
             metric_logger.update(adv_slide_loss=adv_losses["slide_loss"].item())
             metric_logger.update(adv_patch_loss=adv_losses["patch_loss"].item())
 
         else:
+            metric_logger.update(adv_loss=0.0)
             metric_logger.update(adv_patient_loss=0.0)
             metric_logger.update(adv_slide_loss=0.0)
             metric_logger.update(adv_patch_loss=0.0)

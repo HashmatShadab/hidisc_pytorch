@@ -101,11 +101,9 @@ def main(args):
     if get_rank() == 0 and args.out_dir is not None:
 
         if args.wandb.use:
-            name = args.out_dir.replace("/", "_")
             wandb.init(project=args.wandb.project, entity=args.wandb.entity, mode=args.wandb.mode,
-                       name=name, group=args.wandb.exp_name)
-            config = wandb.config
-            config.update(args)
+                       name=args.wandb.exp_name)
+
 
         log.info(f"Saving output to {os.path.join(os.getcwd())}")
 
