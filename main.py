@@ -150,8 +150,11 @@ def main(args):
         # Train for one epoch
         if args['data']['dynamic_aug']:
             K = 50
+            before_strength = strength
             strength = 1.0 - int((epoch/K)) * K / args.training.num_epochs
-            train_loader, _ = get_dataloaders(args, strength=strength, dynamic_aug=True)
+            if before_strength != strength:
+                train_loader, _ = get_dataloaders(args, strength=strength, dynamic_aug=True)
+                log.info(f"==> [Dynamic Augmentation: Strength changed from {before_strength} to {strength}]")
 
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler,
