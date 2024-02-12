@@ -125,7 +125,8 @@ def main(args):
     parma_list = model.parameters() if update_params is None else update_params
 
     # Define loss, create optimizer and scheduler
-    num_it_per_ep = len(train_loader) // get_world_size()
+    num_it_per_ep = len(train_loader)
+    log.info(f"==> [Number of iterations per epoch: {num_it_per_ep}], Length of train_loader: {len(train_loader)}, world_size: {get_world_size()}]")
     optimizer, scheduler = make_optimizer_and_schedule(args, model, parma_list, num_it_per_ep)
 
     crit_params = args["training"]["objective"]["params"]
