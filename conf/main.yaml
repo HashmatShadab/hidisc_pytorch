@@ -131,7 +131,7 @@ distributed:
   local_rank: -1
   dist_on_itp: False
   dist_url: "env://"
-  find_unused_parameters:
+  find_unused_params:
   rank:
   gpu:
   distributed:
