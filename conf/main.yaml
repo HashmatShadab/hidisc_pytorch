@@ -113,7 +113,7 @@ training:
   optimizer: adamw # [sgd, adam, adamw]
   learn_rate: 1.0e-3
   attack:
-      name: "pgd"
+      name:
       eps: 8.0
       alpha: 2.0
       iters: 5

@@ -20,12 +20,6 @@ def plot_grid(w, save=False, name="grid.png"):
 def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 255, iters=2, dual_bn=False):
 
 
-    # Initialize delta and set its bounds
-    # delta = torch.zeros_like(images).cuda()
-    # delta.uniform_(-eps, eps)
-    # delta = torch.clamp(delta, 0 - images, 1 - images)
-    # delta.requires_grad = True
-
     log.info(f"PGD Attack Model is in train mode: {model.training}")
 
     delta = torch.rand_like(images) * eps * 2 - eps
@@ -33,7 +27,6 @@ def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 
 
     # Attack
     for _ in range(iters):
-        # adv_images = images + delta
         # Forward pass to the model
         if dual_bn:
             outputs = model(images+delta, 'pgd')
@@ -54,15 +47,54 @@ def pgd_attack(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 
         delta.data = torch.clamp(delta.data, min=-eps, max=eps)
         delta.data = torch.clamp(images + delta.data, min=0, max=1) - images
 
-        # grad = delta.grad.detach()
-        # d = delta[:, :, :, :]
-        # g = grad[:, :, :, :]
-        #
-        # images_ = images[:, :, :, :]
-        # d = torch.clamp(d + alpha * torch.sign(g), min=-eps, max=eps)
-        # d = torch.clamp(d, 0 - images_, 1 - images_)
-        # delta.data[:, :, :, :] = d
-        # delta.grad.zero_()
+        log.info(f"PGD Attack Loss {_}: {loss.item()}")
+
+    # Create final adversarial images
+    adv_images = images + delta
+
+    return adv_images.detach()
+
+
+def pgd_attack_2(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 / 255, iters=2, dual_bn=False):
+
+
+    # Initialize delta and set its bounds
+    delta = torch.zeros_like(images).cuda()
+    delta.uniform_(-eps, eps)
+    delta = torch.clamp(delta, 0 - images, 1 - images)
+    delta.requires_grad = True
+
+    log.info(f"PGD Attack Model is in train mode: {model.training}")
+
+
+    # Attack
+    for _ in range(iters):
+        adv_images = images + delta
+        # Forward pass to the model
+        if dual_bn:
+            outputs = model(adv_images, 'pgd')
+        else:
+            outputs = model(adv_images)
+
+        outputs = outputs.reshape(*shape, outputs.shape[-1])
+
+        model.zero_grad()
+
+        losses = criterion(outputs, targets)
+        loss = losses["sum_loss"]
+        # Backpropagate & estimate delta
+        loss.backward()
+
+
+        grad = delta.grad.detach()
+        d = delta[:, :, :, :]
+        g = grad[:, :, :, :]
+
+        images_ = images[:, :, :, :]
+        d = torch.clamp(d + alpha * torch.sign(g), min=-eps, max=eps)
+        d = torch.clamp(d, 0 - images_, 1 - images_)
+        delta.data[:, :, :, :] = d
+        delta.grad.zero_()
         # log the loss at each iteration
         log.info(f"PGD Attack Loss {_}: {loss.item()}")
 
@@ -103,7 +135,7 @@ def train_one_epoch(epoch, train_loader, model,
 
         # Move the tensors to the GPUs
         im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-        # orig_im = batch['base_image'].reshape(-1, *batch['base_image'].shape[-3:])
+        orig_im = batch['base_image'].reshape(-1, *batch['base_image'].shape[-3:])
         im_reshaped = im_reshaped.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
         targets = targets.reshape(-1, 1)
@@ -112,6 +144,20 @@ def train_one_epoch(epoch, train_loader, model,
             # put model in eval mode to generate adversarial examples
             model.eval()
             adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
+                                    alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
+            adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
+            adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
+            adv_losses = criterion(adv_outputs, targets)
+            adv_loss = adv_losses["sum_loss"]
+            # put model back in train mode
+            # print to check if model is back in train mode
+            model.train()
+            logging.info(f"Model is in train mode: {model.training}")
+
+        elif attack_type == 'pgd_2':
+            # put model in eval mode to generate adversarial examples
+            model.eval()
+            adv_images = pgd_attack_2(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
                                     alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
             adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
             adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
@@ -167,12 +213,14 @@ def train_one_epoch(epoch, train_loader, model,
             metric_logger.update(adv_patient_loss=adv_losses["patient_loss"].item())
             metric_logger.update(adv_slide_loss=adv_losses["slide_loss"].item())
             metric_logger.update(adv_patch_loss=adv_losses["patch_loss"].item())
+            metric_logger.update(avg_increase=adv_loss.item() - clean_loss.item())
 
         else:
             metric_logger.update(adv_loss=0.0)
             metric_logger.update(adv_patient_loss=0.0)
             metric_logger.update(adv_slide_loss=0.0)
             metric_logger.update(adv_patch_loss=0.0)
+            metric_logger.update(avg_increase=0.0)
 
 
         # Add LRs to the metric logger ass well
