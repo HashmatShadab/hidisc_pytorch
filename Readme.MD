@@ -1,3 +1,21 @@
+### Requirements
+
+```python
+conda create -n hidisc_ssl
+conda install pytorch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 pytorch-cuda=11.8 -c pytorch -c nvidia
+pip install timm
+pip install wandb
+pip install tifffile
+pip install dill
+pip install hydra-core --upgrade
+pip install matplotlib
+pip install scikit-learn
+pip install tqdm
+pip install torchmetrics
+pip install pandas
+```
+
+
 ### SSL Training
 
 ```python
@@ -27,3 +45,4 @@ training.attack.alpha=2.0 training.attack.iters=5 training.batch_size=10 root=".
 ```
 
 All the logs and checkpoints will be saved in os.path.join(root, out_dir)
+
