@@ -4,6 +4,7 @@ import torch
 import torchvision
 
 from helpers import MetricLogger
+import torch.nn.functional as F
 
 log = logging.getLogger(__name__)
 def plot_grid(w, save=False, name="grid.png"):
@@ -137,6 +138,7 @@ def train_one_epoch(epoch, train_loader, model,
         im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
         orig_im = batch['base_image'].reshape(-1, *batch['base_image'].shape[-3:])
         im_reshaped = im_reshaped.to("cuda", non_blocking=True)
+        orig_im = orig_im.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
         targets = targets.reshape(-1, 1)
 
@@ -146,6 +148,8 @@ def train_one_epoch(epoch, train_loader, model,
             adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
                                     alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
             adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
+            zi_adv = adv_outputs[[int(2 * i) for i in range(adv_outputs.shape[0] // 2)]]
+            zj_adv = adv_outputs[[int(2 * i + 1) for i in range(adv_outputs.shape[0] //2)]]
             adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
             adv_losses = criterion(adv_outputs, targets)
             adv_loss = adv_losses["sum_loss"]
@@ -160,6 +164,8 @@ def train_one_epoch(epoch, train_loader, model,
             adv_images = pgd_attack_2(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
                                     alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
             adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
+            zi_adv = adv_outputs[[int(2 * i) for i in range(adv_outputs.shape[0] // 2)]]
+            zj_adv = adv_outputs[[int(2 * i + 1) for i in range(adv_outputs.shape[0] // 2)]]
             adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
             adv_losses = criterion(adv_outputs, targets)
             adv_loss = adv_losses["sum_loss"]
@@ -171,20 +177,31 @@ def train_one_epoch(epoch, train_loader, model,
             adv_loss = 0
             log.info("No attack type specified,  Adv loss set to 0.0")
 
-
+        z_orig = model(orig_im, 'normal') if dual_bn else model(orig_im)
 
         clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
+        zi = clean_outputs[[int(2 * i) for i in range(clean_outputs.shape[0] //2)]]
+        zj = clean_outputs[[int(2 * i + 1) for i in range(clean_outputs.shape[0] // 2)]]
         clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
 
         clean_losses = criterion(clean_outputs, targets)
         clean_loss = clean_losses["sum_loss"]
+
+        # reshape zi, zj, z_orig, zi_adv, zj_adv into (bs, -1)
+        zi = zi.reshape(zi.shape[0], -1)
+        zj = zj.reshape(zj.shape[0], -1)
+        z_orig = z_orig.reshape(z_orig.shape[0], -1)
+        zi_adv = zi_adv.reshape(zi_adv.shape[0], -1)
+        zj_adv = zj_adv.reshape(zj_adv.shape[0], -1)
+
+        sir_loss, air_loss = reg_loss_(z_orig, zi, zi_adv, zj, zj_adv)
 
         if dynamic_aug:
             weight = dynamic_weights_lamda*(1 - dynamic_strength)
         else:
             weight = 0.0
 
-        total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
+        total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss + 0.5*sir_loss + 0.5*air_loss
 
 
         optimizer.zero_grad()
@@ -203,6 +220,8 @@ def train_one_epoch(epoch, train_loader, model,
         metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
         metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
         metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
+        metric_logger.update(sir_loss=sir_loss.item())
+        metric_logger.update(air_loss=air_loss.item())
 
         # Update the metric logger with the weight coefficient
         metric_logger.update(weight_coefficent=weight)
@@ -237,3 +256,73 @@ def train_one_epoch(epoch, train_loader, model,
     # log.info(f"Average stats: {metric_logger}")
 
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+
+
+def reg_loss(zo_norm, zi_norm, zi_adv_norm, zj_norm, zj_adv_norm, temp=0.5):
+
+
+    bs = zi_norm.shape[0]
+    mask = torch.ones((bs, bs), dtype=bool).fill_diagonal_(0)
+
+    ### Standard Invariant Regularization (Implementation follows https://github.com/NightShade99/Self-Supervised-Vision/blob/42183d391f51c60383ff0cb044e2d71379aa7461/utils/losses.py#L154) ###
+    logits_io = torch.mm(zi_norm, zo_norm.t()) / temp
+    logits_jo = torch.mm(zj_norm, zo_norm.t()) / temp
+    probs_io_zi = F.softmax(logits_io[torch.logical_not(mask)], -1)
+    probs_jo_zj = F.log_softmax(logits_jo[torch.logical_not(mask)], -1)
+    SIR_loss = F.kl_div(probs_io_zi, probs_jo_zj, log_target=True, reduction="sum")
+
+    ### Adversarial Invariant Regularization ###
+    logits_io = torch.mm(zi_adv_norm, zi_norm.t()) / temp
+    logits_jo = torch.mm(zj_adv_norm, zj_norm.t()) / temp
+    probs_io_zi_adv_consis = F.softmax(logits_io[torch.logical_not(mask)], -1)
+    probs_jo_zj_adv_consis = F.softmax(logits_jo[torch.logical_not(mask)], -1)
+
+    logits_io = torch.mm(zi_adv_norm, zo_norm.t()) / temp
+    logits_jo = torch.mm(zj_adv_norm, zo_norm.t()) / temp
+    probs_io_zi_adv = F.softmax(logits_io[torch.logical_not(mask)], -1)
+    probs_jo_zj_adv = F.softmax(logits_jo[torch.logical_not(mask)], -1)
+
+    probs_io_zi_adv = torch.mul(probs_io_zi_adv, probs_io_zi_adv_consis)
+    probs_jo_zj_adv = torch.mul(probs_jo_zj_adv, probs_jo_zj_adv_consis)
+    AIR_loss = F.kl_div(probs_io_zi_adv, torch.log(probs_jo_zj_adv), log_target=True, reduction="sum")
+
+
+    return SIR_loss, AIR_loss
+
+
+def reg_loss_(zo_norm, zi_norm, zi_adv_norm, zj_norm, zj_adv_norm, temp=0.5):
+
+
+    bs = zi_norm.shape[0]
+    mask = torch.ones((bs, bs), dtype=bool).fill_diagonal_(0)
+
+    ### Standard Invariant Regularization (Implementation follows https://github.com/NightShade99/Self-Supervised-Vision/blob/42183d391f51c60383ff0cb044e2d71379aa7461/utils/losses.py#L154) ###
+    logits_io = torch.mm(zi_norm, zo_norm.t()) / temp
+    logits_jo = torch.mm(zj_norm, zo_norm.t()) / temp
+    # get log probabilities
+    log_probs_io_zi = F.log_softmax(logits_io[torch.logical_not(mask)], -1)
+    log_probs_jo_zj = F.log_softmax(logits_jo[torch.logical_not(mask)], -1)
+    SIR_loss = F.kl_div(log_probs_io_zi, log_probs_jo_zj, log_target=True, reduction="sum")
+
+
+    ### Adversarial Invariant Regularization ###
+    logits_io = torch.mm(zi_adv_norm, zi_norm.t()) / temp
+    logits_jo = torch.mm(zj_adv_norm, zj_norm.t()) / temp
+    probs_io_zi_adv_consis = F.softmax(logits_io[torch.logical_not(mask)], -1)
+    probs_jo_zj_adv_consis = F.softmax(logits_jo[torch.logical_not(mask)], -1)
+
+    logits_io = torch.mm(zi_adv_norm, zo_norm.t()) / temp
+    logits_jo = torch.mm(zj_adv_norm, zo_norm.t()) / temp
+    probs_io_zi_adv = F.softmax(logits_io[torch.logical_not(mask)], -1)
+    probs_jo_zj_adv = F.softmax(logits_jo[torch.logical_not(mask)], -1)
+
+    probs_io_zi_adv = torch.mul(probs_io_zi_adv, probs_io_zi_adv_consis)
+    probs_jo_zj_adv = torch.mul(probs_jo_zj_adv, probs_jo_zj_adv_consis)
+    # get log probabilities
+    log_probs_io_zi_adv = F.log_softmax(probs_io_zi_adv, -1)
+    log_probs_jo_zj_adv = F.log_softmax(probs_jo_zj_adv, -1)
+    AIR_loss = F.kl_div(log_probs_io_zi_adv, log_probs_jo_zj_adv, log_target=True, reduction="sum")
+
+
+
+    return SIR_loss, AIR_loss
