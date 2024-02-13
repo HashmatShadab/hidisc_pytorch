@@ -339,7 +339,7 @@ class HiDiscDataset(Dataset):
                 one_patient_instance.append(si)
 
         logging.info(
-            f"patient {patient} total slides {len(one_patient_instance)}")
+            f"patient {patient} total slides {len(one_patient_instance)}, total patches {sum([len(i) for i in one_patient_instance])}")
         return one_patient_instance
 
     def process_classes(self):
@@ -376,6 +376,11 @@ class HiDiscDataset(Dataset):
         all_labels = [i[1] for i in self.instances_]
         val_sample = max(Counter(all_labels).values())
 
+        logging.info(f"Total instances/patients : {len(all_labels)}")
+        # print count of each class before balancing
+        count = Counter(all_labels)
+        logging.info(f"Count of patient class before balancing: {count}")
+        self.get_patch_info(all_labels)
         all_instances_ = []
         for l in sorted(set(all_labels)):
             instances_l = [i for i in self.instances_ if i[1] == l]
@@ -384,7 +389,23 @@ class HiDiscDataset(Dataset):
             all_instances_.extend(sorted(instances_l[:val_sample]))
 
         self.instances_ = all_instances_
+        # print count of each class after balancing
+        all_labels = [i[1] for i in self.instances_]
+        count = Counter(all_labels)
+        logging.info(f"Count of patient class after balancing: {count}")
+        # also print total patches after balancing
+        self.get_patch_info(all_labels)
         return
+
+    def get_patch_info(self, all_labels):
+        for l in sorted(set(all_labels)):
+            instances_l = [i[0] for i in self.instances_ if i[1] == l]
+
+            count = 0
+            for instance in instances_l:
+                for slide in instance:
+                    count += len(slide)
+            logging.info(f"Class {l} : {count} patches")
 
     def read_images_slide(self, inst: List[Tuple]):
         """Read in a list of patches, different patches and transformations"""
