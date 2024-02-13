@@ -167,13 +167,13 @@ def main(args):
                                       )
 
         #  Save the checkpoints
-        if (epoch + 1) % args.training.save_checkpoint_interval == 0:
+        if (epoch + 1) % args.training.save_checkpoint_interval == 0 and is_main_process():
             save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
                                name=f'checkpoint_{epoch+1}.pth')
 
-        save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
-                           name=f'checkpoint.pth')
-
+        if is_main_process():
+            save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                               name=f'checkpoint.pth')
 
         # Log the epoch stats
         log_stats_train = {
@@ -192,4 +192,4 @@ def main(args):
        log.info("Training completed successfully")
 
 if __name__ == "__main__":
-    best_certified_accuracy = main()
+    main()

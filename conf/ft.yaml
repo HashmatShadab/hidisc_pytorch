@@ -18,7 +18,7 @@ wandb:
 
 
 data:
-  db_root: F:\Downloads\hidisc_data
+  db_root: D:\hidisc_data
   train_augmentation:
     - which: random_horiz_flip
       params: {}
