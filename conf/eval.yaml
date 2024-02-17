@@ -1,7 +1,9 @@
 
 seed: 1000
 data:
-    db_root:  D:\hidisc_data
+  db_root: F:\Code\datasets\hidisc_data_small
+  meta_json: "opensrh.json"
+  meta_split_json: "train_val_split.json"
 
 root: "."
 out_dir: "EVAL_DIR"
