@@ -125,7 +125,6 @@ training:
       num_warmup_steps: 0.1
       num_cycles: 0.5
   imagenet_backbone_checkpoint: null
-  eval_ckpt_ep_freq: 400
   save_checkpoint_interval: 1000
 
 distributed:
