@@ -18,7 +18,9 @@ wandb:
 
 
 data:
-  db_root: D:\hidisc_data
+  db_root: F:\Code\datasets\hidisc_data_small
+  meta_json: "opensrh.json"
+  meta_split_json: "train_val_split.json"
   train_augmentation:
     - which: random_horiz_flip
       params: {}

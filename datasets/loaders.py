@@ -19,6 +19,8 @@ def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
 
     train_dset = HiDiscDataset(
         data_root=cf["data"]["db_root"],
+        meta_json=cf["data"]["meta_json"],
+        meta_split_json=cf["data"]["meta_split_json"],
         studies="train",
         transform=train_transform,
         balance_study_per_class=cf["data"]["balance_study_per_class"],
@@ -27,6 +29,8 @@ def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
         num_transforms=cf["data"]["hidisc"]["num_transforms"])
     val_dset = HiDiscDataset(
         data_root=cf["data"]["db_root"],
+        meta_json=cf["data"]["meta_json"],
+        meta_split_json=cf["data"]["meta_split_json"],
         studies="val",
         transform=val_transform,
         balance_study_per_class=False,

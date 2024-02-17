@@ -219,7 +219,9 @@ class HiDiscDataset(Dataset):
                  transform: callable = Compose(get_srh_base_aug()),
                  target_transform: callable = torch.tensor,
                  balance_study_per_class: bool = False,
-                 check_images_exist: bool = False) -> None:
+                 check_images_exist: bool = False,
+                 meta_json="opensrh.json",
+                 meta_split_json="train_val_split.json") -> None:
         """Initializes the HiDisc Dataset for OpenSRH
 
         Populate each attribute and walk through slides to look for patches.
@@ -248,6 +250,8 @@ class HiDiscDataset(Dataset):
         self.num_slide_samples_ = num_slide_samples
         self.num_patch_samples_ = num_patch_samples
         self.num_transforms_ = num_transforms
+        self.meta_json = meta_json
+        self.meta_split_json = meta_split_json
         self.get_all_meta()
         self.get_study_list(studies)
 
@@ -266,7 +270,7 @@ class HiDiscDataset(Dataset):
 
         try:
             with open(os.path.join(self.data_root_,
-                                   "meta/opensrh.json")) as fd:
+                                   f"meta/{self.meta_json}")) as fd:
                 self.metadata_ = json.load(fd)
         except Exception as e:
             logging.critical("Failed to locate dataset.")
@@ -283,7 +287,7 @@ class HiDiscDataset(Dataset):
             try:
                 with open(
                         os.path.join(self.data_root_,
-                                     "meta/train_val_split.json")) as fd:
+                                     f"meta/{self.meta_split_json}")) as fd:
                     train_val_split = json.load(fd)
             except Exception as e:
                 logging.critical("Failed to locate preset train/val split.")
