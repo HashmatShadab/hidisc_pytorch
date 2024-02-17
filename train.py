@@ -152,7 +152,7 @@ def train_one_epoch(epoch, train_loader, model,
             # put model back in train mode
             # print to check if model is back in train mode
             model.train()
-            logging.info(f"Model is in train mode: {model.training}")
+            # logging.info(f"Model is in train mode: {model.training}")
 
         elif attack_type == 'pgd_2':
             # put model in eval mode to generate adversarial examples
@@ -166,10 +166,10 @@ def train_one_epoch(epoch, train_loader, model,
             # put model back in train mode
             # print to check if model is back in train mode
             model.train()
-            logging.info(f"Model is in train mode: {model.training}")
+            # logging.info(f"Model is in train mode: {model.training}")
         else:
             adv_loss = 0
-            log.info("No attack type specified,  Adv loss set to 0.0")
+            # log.info("No attack type specified,  Adv loss set to 0.0")
 
 
 
@@ -208,7 +208,7 @@ def train_one_epoch(epoch, train_loader, model,
         metric_logger.update(weight_coefficent=weight)
 
         # Update the metric logger with individual losses from adversarial loss
-        if attack_type == 'pgd':
+        if attack_type == 'pgd' or attack_type == 'pgd_2':
             metric_logger.update(adv_loss=adv_loss.item())
             metric_logger.update(adv_patient_loss=adv_losses["patient_loss"].item())
             metric_logger.update(adv_slide_loss=adv_losses["slide_loss"].item())
