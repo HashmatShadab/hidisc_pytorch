@@ -1,14 +1,13 @@
 #!/bin/bash
 
-DATA_PATH="F:\Code\datasets\hidisc_data_small"
-
-model_backbone=${1:-"resnet50"}
-NUM_GPUS=${2:-1}
-BATCH_SIZE=${3:-10}
-attack=${4:-"pgd_2"}
-attack_eps=${5:-8}
-dynamic_aug=${6:-"False"}
-wandb_use=${7:-"False"}
+DATA_PATH=${1:-"F:\Code\datasets\hidisc_data_small"}
+model_backbone=${2:-"resnet50"}
+NUM_GPUS=${3:-1}
+BATCH_SIZE=${4:-10}
+attack=${5:-"pgd_2"}
+attack_eps=${6:-8}
+dynamic_aug=${7:-"False"}
+wandb_use=${8:-"False"}
 
 
 
