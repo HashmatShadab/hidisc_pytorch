@@ -204,8 +204,9 @@ def train_one_epoch(epoch, train_loader, model,
         metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
         metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
 
-        # Update the metric logger with the weight coefficient
+        # Update the metric logger with the weight coefficient and strength
         metric_logger.update(weight_coefficent=weight)
+        metric_logger.update(strength=dynamic_strength)
 
         # Update the metric logger with individual losses from adversarial loss
         if attack_type == 'pgd' or attack_type == 'pgd_2':
