@@ -15,7 +15,7 @@ echo "Running Baseline for $model_backbone with $NUM_GPUS GPUs and batch size $B
 wandb_exp_name="Baseline_backbone_${model_backbone}__dynamic_aug_${dynamic_aug}"
 out_dir="Results/Baseline/${model_backbone}"
 
-torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=$DATA_PATH data.dynamic_aug=$dynamic_aug model.backbone=resnet50 \
+torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=$DATA_PATH data.dynamic_aug=$dynamic_aug model.backbone=$model_backbone \
 training.attack.name=$attack training.batch_size=$BATCH_SIZE  out_dir=$out_dir \
 wandb.exp_name=$wandb_exp_name wandb.use=$wandb_use
 
