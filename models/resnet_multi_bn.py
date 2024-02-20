@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
+# from torchvision.models.utils import load_state_dict_from_url
 from torch.hub import load_state_dict_from_url
-from .multi_bn_utils import NormalizeByChannelMeanStd
-
+from pdb import set_trace
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152', 'resnext50_32x4d', 'resnext101_32x8d',
            'wide_resnet50_2', 'wide_resnet101_2']
-
 
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
@@ -256,8 +255,6 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], bn_names=self.bn_names,
                                        stride=2, dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.num_out = 512 * block.expansion
-        # self.fc = nn.Linear(512 * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -319,11 +316,7 @@ class ResNet(nn.Module):
 
         x = self.avgpool(x[0])
         x = torch.flatten(x, 1)
-        
-        # if isinstance(self.fc, proj_head):
-        #     x = self.fc(x, bn_name)
-        # else:
-        #     x = self.fc(x)
+
 
         return x
 
@@ -354,6 +347,7 @@ class ResNet(nn.Module):
         x = torch.flatten(x, 1)
         feature = x
         return feature
+
 
 def _resnet(arch, block, layers, pretrained, progress, **kwargs):
     model = ResNet(block, layers, **kwargs)
@@ -487,12 +481,3 @@ def wide_resnet101_2(pretrained=False, progress=True, **kwargs):
     return _resnet('wide_resnet101_2', Bottleneck, [3, 4, 23, 3],
                    pretrained, progress, **kwargs)
 
-
-
-
-if __name__ == "__main__":
-    # test
-    model = resnet50(pretrained=False, progress=True, bn_names=["normal", "pgd"])
-    image = torch.randn(1, 3, 224, 224)
-    output = model(image, bn_name="normal")
-    print(model)
