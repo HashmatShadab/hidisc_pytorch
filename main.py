@@ -147,6 +147,8 @@ def main(args):
         model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
+
+        args.distributed.find_unused_params = True if args.model.backbone == "resnet_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
                                                           find_unused_parameters=args.distributed.find_unused_params,
                                                           broadcast_buffers=False)
