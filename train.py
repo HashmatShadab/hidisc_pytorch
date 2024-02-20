@@ -216,7 +216,7 @@ def train_one_epoch(epoch, train_loader, model,
             metric_logger.update(adv_patient_loss=adv_losses["patient_loss"].item())
             metric_logger.update(adv_slide_loss=adv_losses["slide_loss"].item())
             metric_logger.update(adv_patch_loss=adv_losses["patch_loss"].item())
-            metric_logger.update(avg_increase=adv_loss.item() - clean_loss.item())
+            # metric_logger.update(avg_increase=adv_loss.item() - clean_loss.item())
 
         else:
             metric_logger.update(adv_loss=0.0)
