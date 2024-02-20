@@ -136,6 +136,8 @@ def main(args):
         lambda_patch=crit_params["lambda_patch"],
         supcon_loss_params=crit_params["supcon_params"])
 
+    # synchronize batch norm layers
+    model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
