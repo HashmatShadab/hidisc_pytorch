@@ -199,7 +199,7 @@ def train_one_epoch(epoch, train_loader, model,
 
         # Update the metric logger with clean and adversarial losses
         metric_logger.update(total_loss=total_loss.item())
-        metric_logger.update(clean_loss=clean_loss.item())
+        # metric_logger.update(clean_loss=clean_loss.item())
 
         # # Update the metric logger with individual losses from clean loss
         # metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
