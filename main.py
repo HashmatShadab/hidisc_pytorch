@@ -141,7 +141,8 @@ def main(args):
 
     if args.distributed.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
-                                                          find_unused_parameters=args.distributed.find_unused_params)
+                                                          find_unused_parameters=args.distributed.find_unused_params,
+                                                          broadcast_buffers=False)
 
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
 

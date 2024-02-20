@@ -171,26 +171,31 @@ def train_one_epoch(epoch, train_loader, model,
             adv_loss = 0
             # log.info("No attack type specified,  Adv loss set to 0.0")
 
-
-
-        # clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
-        # clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
-        #
-        # clean_losses = criterion(clean_outputs, targets)
-        # clean_loss = clean_losses["sum_loss"]
-
-        clean_loss = 0
-
         if dynamic_aug:
-            weight = dynamic_weights_lamda*(1 - dynamic_strength)
+            weight = dynamic_weights_lamda * (1 - dynamic_strength)
         else:
             weight = 0.0
 
-        total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
+
+
+
+        clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
+        clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
+
+        clean_losses = criterion(clean_outputs, targets)
+        clean_loss = clean_losses["sum_loss"]
+
+        weighted_clean_loss = (1 - weight) * clean_loss
+        weighted_clean_loss.backward()
+
+        total_loss = (1 - weight) * clean_loss + (1 + weight) * adv_loss
+
+
+
 
 
         optimizer.zero_grad()
-        total_loss.backward()
+        # total_loss.backward()
         optimizer.step()
         scheduler.step()
 
@@ -199,12 +204,12 @@ def train_one_epoch(epoch, train_loader, model,
 
         # Update the metric logger with clean and adversarial losses
         metric_logger.update(total_loss=total_loss.item())
-        # metric_logger.update(clean_loss=clean_loss.item())
+        metric_logger.update(clean_loss=clean_loss.item())
 
-        # # Update the metric logger with individual losses from clean loss
-        # metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
-        # metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
-        # metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
+        # Update the metric logger with individual losses from clean loss
+        metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
+        metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
+        metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
 
         # Update the metric logger with the weight coefficient and strength
         metric_logger.update(weight_coefficent=weight)
@@ -216,7 +221,7 @@ def train_one_epoch(epoch, train_loader, model,
             metric_logger.update(adv_patient_loss=adv_losses["patient_loss"].item())
             metric_logger.update(adv_slide_loss=adv_losses["slide_loss"].item())
             metric_logger.update(adv_patch_loss=adv_losses["patch_loss"].item())
-            # metric_logger.update(avg_increase=adv_loss.item() - clean_loss.item())
+            metric_logger.update(avg_increase=adv_loss.item() - clean_loss.item())
 
         else:
             metric_logger.update(adv_loss=0.0)
