@@ -16,7 +16,7 @@ from datasets.loaders import get_dataloaders
 from helpers import init_distributed_mode, get_rank, is_main_process, get_world_size, setup_seed
 from losses.hidisc import HiDiscLoss
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
-from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
+from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
 from models import resnetv2_50, resnetv2_50_gn
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
@@ -58,7 +58,7 @@ class HiDiscModel(torch.nn.Module):
             raise NotImplementedError()
 
         mlp = partial(MLP,
-                      n_in=bb().num_out,
+                      n_in=2048,
                       hidden_layers=cf["model"]["mlp_hidden"],
                       n_out=cf["model"]["num_embedding_out"])
         self.model = ContrastiveLearningNetwork(bb, mlp)
