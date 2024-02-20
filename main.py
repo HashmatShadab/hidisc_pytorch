@@ -155,16 +155,18 @@ def main(args):
                 train_loader, _ = get_dataloaders(args, strength=strength, dynamic_aug=True)
                 log.info(f"==> [Dynamic Augmentation: Strength changed from {before_strength} to {strength}]")
 
-        train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
-                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler,
-                                      attack_type=args.training.attack.name, attack_eps=args.training.attack.eps,
-                                      attack_alpha=args.training.attack.alpha,
-                                      attack_iters=args.training.attack.iters,
-                                      dual_bn=dual_bn,
-                                      dynamic_aug=args['data']['dynamic_aug'],
-                                      dynamic_strength=strength,
-                                      dynamic_weights_lamda=args['training']['dynamic_weights_lamda'],
-                                      )
+        with torch.autograd.set_detect_anomaly(True):
+
+            train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
+                                          optimizer=optimizer, criterion=criterion, scheduler=scheduler,
+                                          attack_type=args.training.attack.name, attack_eps=args.training.attack.eps,
+                                          attack_alpha=args.training.attack.alpha,
+                                          attack_iters=args.training.attack.iters,
+                                          dual_bn=dual_bn,
+                                          dynamic_aug=args['data']['dynamic_aug'],
+                                          dynamic_strength=strength,
+                                          dynamic_weights_lamda=args['training']['dynamic_weights_lamda'],
+                                          )
 
         #  Save the checkpoints
         if (epoch + 1) % args.training.save_checkpoint_interval == 0 and is_main_process():
