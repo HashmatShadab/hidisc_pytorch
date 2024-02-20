@@ -17,10 +17,13 @@ from helpers import init_distributed_mode, get_rank, is_main_process, get_world_
 from losses.hidisc import HiDiscLoss
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
+from models import resnetv2_50, resnetv2_50_gn
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from ft_validate import validate_clean
 from utils import save_checkpoints, restart_from_checkpoint
+from timm.layers import convert_sync_batchnorm
+
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +50,10 @@ class HiDiscModel(torch.nn.Module):
             bb = partial(resnet_backbone, arch=cf["model"]["backbone"])
         elif cf["model"]["backbone"] == "resnet50_multi_bn":
             bb = partial(resnet50_multi_bn)
+        elif cf["model"]["backbone"] == "resnetv2_50":
+            bb = partial(resnetv2_50)
+        elif cf["model"]["backbone"] == "resnetv2_50_gn":
+            bb = partial(resnetv2_50_gn)
         else:
             raise NotImplementedError()
 
@@ -136,6 +143,8 @@ def main(args):
         lambda_patch=crit_params["lambda_patch"],
         supcon_loss_params=crit_params["supcon_params"])
 
+    if args.model.backbone == "resnetv2_50":
+        model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
