@@ -23,6 +23,7 @@ from train import train_one_epoch
 from ft_validate import validate_clean
 from utils import save_checkpoints, restart_from_checkpoint
 from timm.layers import convert_sync_batchnorm
+from torch.cuda.amp import GradScaler
 
 
 log = logging.getLogger(__name__)
@@ -143,7 +144,11 @@ def main(args):
         lambda_patch=crit_params["lambda_patch"],
         supcon_loss_params=crit_params["supcon_params"])
 
-    if args.model.backbone == "resnetv2_50":
+    # Gradient scaler
+    grad_scaler = GradScaler()
+    # model in float16
+
+    if args.model.backbone == "resnetv2_50" or args.model.backbone == "resnet50":
         model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
@@ -176,6 +181,7 @@ def main(args):
                                       dynamic_aug=args['data']['dynamic_aug'],
                                       dynamic_strength=strength,
                                       dynamic_weights_lamda=args['training']['dynamic_weights_lamda'],
+                                      grad_scaler=grad_scaler,
                                       )
 
         #  Save the checkpoints
