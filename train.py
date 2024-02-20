@@ -2,7 +2,6 @@ import logging
 
 import torch
 import torchvision
-from torch.cuda.amp import autocast
 
 from helpers import MetricLogger
 
@@ -110,7 +109,7 @@ def pgd_attack_2(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 
 def train_one_epoch(epoch, train_loader, model,
                     optimizer, criterion, scheduler, print_freq=50, attack_type='pgd',
                     attack_eps=1/255, attack_alpha=1/255, attack_iters=7, dual_bn=False,
-                    dynamic_aug=False, dynamic_weights_lamda=0.5, dynamic_strength=1.0, grad_scaler=None):
+                    dynamic_aug=False, dynamic_weights_lamda=0.5, dynamic_strength=1.0):
 
     """
     :param epoch: The current epoch number.
@@ -141,67 +140,60 @@ def train_one_epoch(epoch, train_loader, model,
         targets = batch["label"].to("cuda", non_blocking=True)
         targets = targets.reshape(-1, 1)
 
-        with autocast():
-            if attack_type == 'pgd':
-                # put model in eval mode to generate adversarial examples
-                model.eval()
-                adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
-                                        alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
-                adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
-                adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
-                adv_losses = criterion(adv_outputs, targets)
-                adv_loss = adv_losses["sum_loss"]
-                # put model back in train mode
-                # print to check if model is back in train mode
-                model.train()
-                # logging.info(f"Model is in train mode: {model.training}")
+        if attack_type == 'pgd':
+            # put model in eval mode to generate adversarial examples
+            model.eval()
+            adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
+                                    alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
+            adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
+            adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
+            adv_losses = criterion(adv_outputs, targets)
+            adv_loss = adv_losses["sum_loss"]
+            # put model back in train mode
+            # print to check if model is back in train mode
+            model.train()
+            # logging.info(f"Model is in train mode: {model.training}")
 
-            elif attack_type == 'pgd_2':
-                # put model in eval mode to generate adversarial examples
-                model.eval()
-                adv_images = pgd_attack_2(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
-                                        alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
-                adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
-                adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
-                adv_losses = criterion(adv_outputs, targets)
-                adv_loss = adv_losses["sum_loss"]
-                # put model back in train mode
-                # print to check if model is back in train mode
-                model.train()
-                # logging.info(f"Model is in train mode: {model.training}")
-            else:
-                adv_loss = 0
-                # log.info("No attack type specified,  Adv loss set to 0.0")
-
+        elif attack_type == 'pgd_2':
+            # put model in eval mode to generate adversarial examples
+            model.eval()
+            adv_images = pgd_attack_2(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
+                                    alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
+            adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
+            adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
+            adv_losses = criterion(adv_outputs, targets)
+            adv_loss = adv_losses["sum_loss"]
+            # put model back in train mode
+            # print to check if model is back in train mode
+            model.train()
+            # logging.info(f"Model is in train mode: {model.training}")
+        else:
+            adv_loss = 0
+            # log.info("No attack type specified,  Adv loss set to 0.0")
 
 
-            clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
-            clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
 
-            clean_losses = criterion(clean_outputs, targets)
-            clean_loss = clean_losses["sum_loss"]
+        clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
+        clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
 
-            if dynamic_aug:
-                weight = dynamic_weights_lamda*(1 - dynamic_strength)
-            else:
-                weight = 0.0
+        clean_losses = criterion(clean_outputs, targets)
+        clean_loss = clean_losses["sum_loss"]
 
-            if attack_type == 'pgd' or attack_type == 'pgd_2':
-                total_loss = ((1 - weight)*clean_loss + (1 + weight)*adv_loss) / 2
-            else:
-                total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
+        if dynamic_aug:
+            weight = dynamic_weights_lamda*(1 - dynamic_strength)
+        else:
+            weight = 0.0
+
+        if attack_type == 'pgd' or attack_type == 'pgd_2':
+            total_loss = ((1 - weight)*clean_loss + (1 + weight)*adv_loss) / 2
+        else:
+            total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
 
 
-            optimizer.zero_grad()
-            if grad_scaler is not None:
-                grad_scaler.scale(total_loss).backward()
-                grad_scaler.step(optimizer)
-
-        grad_scaler.update()
-
-        # total_loss.backward()
-        # optimizer.step()
-        # scheduler.step()
+        optimizer.zero_grad()
+        total_loss.backward()
+        optimizer.step()
+        scheduler.step()
 
         # Synchronize
         torch.cuda.synchronize()
