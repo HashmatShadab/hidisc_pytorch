@@ -13,12 +13,19 @@ wandb_use=${8:-"False"}
 
 echo "Running Adv Training for $model_backbone with $NUM_GPUS GPUs and batch size $BATCH_SIZE"
 
+param="False"
+# if model_backbone == resnet50_multi_bn, theen set flag to True
+if [ $model_backbone == "resnet50_multi_bn" ]
+then
+    param="True"
+fi
+
 wandb_exp_name="Adv_backbone_${model_backbone}_attack_${attack}_eps_{$attack_eps}_dynamic_aug_${dynamic_aug}"
 out_dir="Results/Adv/${model_backbone}_attack_${attack}_eps_{$attack_eps}_dynaug_${dynamic_aug}"
 
 torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py  data.db_root=$DATA_PATH data.dynamic_aug=$dynamic_aug model.backbone=$model_backbone \
 training.attack.name=$attack training.attack.eps=$attack_eps training.batch_size=$BATCH_SIZE  out_dir=$out_dir \
-wandb.exp_name=$wandb_exp_name wandb.use=$wandb_use
+wandb.exp_name=$wandb_exp_name wandb.use=$wandb_use distributed.find_unused_params=$param
 
 
 
