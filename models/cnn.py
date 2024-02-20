@@ -53,7 +53,7 @@ class ContrastiveLearningNetwork(torch.nn.Module):
     def forward(self, x: torch.Tensor, bn_name) -> torch.Tensor:
 
         if bn_name is not None:
-            x = self.bb(x, bn_name)
+            bb_out = self.bb(x, bn_name)
         else:
             bb_out = self.bb(x)
         #bb_out_norm = torch.nn.functional.normalize(bb_out, p=2.0, dim=1)
