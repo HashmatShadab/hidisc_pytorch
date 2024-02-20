@@ -49,7 +49,7 @@ class HiDiscModel(torch.nn.Module):
         if cf["model"]["backbone"] == "resnet50":
             bb = partial(resnet_backbone, arch=cf["model"]["backbone"])
         elif cf["model"]["backbone"] == "resnet50_multi_bn":
-            bb = partial(resnet50_multi_bn)
+            bb = partial(resnet50_multi_bn, bn_names=["normal", "pgd"])
         elif cf["model"]["backbone"] == "resnetv2_50":
             bb = partial(resnetv2_50)
         elif cf["model"]["backbone"] == "resnetv2_50_gn":
