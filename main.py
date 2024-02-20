@@ -16,11 +16,14 @@ from datasets.loaders import get_dataloaders
 from helpers import init_distributed_mode, get_rank, is_main_process, get_world_size, setup_seed
 from losses.hidisc import HiDiscLoss
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
-from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
+from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
+from models import resnetv2_50, resnetv2_50_gn
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from ft_validate import validate_clean
 from utils import save_checkpoints, restart_from_checkpoint
+from timm.layers import convert_sync_batchnorm
+
 
 log = logging.getLogger(__name__)
 
@@ -46,12 +49,16 @@ class HiDiscModel(torch.nn.Module):
         if cf["model"]["backbone"] == "resnet50":
             bb = partial(resnet_backbone, arch=cf["model"]["backbone"])
         elif cf["model"]["backbone"] == "resnet50_multi_bn":
-            bb = partial(resnet50_multi_bn)
+            bb = partial(resnet50_multi_bn, bn_names=["normal", "pgd"])
+        elif cf["model"]["backbone"] == "resnetv2_50":
+            bb = partial(resnetv2_50)
+        elif cf["model"]["backbone"] == "resnetv2_50_gn":
+            bb = partial(resnetv2_50_gn)
         else:
             raise NotImplementedError()
 
         mlp = partial(MLP,
-                      n_in=bb().num_out,
+                      n_in=2048,
                       hidden_layers=cf["model"]["mlp_hidden"],
                       n_out=cf["model"]["num_embedding_out"])
         self.model = ContrastiveLearningNetwork(bb, mlp)
@@ -136,10 +143,15 @@ def main(args):
         lambda_patch=crit_params["lambda_patch"],
         supcon_loss_params=crit_params["supcon_params"])
 
+    if args.model.backbone == "resnetv2_50":
+        model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
+
+        args.distributed.find_unused_params = True if args.model.backbone == "resnet_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
-                                                          find_unused_parameters=args.distributed.find_unused_params)
+                                                          find_unused_parameters=args.distributed.find_unused_params,
+                                                          broadcast_buffers=False)
 
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
 
