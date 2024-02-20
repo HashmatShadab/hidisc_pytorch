@@ -201,10 +201,10 @@ def train_one_epoch(epoch, train_loader, model,
         metric_logger.update(total_loss=total_loss.item())
         metric_logger.update(clean_loss=clean_loss.item())
 
-        # Update the metric logger with individual losses from clean loss
-        metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
-        metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
-        metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
+        # # Update the metric logger with individual losses from clean loss
+        # metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
+        # metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
+        # metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
 
         # Update the metric logger with the weight coefficient and strength
         metric_logger.update(weight_coefficent=weight)
