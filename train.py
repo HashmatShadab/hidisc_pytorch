@@ -184,7 +184,10 @@ def train_one_epoch(epoch, train_loader, model,
         else:
             weight = 0.0
 
-        total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
+        if attack_type == 'pgd' or attack_type == 'pgd_2':
+            total_loss = ((1 - weight)*clean_loss + (1 + weight)*adv_loss) / 2
+        else:
+            total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
 
 
         optimizer.zero_grad()
