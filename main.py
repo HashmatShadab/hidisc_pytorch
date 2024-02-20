@@ -148,9 +148,9 @@ def main(args):
 
     if args.distributed.distributed:
 
-        args.distributed.find_unused_params = True if args.model.backbone == "resnet_multi_bn" else False
+        unused_params = True if args.model.backbone == "resnet50_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
-                                                          find_unused_parameters=args.distributed.find_unused_params,
+                                                          find_unused_parameters=unused_params,
                                                           broadcast_buffers=False)
 
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
