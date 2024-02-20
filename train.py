@@ -173,11 +173,13 @@ def train_one_epoch(epoch, train_loader, model,
 
 
 
-        clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
-        clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
+        # clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
+        # clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
+        #
+        # clean_losses = criterion(clean_outputs, targets)
+        # clean_loss = clean_losses["sum_loss"]
 
-        clean_losses = criterion(clean_outputs, targets)
-        clean_loss = clean_losses["sum_loss"]
+        clean_loss = 0
 
         if dynamic_aug:
             weight = dynamic_weights_lamda*(1 - dynamic_strength)
