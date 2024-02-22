@@ -230,11 +230,11 @@ def make_specs(predictions: Dict[str, Union[torch.Tensor, List[str]]]) -> None:
 
     # generate metrics
     def get_all_metrics(logits, label):
-        map = AveragePrecision(num_classes=7, task="binary")
-        acc = Accuracy(num_classes=7, task="binary")
-        t2 = Accuracy(num_classes=7, top_k=2, task="binary")
-        t3 = Accuracy(num_classes=7, top_k=3, task="binary")
-        mca = Accuracy(num_classes=7, average="macro", task="binary")
+        map = AveragePrecision(num_classes=7, task="multiclass")
+        acc = Accuracy(num_classes=7, task="multiclass")
+        t2 = Accuracy(num_classes=7, top_k=2, task="multiclass")
+        t3 = Accuracy(num_classes=7, top_k=3, task="multiclass")
+        mca = Accuracy(num_classes=7, average="macro", task="multiclass")
 
         logits = logits.squeeze()  # Remove extra dimensions from logits
         acc_val = acc(logits, label)
