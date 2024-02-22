@@ -22,6 +22,7 @@ data:
   meta_json: "opensrh.json"
   meta_split_json: "train_val_split.json"
   dynamic_aug: False
+  dynamic_aug_version: "v0"
   train_augmentation:
     - which: random_horiz_flip
       params: {}
