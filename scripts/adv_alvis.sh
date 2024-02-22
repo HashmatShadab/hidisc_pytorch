@@ -45,15 +45,15 @@ if [ $exp_num -eq 5 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True v1"
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True model.backbone=$model_name \
-    training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True_v1 \
-    wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_v1 wandb.use=True data.dynamic_aug_version=v1
+    training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True_v1_model_train_before_loss \
+    wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_v1_model_train_before_loss wandb.use=True data.dynamic_aug_version=v1
 fi
 
 if [ $exp_num -eq 6 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True v1"
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True model.backbone=$model_name \
-    training.attack.name=pgd_2  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_2_eps_8_dynaug_True_v1 \
-    wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_2_eps_8_dynamic_aug_True_v1 wandb.use=True data.dynamic_aug_version=v1
+    training.attack.name=pgd_2  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_2_eps_8_dynaug_True_v1_model_train_before_loss \
+    wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_2_eps_8_dynamic_aug_True_v1_model_train_before_loss wandb.use=True data.dynamic_aug_version=v1
 fi
 
