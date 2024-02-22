@@ -145,13 +145,14 @@ def train_one_epoch(epoch, train_loader, model,
             model.eval()
             adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
                                     alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
+            model.train()
+
             adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
             adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
             adv_losses = criterion(adv_outputs, targets)
             adv_loss = adv_losses["sum_loss"]
             # put model back in train mode
             # print to check if model is back in train mode
-            model.train()
             # logging.info(f"Model is in train mode: {model.training}")
 
         elif attack_type == 'pgd_2':
@@ -159,13 +160,13 @@ def train_one_epoch(epoch, train_loader, model,
             model.eval()
             adv_images = pgd_attack_2(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=attack_eps/255.0,
                                     alpha=attack_alpha/255.0, iters=attack_iters, shape=batch["image"].shape[:4], dual_bn=dual_bn)
+            model.train()
             adv_outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
             adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
             adv_losses = criterion(adv_outputs, targets)
             adv_loss = adv_losses["sum_loss"]
             # put model back in train mode
             # print to check if model is back in train mode
-            model.train()
             # logging.info(f"Model is in train mode: {model.training}")
         else:
             adv_loss = 0
