@@ -132,7 +132,7 @@ def get_dynacl_aug_v1(strength):
     strong_aug = [Normalize(u16_min, u16_max), GetThirdChannel(), MinMaxChop()]
 
     # Append transformations to the list
-    strong_aug.append(transforms.RandomResizedCrop(96 , scale=(1.0 - 0.9 * strength, 1.0), interpolation=3))
+    strong_aug.append(transforms.RandomResizedCrop((300,300) , scale=(1.0 - 0.9 * strength, 1.0), interpolation=3))
     strong_aug.append(transforms.RandomHorizontalFlip())
     strong_aug.append(transforms.RandomApply([transforms.ColorJitter(0.4 * strength, 0.4 * strength, 0.4 * strength, 0.1 * strength)], p=0.8 * strength))
     strong_aug.append(transforms.RandomGrayscale(p=0.2 * strength))
@@ -144,62 +144,12 @@ def get_dynacl_aug_v1(strength):
     log.info(f"ColorJitter with brightness: {0.4 * strength}, contrast: {0.4 * strength}, saturation: {0.4 * strength}, hue: {0.1 * strength},"
         f" RandomApply with probability {0.8 * strength}")
     log.info(f"RandomGrayscale with probability {0.2 * strength}")
-    log.info(f"RandomResizedCrop with size: 96, 96, scale: {1.0 - 0.9 * strength}, 1.0, interpolation: 3")
-
-
-
-    return strong_aug
-
-
-def get_dynacl_aug_v2(strength):
-    u16_min = (0, 0)
-    u16_max = (65536, 65536)  # 2^16
-
-    # Base augmentations
-    strong_aug = [Normalize(u16_min, u16_max), GetThirdChannel(), MinMaxChop()]
-
-    # Append transformations to the list
-    strong_aug.append(transforms.RandomResizedCrop(128, scale=(1.0 - 0.9 * strength, 1.0), interpolation=3))
-    strong_aug.append(transforms.RandomHorizontalFlip())
-    strong_aug.append(
-        transforms.RandomApply([transforms.ColorJitter(0.4 * strength, 0.4 * strength, 0.4 * strength, 0.1 * strength)], p=0.8 * strength))
-    strong_aug.append(transforms.RandomGrayscale(p=0.2 * strength))
-
-    log.info(f"Fixed probability augmentations:")
-    log.info(f"RandomHorizontalFlip with probability {0.5}")
-
-    log.info(f"Variable probability augmentations and Varying augmentation strength:")
-    log.info(
-        f"ColorJitter with brightness: {0.4 * strength}, contrast: {0.4 * strength}, saturation: {0.4 * strength}, hue: {0.1 * strength},"
-        f" RandomApply with probability {0.8 * strength}")
-    log.info(f"RandomGrayscale with probability {0.2 * strength}")
-    log.info(f"RandomResizedCrop with size: 128, 128, scale: {1.0 - 0.9 * strength}, 1.0, interpolation: 3")
-    return strong_aug
-
-def get_dynacl_aug_v3(strength):
-    u16_min = (0, 0)
-    u16_max = (65536, 65536)  # 2^16
-
-    # Base augmentations
-    strong_aug = [Normalize(u16_min, u16_max), GetThirdChannel(), MinMaxChop()]
-
-    # Append transformations to the list
-    strong_aug.append(transforms.RandomResizedCrop(size=(300, 300),  scale=(1.0 - 0.9 * strength, 1.0), interpolation=3))
-    strong_aug.append(transforms.RandomHorizontalFlip())
-    strong_aug.append(
-        transforms.RandomApply([transforms.ColorJitter(0.4 * strength, 0.4 * strength, 0.4 * strength, 0.1 * strength)], p=0.8 * strength))
-    strong_aug.append(transforms.RandomGrayscale(p=0.2 * strength))
-
-    log.info(f"Fixed probability augmentations:")
-    log.info(f"RandomHorizontalFlip with probability {0.5}")
-
-    log.info(f"Variable probability augmentations and Varying augmentation strength:")
-    log.info(
-        f"ColorJitter with brightness: {0.4 * strength}, contrast: {0.4 * strength}, saturation: {0.4 * strength}, hue: {0.1 * strength},"
-        f" RandomApply with probability {0.8 * strength}")
-    log.info(f"RandomGrayscale with probability {0.2 * strength}")
     log.info(f"RandomResizedCrop with size: 300, 300, scale: {1.0 - 0.9 * strength}, 1.0, interpolation: 3")
+
+
     return strong_aug
+
+
 
 
 def get_strong_aug(augs, rand_prob) -> List:
