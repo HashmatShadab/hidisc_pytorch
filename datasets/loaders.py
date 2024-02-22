@@ -1,5 +1,5 @@
-from .improc import get_srh_aug_list
-from .srh_dataset import HiDiscDataset
+from .improc import get_srh_aug_list, get_srh_base_aug
+from .srh_dataset import HiDiscDataset, OpenSRHDataset
 import os
 from functools import partial
 from torchvision.transforms import Compose
@@ -56,6 +56,46 @@ def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
 
     return train_loader, val_loader
 
+
+
+def get_dataloaders_ft(cf):
+    """Create dataloader for contrastive experiments."""
+
+
+
+    train_transform = Compose(get_srh_aug_list(cf["data"]["train_augmentation"]))
+    val_transform = Compose(get_srh_base_aug())
+
+    train_dset = OpenSRHDataset(
+        data_root=cf["data"]["db_root"],
+        studies="train",
+        transform=train_transform,
+        balance_patch_per_class=False)
+
+    val_dset = OpenSRHDataset(
+        data_root=cf["data"]["db_root"],
+        studies="val",
+        transform=val_transform,
+        balance_patch_per_class=False)
+
+
+
+
+    if cf['distributed']['distributed']:
+        num_tasks = get_world_size()
+        global_rank = get_rank()
+        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dset, num_replicas=num_tasks, rank=global_rank, shuffle=True)
+        val_sampler = torch.utils.data.distributed.DistributedSampler(val_dset, num_replicas=num_tasks, rank=global_rank, shuffle=True)
+        train_loader = torch.utils.data.DataLoader(train_dset, batch_size=cf['training']['batch_size'], sampler=train_sampler, drop_last=False)
+        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], sampler=val_sampler, drop_last=False)
+
+
+    else:
+
+        train_loader = torch.utils.data.DataLoader(train_dset, batch_size=cf['training']['batch_size'], shuffle=True, drop_last=False)
+        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], shuffle=True, drop_last=False)
+
+    return train_loader, val_loader
 
 
 

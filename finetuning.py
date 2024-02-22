@@ -14,14 +14,16 @@ import wandb
 from hydra.utils import get_original_cwd
 from omegaconf import OmegaConf
 
-from datasets.loaders import get_dataloaders
+from datasets.loaders import get_dataloaders_ft
 from helpers import init_distributed_mode, get_rank, is_main_process, get_world_size
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
-from models.resnet_multi_bn import resnet50 as resnet50_multi_bn
+from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
+from models import resnetv2_50, resnetv2_50_gn
 from scheduler import make_optimizer_and_schedule
-from utils import save_checkpoints, restart_from_checkpoint
 import torch
 from helpers import  accuracy, MetricLogger, setup_seed
+from timm.layers import convert_sync_batchnorm
+
 log = logging.getLogger(__name__)
 
 
@@ -49,11 +51,15 @@ class FineTuneModel(torch.nn.Module):
             backbone = resnet_backbone(arch=cf["model"]["backbone"])
         elif cf["model"]["backbone"] == "resnet50_multi_bn":
             backbone = resnet50_multi_bn()
+        elif cf["model"]["backbone"] == "resnetv2_50":
+            backbone = resnetv2_50()
+        elif cf["model"]["backbone"] == "resnetv2_50_gn":
+            backbone = resnetv2_50_gn()
         else:
             raise NotImplementedError()
 
         self.bb = backbone
-        self.linear_head = torch.nn.Linear(in_features=backbone.num_out, out_features=num_classes)
+        self.linear_head = torch.nn.Linear(in_features=2048, out_features=num_classes)
 
 
     def forward(self, img, bn_name=None):
@@ -100,9 +106,9 @@ def main(args):
 
         log.info(f"Saving output to {os.path.join(os.getcwd())}")
 
-    train_loader, validation_loader = get_dataloaders(args)
+    train_loader, validation_loader = get_dataloaders_ft(args)
 
-    model = FineTuneModel(args, num_classes=7)
+    model = FineTuneModel(args, num_classes=args.model.num_classes)
     dual_bn = True if args.model.backbone == "resnet50_multi_bn" else False
     model.to(device="cuda")
 
@@ -156,9 +162,14 @@ def main(args):
     if is_main_process():
         log.info(f"Total number of learnable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
+    if args.model.backbone == "resnetv2_50":
+        model = convert_sync_batchnorm(model)
+
     if args.distributed.distributed:
+        unused_params = True if args.model.backbone == "resnet50_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
-                                                          find_unused_parameters=args.distributed.find_unused_params)
+                                                          find_unused_parameters=unused_params,
+                                                          broadcast_buffers=False)
 
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
     args.training.num_epochs = args.training.num_epochs - start_epoch
@@ -316,6 +327,59 @@ def validate_clean(val_loader, model, criterion, dual_bn=False):
 
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
+
+def save_checkpoints(epoch, model, optimizer, scheduler, train_stats,
+                      name='checkpoint.pth'):
+    """
+    Save model, optimizer and scheduler to a checkpoint file inside out_dir.
+
+    """
+    print("Saving checkpoint to: ", os.path.join(os.getcwd(), name))
+    torch.save({
+        'epoch': epoch,
+        'model': model.state_dict(),
+        'optimizer': optimizer.state_dict(),
+        'schedule': scheduler.state_dict() if scheduler else None,
+        'loss': train_stats['loss'],
+    },
+        f"{name}")
+
+def restart_from_checkpoint(checkpoint_name, model, optimizer,
+                            scheduler):
+    """
+    New script for this codebase
+    Loads model, optimizer and scheduler from a checkpoint. If the checkpoint is not found
+    in the out_dir, returns 0 epoch.
+
+    """
+    if not os.path.isfile(checkpoint_name):
+        print(f"Restarting: No checkpoints found in {os.getcwd()}")
+        return 0, 0
+
+    # open checkpoint file
+    checkpoint = torch.load(checkpoint_name, pickle_module=dill)
+    start_epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
+
+    print(f"=> Restarting from checkpoint {os.path.join(os.getcwd(), checkpoint_name)} (Epoch{start_epoch})")
+    if "model" in checkpoint and checkpoint['model'] is not None:
+        model_weights = checkpoint["model"]
+        # remove the module from the keys
+        model_weights = {k.replace("module.model.model", "module.model"): v for k, v in model_weights.items()}
+        msg = model.load_state_dict(model_weights, strict=False)
+        print("Load model with msg: ", msg)
+
+    if "optimizer" in checkpoint and checkpoint['optimizer'] is not None:
+        msg = optimizer.load_state_dict(checkpoint['optimizer'])
+        print("Load optimizer with msg: ", msg)
+
+    if "schedule" in checkpoint and checkpoint['schedule'] is not None:
+        msg = scheduler.load_state_dict(checkpoint['schedule'])
+        print("Load scheduler with msg: ", msg)
+    else:
+        print("No scheduler in checkpoint")
+
+    return start_epoch, loss
 
 if __name__ == "__main__":
     best_certified_accuracy = main()
