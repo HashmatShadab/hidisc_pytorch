@@ -109,7 +109,7 @@ def pgd_attack_2(model, criterion, images, targets, shape, eps=1 / 255, alpha=1 
 def train_one_epoch(epoch, train_loader, model,
                     optimizer, criterion, scheduler, print_freq=50, attack_type='pgd',
                     attack_eps=1/255, attack_alpha=1/255, attack_iters=7, dual_bn=False,
-                    dynamic_aug=False, dynamic_weights_lamda=0.5, dynamic_strength=1.0):
+                    dynamic_aug=False, dynamic_weights_lamda=0.5, dynamic_strength=1.0, only_adv=False):
 
     """
     :param epoch: The current epoch number.
@@ -170,25 +170,30 @@ def train_one_epoch(epoch, train_loader, model,
             # logging.info(f"Model is in train mode: {model.training}")
         else:
             adv_loss = 0
+            only_adv = False
+            dynamic_aug = False
             # log.info("No attack type specified,  Adv loss set to 0.0")
 
+        if only_adv:
+            total_loss = adv_loss
 
-
-        clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
-        clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
-
-        clean_losses = criterion(clean_outputs, targets)
-        clean_loss = clean_losses["sum_loss"]
-
-        if dynamic_aug:
-            weight = dynamic_weights_lamda*(1 - dynamic_strength)
         else:
-            weight = 0.0
 
-        if attack_type == 'pgd' or attack_type == 'pgd_2':
-            total_loss = ((1 - weight)*clean_loss + (1 + weight)*adv_loss) / 2
-        else:
-            total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
+            clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
+            clean_outputs = clean_outputs.reshape(*batch["image"].shape[:4], clean_outputs.shape[-1])
+
+            clean_losses = criterion(clean_outputs, targets)
+            clean_loss = clean_losses["sum_loss"]
+
+            if dynamic_aug:
+                weight = dynamic_weights_lamda*(1 - dynamic_strength)
+            else:
+                weight = 0.0
+
+            if attack_type == 'pgd' or attack_type == 'pgd_2':
+                total_loss = ((1 - weight)*clean_loss + (1 + weight)*adv_loss) / 2
+            else:
+                total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss
 
 
         optimizer.zero_grad()
@@ -201,16 +206,24 @@ def train_one_epoch(epoch, train_loader, model,
 
         # Update the metric logger with clean and adversarial losses
         metric_logger.update(total_loss=total_loss.item())
-        metric_logger.update(clean_loss=clean_loss.item())
+        if only_adv:
+            metric_logger.update(clean_loss=0.0)
+            metric_logger.update(clean_patient_loss=0.0)
+            metric_logger.update(clean_slide_loss=0.0)
+            metric_logger.update(clean_patch_loss=0.0)
+            metric_logger.update(weight_coefficent=0.0)
+            metric_logger.update(strength=dynamic_strength)
+        else:
+            metric_logger.update(clean_loss=clean_loss.item())
 
-        # Update the metric logger with individual losses from clean loss
-        metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
-        metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
-        metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
+            # Update the metric logger with individual losses from clean loss
+            metric_logger.update(clean_patient_loss=clean_losses["patient_loss"].item())
+            metric_logger.update(clean_slide_loss=clean_losses["slide_loss"].item())
+            metric_logger.update(clean_patch_loss=clean_losses["patch_loss"].item())
 
-        # Update the metric logger with the weight coefficient and strength
-        metric_logger.update(weight_coefficent=weight)
-        metric_logger.update(strength=dynamic_strength)
+            # Update the metric logger with the weight coefficient and strength
+            metric_logger.update(weight_coefficent=weight)
+            metric_logger.update(strength=dynamic_strength)
 
         # Update the metric logger with individual losses from adversarial loss
         if attack_type == 'pgd' or attack_type == 'pgd_2':
@@ -218,7 +231,8 @@ def train_one_epoch(epoch, train_loader, model,
             metric_logger.update(adv_patient_loss=adv_losses["patient_loss"].item())
             metric_logger.update(adv_slide_loss=adv_losses["slide_loss"].item())
             metric_logger.update(adv_patch_loss=adv_losses["patch_loss"].item())
-            metric_logger.update(avg_increase=adv_loss.item() - clean_loss.item())
+            avg_increase = (adv_loss.item() - clean_loss.item())  if not only_adv else 0.0
+            metric_logger.update(avg_increase=avg_increase)
 
         else:
             metric_logger.update(adv_loss=0.0)

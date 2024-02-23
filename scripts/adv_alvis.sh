@@ -57,3 +57,26 @@ then
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_2_eps_8_dynamic_aug_True_v1_model_train_before_loss wandb.use=True data.dynamic_aug_version=v1
 fi
 
+if [ $exp_num -eq 7 ]
+then
+  echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True"
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True model.backbone=$model_name \
+    training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True_sanity_check \
+    wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_sanity_check wandb.use=True
+fi
+
+if [ $exp_num -eq 8 ]
+then
+  echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True"
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True model.backbone=$model_name \
+    training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True_sanity_check_only_adv_loss \
+    wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_sanity_check_only_adv_loss wandb.use=True training.only_adv=True
+fi
+
+if [ $exp_num -eq 8 ]
+then
+  echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=False"
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=False model.backbone=$model_name \
+    training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_False_sanity_check_only_adv_loss \
+    wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_False_sanity_check_only_adv_loss wandb.use=True training.only_adv=True
+fi

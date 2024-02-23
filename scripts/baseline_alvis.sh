@@ -8,8 +8,8 @@ model_name=$3
 
 # change the out_dir and wandb.exp_name to reflect the model name and dynamic_aug
 
-dir="Results/Baseline/${model_name}_dynamic_aug_False"
-exp_name="Baseline_backbone_${model_name}_dynamic_aug_False"
+dir="Results/Baseline/${model_name}_dynamic_aug_False_sanity_check_after_model_train_before_loss"
+exp_name="Baseline_backbone_${model_name}_dynamic_aug_False_sanity_check_after_model_train_before_loss"
 
 
 
