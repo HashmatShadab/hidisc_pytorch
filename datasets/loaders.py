@@ -102,7 +102,7 @@ def get_dataloaders_ft(cf):
     else:
 
         train_loader = torch.utils.data.DataLoader(train_dset, batch_size=cf['training']['batch_size'], shuffle=True, drop_last=False)
-        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], shuffle=True, drop_last=False)
+        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], shuffle=False, drop_last=False)
 
     return train_loader, val_loader
 
