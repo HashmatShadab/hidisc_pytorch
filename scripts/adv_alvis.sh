@@ -73,7 +73,7 @@ then
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_sanity_check_only_adv_loss wandb.use=True training.only_adv=True
 fi
 
-if [ $exp_num -eq 8 ]
+if [ $exp_num -eq 9 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=False"
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=False model.backbone=$model_name \
