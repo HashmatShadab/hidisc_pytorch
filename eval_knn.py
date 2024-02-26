@@ -115,7 +115,15 @@ def get_embeddings(cf: Dict[str, Any],
     # load model from checkpoint
     ckpt_path = cf["eval"]["ckpt_path"]
     model = HiDiscModel(cf)
-    msg = model.load_state_dict(torch.load(ckpt_path)["state_dict"])
+    ckpt = torch.load(ckpt_path)
+
+    if "state_dict" in ckpt.keys():
+        msg = model.load_state_dict(ckpt["state_dict"])
+    else:
+        ckpt_weights = ckpt["model"]
+        ckpt_weights = {k.replace("module.model", "model"): v for k, v in ckpt_weights.items()}
+        msg = model.load_state_dict(ckpt_weights)
+
     log.info(f"Loaded model from {ckpt_path} with message {msg}")
     model.to("cuda")
     model.eval()
