@@ -122,6 +122,7 @@ training:
       alpha: 2.0
       iters: 5
       loss_type: "p_s_pt"
+      warmup_epochs: 0
   scheduler:
     which: cos_warmup
     params:

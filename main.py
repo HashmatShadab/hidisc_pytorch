@@ -143,10 +143,14 @@ def main(args):
         lambda_patch=crit_params["lambda_patch"],
         supcon_loss_params=crit_params["supcon_params"])
 
-    if args.model.backbone == "resnetv2_50":
-        model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
+        if args.model.backbone == "resnetv2_50" or args.model.backbone == "resnetv2_50_gn":
+            model = convert_sync_batchnorm(model)
+        elif args.model.backbone == "resnet50_multi_bn" or args.model.backbone == "resnet50":
+            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+        else:
+            raise NotImplementedError()
 
         unused_params = True if args.model.backbone == "resnet50_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
@@ -157,6 +161,11 @@ def main(args):
 
     # Training loop
     strength = 1.0
+    epsilon_values_for_each_epoch = [args.training.attack.eps]*args.training.num_epochs
+    epsilon_warmup_epochs = args.training.attack.warmup_epochs
+    if epsilon_warmup_epochs > 0:
+        epsilon_values_for_each_epoch[:epsilon_warmup_epochs] = np.linspace(1, args.training.attack.eps, epsilon_warmup_epochs)
+
     for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
         if args['data']['dynamic_aug']:
@@ -166,10 +175,10 @@ def main(args):
             if before_strength != strength:
                 train_loader, _ = get_dataloaders(args, strength=strength, dynamic_aug=True)
                 log.info(f"==> [Dynamic Augmentation: Strength changed from {before_strength} to {strength}]")
-
+        epsilon = epsilon_values_for_each_epoch[epoch]
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler,
-                                      attack_type=args.training.attack.name, attack_eps=args.training.attack.eps,
+                                      attack_type=args.training.attack.name, attack_eps=epsilon,
                                       attack_alpha=args.training.attack.alpha,
                                       attack_iters=args.training.attack.iters,
                                       dual_bn=dual_bn,
