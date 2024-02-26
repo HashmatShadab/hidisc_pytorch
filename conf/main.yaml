@@ -117,10 +117,11 @@ training:
   optimizer: adamw # [sgd, adam, adamw]
   learn_rate: 1.0e-3
   attack:
-      name:
+      name: none
       eps: 8.0
       alpha: 2.0
       iters: 5
+      loss_type: "p_s_pt"
   scheduler:
     which: cos_warmup
     params:

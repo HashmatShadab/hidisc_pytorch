@@ -177,6 +177,7 @@ def main(args):
                                       dynamic_strength=strength,
                                       dynamic_weights_lamda=args['training']['dynamic_weights_lamda'],
                                       only_adv = args['training']['only_adv'],
+                                      adv_loss_type = args['training']['attack']['loss_type'],
                                       )
 
         #  Save the checkpoints
