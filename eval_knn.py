@@ -323,9 +323,6 @@ def get_args():
     parser.add_argument('--data_meta_json', type=str, default='opensrh.json')
     parser.add_argument('--data_meta_split_json', type=str, default='train_val_split.json')
 
-    parser.add_argument('--root', type=str, default='.')
-    parser.add_argument('--out_dir', type=str, default='EVAL_DIR')
-
     parser.add_argument('--model_backbone', type=str, default='resnet50')
     parser.add_argument('--model_mlp_hidden', nargs='*', type=int, default=[])
     parser.add_argument('--model_num_embedding_out', type=int, default=128)
