@@ -80,13 +80,7 @@ def knn_predict(feature, feature_bank, feature_labels, classes: int,
 def get_embeddings(cf: Dict[str, Any],
                    exp_root: str, log) -> Dict[str, Union[torch.Tensor, List[str]]]:
     """Run forward pass on the dataset, and generate embeddings and logits"""
-    # get model
-    # if cf["model"]["backbone"] == "resnet50":
-    #     aug_func = get_srh_base_aug
-    # elif cf["model"]["backbone"] == "vit":
-    #     aug_func = get_srh_vit_base_aug
-    # else:
-    #     raise NotImplementedError()
+
 
     # above code if argparser is used
     if cf.model_backbone == "resnet50":
@@ -97,49 +91,23 @@ def get_embeddings(cf: Dict[str, Any],
         raise NotImplementedError()
 
 
-    # get dataset / loader
-    # train_dset = OpenSRHDataset(data_root=cf["data"]["db_root"],
-    #                             studies="train",
-    #                             transform=Compose(aug_func()),
-    #                             balance_patch_per_class=False)
 
     train_dset = OpenSRHDataset(data_root=cf.data_db_root,
                                                 studies="train",
                                                 transform=Compose(aug_func()),
                                                 balance_patch_per_class=False)
 
-    # train_loader = torch.utils.data.DataLoader(
-    #     train_dset,
-    #     batch_size=cf["eval"]["predict_batch_size"],
-    #     drop_last=False,
-    #     pin_memory=True,
-    #     # num_workers=get_num_worker(),
-    #     persistent_workers=False)
 
     train_loader = torch.utils.data.DataLoader( train_dset, batch_size=cf.eval_predict_batch_size,
                                                 drop_last=False, pin_memory=True, persistent_workers=False)
 
-    # val_dset = OpenSRHDataset(data_root=cf["data"]["db_root"],
-    #                           studies="val",
-    #                           transform=Compose(aug_func()),
-    #                           balance_patch_per_class=False)
 
     val_dset = OpenSRHDataset(data_root=cf.data_db_root, studies="val",
                               transform=Compose(aug_func()), balance_patch_per_class=False)
 
-    # val_loader = torch.utils.data.DataLoader(
-    #     val_dset,
-    #     batch_size=cf["eval"]["predict_batch_size"],
-    #     drop_last=False,
-    #     pin_memory=True,
-    #     # num_workers=get_num_worker(),
-    #     persistent_workers=False)
 
     val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf.eval_predict_batch_size,
                                              drop_last=False, pin_memory=True, persistent_workers=False)
-
-    # load model from checkpoint
-    # ckpt_path = cf["eval"]["ckpt_path"]
     ckpt_path = cf.eval_ckpt_path
     model_dict = {"model": {"backbone": cf.model_backbone, "mlp_hidden": cf.model_mlp_hidden,
                             "num_embedding_out": cf.model_num_embedding_out
@@ -150,12 +118,14 @@ def get_embeddings(cf: Dict[str, Any],
 
     if "state_dict" in ckpt.keys():
         msg = model.load_state_dict(ckpt["state_dict"])
+        epoch = ckpt["epoch"]
     else:
         ckpt_weights = ckpt["model"]
+        epoch = ckpt["epoch"]
         ckpt_weights = {k.replace("module.model", "model"): v for k, v in ckpt_weights.items()}
         msg = model.load_state_dict(ckpt_weights)
 
-    log.info(f"Loaded model from {ckpt_path} with message {msg}")
+    log.info(f"Loaded model from {ckpt_path} Epoch {epoch} with message {msg}")
     model.to("cuda")
     model.eval()
 
@@ -345,7 +315,12 @@ def main():
     if not os.path.exists(results_path):
         os.makedirs(results_path, exist_ok=True)
 
-    log_dir = os.path.join(results_path, f"{cf.model_backbone}_eval.log")
+    ckpt_path = cf.eval_ckpt_path
+    ckpt = torch.load(ckpt_path)
+    epoch = ckpt["epoch"]
+    del ckpt
+
+    log_dir = os.path.join(results_path, f"{cf.model_backbone}_epoch{epoch}_eval.log")
     logging.basicConfig(filename=log_dir, filemode="a",
                         format="%(name)s → %(levelname)s: %(message)s")
     log = logging.getLogger(__name__)
@@ -361,8 +336,6 @@ def main():
 
 
     setup_seed(cf.seed)
-
-
     prediction_path = os.path.join(cf.save_results_path, "predictions.pt")
 
     if os.path.exists(prediction_path):
