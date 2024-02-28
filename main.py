@@ -18,11 +18,13 @@ from losses.hidisc import HiDiscLoss
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
 from models import resnetv2_50, resnetv2_50_gn
+from models import timm_wideresnet50_2, timm_resnet50, timm_resnetv2_50
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from ft_validate import validate_clean
 from utils import save_checkpoints, restart_from_checkpoint
 from timm.layers import convert_sync_batchnorm
+
 
 
 log = logging.getLogger(__name__)
@@ -54,6 +56,18 @@ class HiDiscModel(torch.nn.Module):
             bb = partial(resnetv2_50)
         elif cf["model"]["backbone"] == "resnetv2_50_gn":
             bb = partial(resnetv2_50_gn)
+        elif cf["model"]["backbone"] == "wide_resnet50_2":
+            bb = partial(timm_wideresnet50_2, pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm":
+            bb = partial(timm_resnet50, pretrained=False)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm":
+            bb = partial(timm_resnetv2_50, pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm_pretrained":
+            bb = partial(timm_resnet50, pretrained=True)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm_pretrained":
+            bb = partial(timm_resnetv2_50, pretrained=True)
+        elif cf["model"]["backbone"] == "wide_resnet50_2_pretrained":
+            bb = partial(timm_wideresnet50_2, pretrained=True)
         else:
             raise NotImplementedError()
 
@@ -145,12 +159,11 @@ def main(args):
 
 
     if args.distributed.distributed:
-        if args.model.backbone == "resnetv2_50" or args.model.backbone == "resnetv2_50_gn":
-            model = convert_sync_batchnorm(model)
-        elif args.model.backbone == "resnet50_multi_bn" or args.model.backbone == "resnet50":
+
+        if args.model.backbone == "resnet50_multi_bn" or args.model.backbone == "resnet50":
             model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
         else:
-            raise NotImplementedError()
+            model = convert_sync_batchnorm(model)
 
         unused_params = True if args.model.backbone == "resnet50_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
@@ -201,6 +214,7 @@ def main(args):
         # Log the epoch stats
         log_stats_train = {
             'Epoch': epoch,
+            'Epsilon': epsilon,
             **{f'train_{key}': value for key, value in train_stats.items() if "acc5" not in key},
         }
 
