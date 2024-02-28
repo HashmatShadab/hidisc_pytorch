@@ -209,3 +209,116 @@ then
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynaug_True_only_adv_warmup_eps_10000_exp17 wandb.use=True
 
 fi
+
+if [ $exp_num -eq 18 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=False data.dynamic_aug_version=v0 \
+    model.backbone=$model_name \
+    training.batch_size=$BATCH_SIZE training.only_adv=False \
+    training.attack.name=none  training.attack.eps=8 training.attack.warmup_epochs=0 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Baseline/${model_name}_exp18 \
+    wandb.exp_name=Baseline_backbone_${model_name}_exp18 wandb.use=True
+
+fi
+
+if [ $exp_num -eq 19 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19 wandb.use=True
+
+fi
+
+
+if [ $exp_num -eq 20 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name \
+    training.batch_size=$BATCH_SIZE training.only_adv=False \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20 wandb.use=True
+
+fi
+
+
+
+
+
+if [ $exp_num -eq 21 ]
+then
+    python main.py distributed.single_gpu=True \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=False data.dynamic_aug_version=v0 \
+    model.backbone=$model_name \
+    training.batch_size=$BATCH_SIZE training.only_adv=False \
+    training.attack.name=none  training.attack.eps=8 training.attack.warmup_epochs=0 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Baseline/${model_name}_single_gpu_exp21 \
+    wandb.exp_name=Baseline_backbone_${model_name}_single_gpu_exp21 wandb.use=True
+
+fi
+
+if [ $exp_num -eq 22 ]
+then
+    python main.py distributed.single_gpu=True \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_single_gpu_exp22 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_single_gpu_exp22 wandb.use=True
+
+fi
+
+
+if [ $exp_num -eq 23 ]
+then
+    python main.py distributed.single_gpu=True \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name \
+    training.batch_size=$BATCH_SIZE training.only_adv=False \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_single_gpu_exp23 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_single_gpu_exp23 wandb.use=True
+
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -170,7 +170,7 @@ def train_one_epoch(epoch, train_loader, model,
             clean_losses = criterion(clean_outputs, targets)
             clean_loss = clean_losses["sum_loss"]
 
-        elif attack_type != 'pgd' and attack_type != 'pgd_2' and not only_adv:
+        else:
             adv_losses = {'sum_loss': torch.tensor(0.0), 'patient_loss': torch.tensor(0.0), 'slide_loss': torch.tensor(0.0), 'patch_loss': torch.tensor(0.0)}
             adv_loss = adv_losses["sum_loss"]
             clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
@@ -178,15 +178,13 @@ def train_one_epoch(epoch, train_loader, model,
             clean_losses = criterion(clean_outputs, targets)
             clean_loss = clean_losses["sum_loss"]
 
-        else:
-            raise ValueError(f"Attack type {attack_type} not supported")
 
 
         if not attack_type.startswith('pgd'):
             total_loss = clean_loss
         else:
             weight = dynamic_weights_lamda * (1 - dynamic_strength) if dynamic_aug else 0.0
-            total_loss = (1 - weight)*clean_loss + (1 + weight)*adv_loss  if only_adv else ( (1 - weight)*clean_loss + (1 + weight)*adv_loss ) / 2
+            total_loss = adv_loss  if only_adv else ( (1 - weight)*clean_loss + (1 + weight)*adv_loss ) / 2
 
 
         optimizer.zero_grad()

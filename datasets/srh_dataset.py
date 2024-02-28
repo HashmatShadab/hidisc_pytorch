@@ -270,8 +270,8 @@ class HiDiscDataset(Dataset):
         """Read in all metadata files."""
 
         try:
-            with open(os.path.join(self.data_root_,
-                                   f"meta/{self.meta_json}")) as fd:
+            file_path = os.path.join(self.data_root_,"meta", self.meta_json)
+            with open(file_path) as fd:
                 self.metadata_ = json.load(fd)
         except Exception as e:
             logging.critical("Failed to locate dataset.")
@@ -286,9 +286,8 @@ class HiDiscDataset(Dataset):
 
         if isinstance(studies, str):
             try:
-                with open(
-                        os.path.join(self.data_root_,
-                                     f"meta/{self.meta_split_json}")) as fd:
+                file_path = os.path.join(self.data_root_,"meta", self.meta_split_json)
+                with open(file_path) as fd:
                     train_val_split = json.load(fd)
             except Exception as e:
                 logging.critical("Failed to locate preset train/val split.")

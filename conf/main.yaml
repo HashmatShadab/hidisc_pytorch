@@ -132,7 +132,7 @@ training:
   save_checkpoint_interval: 1000
 
 distributed:
-  single_gpu: False
+  single_gpu:
   world_size: 1
   local_rank: -1
   dist_on_itp: False
