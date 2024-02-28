@@ -83,12 +83,10 @@ def get_embeddings(cf: Dict[str, Any],
 
 
     # above code if argparser is used
-    if cf.model_backbone == "resnet50":
-        aug_func = get_srh_base_aug
-    elif cf.model_backbone == "vit":
+    if cf.model_backbone.startswith("vit"):
         aug_func = get_srh_vit_base_aug
     else:
-        raise NotImplementedError()
+        aug_func = get_srh_base_aug
 
 
 
@@ -114,6 +112,8 @@ def get_embeddings(cf: Dict[str, Any],
                             }
                   }
     model = HiDiscModel(model_dict)
+    dual_bn = True if cf.model_backbone == "resnet50_multi_bn" else False
+
     ckpt = torch.load(ckpt_path)
 
     if "state_dict" in ckpt.keys():
@@ -134,8 +134,9 @@ def get_embeddings(cf: Dict[str, Any],
 
         images = batch["image"].to("cuda")
         labels = batch["label"].to("cuda")
+
         with torch.no_grad():
-            outputs = model.get_features(images)
+            outputs = model.get_features(images, bn_name="normal") if dual_bn else model.get_features(images)
 
         d = {"embeddings": outputs, "label": labels, "path": batch["path"]}
         log.info(f"BATCH {i} {d['embeddings'].shape} {d['label'].shape}")
@@ -149,7 +150,7 @@ def get_embeddings(cf: Dict[str, Any],
         images = batch["image"].to("cuda")
         labels = batch["label"].to("cuda")
         with torch.no_grad():
-            outputs = model.get_features(images)
+            outputs = model.get_features(images, bn_name="normal") if dual_bn else model.get_features(images)
 
         d = {"embeddings": outputs, "label": labels, "path": batch["path"]}
 
