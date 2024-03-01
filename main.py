@@ -174,6 +174,8 @@ def main(args):
 
     # Training loop
     strength = 1.0
+    best_clean_loss = 100000000000.0
+    best_adv_loss = 100000000000.0
     epsilon_values_for_each_epoch = [args.training.attack.eps]*args.training.num_epochs
     epsilon_warmup_epochs = args.training.attack.warmup_epochs
     if epsilon_warmup_epochs > 0:
@@ -207,9 +209,23 @@ def main(args):
             save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
                                name=f'checkpoint_{epoch+1}.pth')
 
+
         if is_main_process():
             save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
                                name=f'checkpoint.pth')
+
+            clean_loss_for_epoch = train_stats['clean_loss']
+            adv_loss_for_epoch = train_stats['adv_loss']
+            if clean_loss_for_epoch < best_clean_loss and clean_loss_for_epoch != 0.0:
+                best_clean_loss = clean_loss_for_epoch
+                save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                               name=f'best_clean_loss_checkpoint.pth')
+                log.info(f"==> [Best Clean Loss: {best_clean_loss}]")
+            if adv_loss_for_epoch < best_adv_loss and adv_loss_for_epoch != 0.0:
+                best_adv_loss = adv_loss_for_epoch
+                save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                               name=f'best_adv_loss_checkpoint.pth')
+                log.info(f"==> [Best Adv Loss: {best_adv_loss}]")
 
         # Log the epoch stats
         log_stats_train = {
@@ -227,6 +243,8 @@ def main(args):
 
     if is_main_process():
        log.info("Training completed successfully")
+       log.info(f"==> Best Clean Loss: {best_clean_loss}]")
+       log.info(f"==> Best Adv Loss: {best_adv_loss}")
 
 if __name__ == "__main__":
     main()
