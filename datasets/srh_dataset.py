@@ -64,11 +64,18 @@ class OpenSRHDataset(Dataset):
 
         # Walk through each study
         self.instances_ = []
+        self.total_patches_per_patient = {}
+        self.total_patches_per_class = {}
         for p in tqdm(self.studies_):
             self.instances_.extend(self.get_study_instances(p))
+        # log total patches per patient and class
+        logging.info(f"Total patches per patient: {self.total_patches_per_patient}")
+        logging.info(f"Total patches per class: {self.total_patches_per_class}")
+        logging.info(f"Total Number of Patches: {sum(self.total_patches_per_patient.values())}")
 
         if balance_patch_per_class:
             self.replicate_balance_instances()
+            logging.info(f"Total Number of Patches after balancing: {len(self.instances_)}")
         self.get_weights()
 
     def get_all_meta(self):
@@ -139,7 +146,10 @@ class OpenSRHDataset(Dataset):
             else:
                 check_add_patches(
                     self.metadata_[patient]["slides"][s]["tumor_patches"])
-        logging.debug(f"patient {patient} patches {len(slide_instances)}")
+        self.total_patches_per_patient[patient] = len(slide_instances)
+        if self.metadata_[patient]["class"] not in self.total_patches_per_class:
+            self.total_patches_per_class[self.metadata_[patient]["class"]] = 0
+        self.total_patches_per_class[self.metadata_[patient]["class"]] += len(slide_instances)
         return slide_instances
 
     def process_classes(self):
@@ -167,7 +177,7 @@ class OpenSRHDataset(Dataset):
         # Compute weights
         inv_count = 1 / count
         self.weights_ = inv_count / torch.sum(inv_count)
-        logging.debug("Weights: {}".format(self.weights_))
+        logging.info("Weights: {}".format(self.weights_))
         return self.weights_
 
     def replicate_balance_instances(self):

@@ -79,7 +79,7 @@ def get_dataloaders_ft(cf):
         data_root=cf["data"]["db_root"],
         studies="train",
         transform=train_transform,
-        balance_patch_per_class=False)
+        balance_patch_per_class=cf["data"]["balance_study_per_class"])
 
     val_dset = OpenSRHDataset(
         data_root=cf["data"]["db_root"],

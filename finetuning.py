@@ -19,6 +19,7 @@ from helpers import init_distributed_mode, get_rank, is_main_process, get_world_
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
 from models import resnetv2_50, resnetv2_50_gn
+from models import timm_wideresnet50_2, timm_resnet50, timm_resnetv2_50
 from scheduler import make_optimizer_and_schedule
 import torch
 from helpers import  accuracy, MetricLogger, setup_seed
@@ -56,6 +57,18 @@ class FineTuneModel(torch.nn.Module):
             backbone = resnetv2_50()
         elif cf["model"]["backbone"] == "resnetv2_50_gn":
             backbone = resnetv2_50_gn()
+        elif cf["model"]["backbone"] == "wide_resnet50_2":
+            backbone = timm_wideresnet50_2(pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm":
+            backbone = timm_resnet50(pretrained=False)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm":
+            backbone = timm_resnetv2_50(pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm_pretrained":
+            backbone = timm_resnet50(pretrained=True)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm_pretrained":
+            backbone = timm_resnetv2_50(pretrained=True)
+        elif cf["model"]["backbone"] == "wide_resnet50_2_pretrained":
+            backbone = timm_wideresnet50_2(pretrained=True)
         else:
             raise NotImplementedError()
 
@@ -95,15 +108,12 @@ def main(args):
     if is_main_process():
         log.info(OmegaConf.to_yaml(args))  # log.info all the command line arguments
 
-    # Create the output director if not exits
+        # Create the output director if not exits
     if get_rank() == 0 and args.out_dir is not None:
 
         if args.wandb.use:
-            name = args.out_dir.replace("/", "_")
             wandb.init(project=args.wandb.project, entity=args.wandb.entity, mode=args.wandb.mode,
-                       name=name, group=args.wandb.exp_name)
-            config = wandb.config
-            config.update(args)
+                       name=args.wandb.exp_name)
 
         log.info(f"Saving output to {os.path.join(os.getcwd())}")
 
@@ -131,13 +141,16 @@ def main(args):
     log.info(f'==> [Number of parameters of the model is {len(parameters)}]')
 
     if args.model.start_from_ssl_ckpt:
+
+        if not os.path.isfile(args.model.start_from_ssl_ckpt):
+            print(f": No checkpoints found in {os.getcwd()}")
+            raise FileNotFoundError
         """
         Loads only model weights for evaluation.
         if restart_from_ckpt, then model weights will be loaded from the output dir,
         no need to pass the checkpoints path.
 
         """
-        log.info(f"Loading model weights from {args.model.start_from_ssl_ckpt}")
         checkpoint = torch.load(args.model.start_from_ssl_ckpt, pickle_module=dill)
         model_weights = checkpoint["model"]
         # remove the module from the keys
@@ -163,17 +176,18 @@ def main(args):
     if is_main_process():
         log.info(f"Total number of learnable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
-    if args.model.backbone == "resnetv2_50":
-        model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
+        if args.model.backbone == "resnet50_multi_bn" or args.model.backbone == "resnet50":
+            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+        else:
+            model = convert_sync_batchnorm(model)
         unused_params = True if args.model.backbone == "resnet50_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
                                                           find_unused_parameters=unused_params,
                                                           broadcast_buffers=False)
 
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
-    args.training.num_epochs = args.training.num_epochs - start_epoch
 
     # Perform evaluation and exit if `eval_only` is set
     if args.eval_only:
@@ -181,13 +195,17 @@ def main(args):
         validate_clean(validation_loader, model, criterion)
         return  # Safe exit
 
-
-    train_attack = PGD(model=model, steps=7, eps=8/255.0)
+    if args.training.train_attack == 'pgd':
+        train_attack = PGD(model=model, steps=7, eps=8/255.0)
+    else:
+        train_attack = False
 
     eval_attack = FFGSM(model=model, eps=8/255.0)
 
     # Training loop
-    for epoch in range(args.training.num_epochs):
+    best_clean_accuracy = 0
+    best_adv_accuracy = 0
+    for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler,
@@ -196,17 +214,35 @@ def main(args):
         val_stats = validate_clean(validation_loader, model, criterion, dual_bn=dual_bn)
         adv_stats = validate_adv(validation_loader, model, criterion, dual_bn=dual_bn, eval_attack=eval_attack)
 
-        # if scheduler:
-        #     scheduler.step()
 
         #  Save the checkpoints
-        save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
-                         name='checkpoint.pth')
+        if (epoch + 1) % args.training.save_checkpoint_interval == 0 and is_main_process():
+            save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                             name=f'checkpoint_{epoch + 1}.pth')
+
+        if is_main_process():
+            save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                             name=f'checkpoint.pth')
+
+            clean_acc_for_epoch = val_stats['acc1']
+            adv_acc_for_epoch = adv_stats['acc1']
+            if clean_acc_for_epoch < best_clean_accuracy:
+                best_clean_accuracy = clean_acc_for_epoch
+                save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                                 name=f'best_clean_acc_checkpoint.pth')
+                log.info(f"==> [Best Clean Acc: {best_clean_accuracy}]")
+            if adv_acc_for_epoch < best_adv_accuracy :
+                best_adv_accuracy = adv_acc_for_epoch
+                save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                                 name=f'best_adv_acc_checkpoint.pth')
+                log.info(f"==> [Best Adv Acc: {best_adv_accuracy}]")
 
         # Log the epoch stats
         log_stats_train = {
             'Epoch': epoch,
-            **{f'train_{key}': value for key, value in train_stats.items() if "acc5" not in key},
+            **{f'train_{key}': value for key, value in train_stats.items()},
+            **{f'val_{key}': value for key, value in val_stats.items() if "acc5" not in key},
+            **{f'adv_val_{key}': value for key, value in adv_stats.items() if "acc5" not in key}
         }
 
         if args.out_dir and is_main_process():
@@ -250,17 +286,10 @@ def train_one_epoch(epoch, train_loader, model,
         im_reshaped = im_reshaped.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
 
-        # adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=1/255, alpha=1/255, iters=7, shape=batch["image"].shape[:4])
-        # adv_outputs = model(adv_images)
-        # adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
-        # adv_losses = criterion(adv_outputs, targets)
-        # adv_loss = adv_losses["sum_loss"]
-        # if using Dual Stream model, then use the following line
-        # model(inputs, 'normal') for clean images and model(inputs, 'pgd') for adversarial images
-        # also fopr attack pass model(images + delta, 'pgd')
-
-
-        adv_images = train_attack(im_reshaped, targets, dual_bn=dual_bn)
+        if train_attack:
+            adv_images = train_attack(im_reshaped, targets, dual_bn=dual_bn)
+        else:
+            adv_images = im_reshaped
         outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
 
         loss = criterion(outputs, targets)
@@ -432,4 +461,4 @@ def restart_from_checkpoint(checkpoint_name, model, optimizer,
     return start_epoch, loss
 
 if __name__ == "__main__":
-    best_certified_accuracy = main()
+    main()
