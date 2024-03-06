@@ -101,6 +101,7 @@ model:
 
 training:
   dynamic_weights_lamda: 0.66
+  only_adv: False
   objective:
     which: hidisc
     params:
@@ -116,10 +117,12 @@ training:
   optimizer: adamw # [sgd, adam, adamw]
   learn_rate: 1.0e-3
   attack:
-      name:
+      name: none
       eps: 8.0
       alpha: 2.0
       iters: 5
+      loss_type: "p_s_pt"
+      warmup_epochs: 0
   scheduler:
     which: cos_warmup
     params:
@@ -129,6 +132,7 @@ training:
   save_checkpoint_interval: 1000
 
 distributed:
+  single_gpu:
   world_size: 1
   local_rank: -1
   dist_on_itp: False

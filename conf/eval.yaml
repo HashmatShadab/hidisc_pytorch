@@ -19,8 +19,11 @@ eval:
     ckpt_path: F:\Code\Projects\ckpt-epoch35199.ckpt # eg. hash_datetime_expname_comment/models/ckpt-epochXX-accXXX.ckpt
     save_predictions_path: ./
 
-hydra:
-  run:
-    dir: ${root}/${out_dir}
-  job:
-    chdir: True
+#hydra:
+#  run:
+#    dir:
+#  job:
+#    chdir: True
+#
+# parent directory of ckpt_path
+

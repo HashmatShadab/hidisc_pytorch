@@ -28,7 +28,7 @@ class HiDiscLoss(nn.Module):
         self.lambda_slide_ = lambda_slide
         self.lambda_patch_ = lambda_patch
 
-    def forward(self, features, labels=None):
+    def forward(self, features, labels=None, loss_type="p_s_pt"):
         emb_sz = features.shape[-1]
         sz_prod = lambda x: torch.prod(torch.tensor(x))
         feat_shape = features.shape
@@ -37,9 +37,36 @@ class HiDiscLoss(nn.Module):
         slide_emb = features.reshape(sz_prod(feat_shape[0:2]), -1, emb_sz)
         patch_emb = features.reshape(sz_prod(feat_shape[0:3]), -1, emb_sz)
 
-        patient_loss = self.criterion(patient_emb, None)
-        slide_loss = self.criterion(slide_emb, None)
-        patch_loss = self.criterion(patch_emb, None)
+        if loss_type == "p_s_pt":
+            patient_loss = self.criterion(patient_emb, None)
+            slide_loss = self.criterion(slide_emb, None)
+            patch_loss = self.criterion(patch_emb, None)
+        elif loss_type == "p_s":
+            patient_loss = self.criterion(patient_emb, None)
+            slide_loss = self.criterion(slide_emb, None)
+            patch_loss = 0.0
+        elif loss_type == "p_pt":
+            patient_loss = self.criterion(patient_emb, None)
+            slide_loss = 0.0
+            patch_loss = self.criterion(patch_emb, None)
+        elif loss_type == "s_pt":
+            patient_loss = 0.0
+            slide_loss = self.criterion(slide_emb, None)
+            patch_loss = self.criterion(patch_emb, None)
+        elif loss_type == "p":
+            patient_loss = self.criterion(patient_emb, None)
+            slide_loss = 0.0
+            patch_loss = 0.0
+        elif loss_type == "s":
+            patient_loss = 0.0
+            slide_loss = self.criterion(slide_emb, None)
+            patch_loss = 0.0
+        elif loss_type == "pt":
+            patient_loss = 0.0
+            slide_loss = 0.0
+            patch_loss = self.criterion(patch_emb, None)
+        else:
+            raise ValueError(f"Loss type {loss_type} not supported")
 
         loss = ((self.lambda_patient_ * patient_loss) +
                 (self.lambda_slide_ * slide_loss) +

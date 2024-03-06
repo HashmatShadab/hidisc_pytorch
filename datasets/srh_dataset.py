@@ -270,8 +270,8 @@ class HiDiscDataset(Dataset):
         """Read in all metadata files."""
 
         try:
-            with open(os.path.join(self.data_root_,
-                                   f"meta/{self.meta_json}")) as fd:
+            file_path = os.path.join(self.data_root_,"meta", self.meta_json)
+            with open(file_path) as fd:
                 self.metadata_ = json.load(fd)
         except Exception as e:
             logging.critical("Failed to locate dataset.")
@@ -286,9 +286,8 @@ class HiDiscDataset(Dataset):
 
         if isinstance(studies, str):
             try:
-                with open(
-                        os.path.join(self.data_root_,
-                                     f"meta/{self.meta_split_json}")) as fd:
+                file_path = os.path.join(self.data_root_,"meta", self.meta_split_json)
+                with open(file_path) as fd:
                     train_val_split = json.load(fd)
             except Exception as e:
                 logging.critical("Failed to locate preset train/val split.")
@@ -403,6 +402,7 @@ class HiDiscDataset(Dataset):
         return
 
     def get_patch_info(self, all_labels):
+        sum = 0
         for l in sorted(set(all_labels)):
             instances_l = [i[0] for i in self.instances_ if i[1] == l]
 
@@ -410,7 +410,10 @@ class HiDiscDataset(Dataset):
             for instance in instances_l:
                 for slide in instance:
                     count += len(slide)
+                    sum += len(slide)
             logging.info(f"Class {l} : {count} patches")
+        logging.info(f"Total patches : {sum}")
+
 
     def read_images_slide(self, inst: List[Tuple]):
         """Read in a list of patches, different patches and transformations"""

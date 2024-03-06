@@ -31,7 +31,10 @@ from datasets.improc import get_srh_base_aug, get_srh_vit_base_aug
 #                                  get_num_worker)
 from datasets.loaders import get_num_worker
 from main import HiDiscModel
-log = logging.getLogger(__name__)
+import argparse
+
+import logging
+
 
 
 # code for kNN prediction is from the github repo IgorSusmelj/barlowtwins
@@ -75,48 +78,54 @@ def knn_predict(feature, feature_bank, feature_labels, classes: int,
 
 
 def get_embeddings(cf: Dict[str, Any],
-                   exp_root: str) -> Dict[str, Union[torch.Tensor, List[str]]]:
+                   exp_root: str, log) -> Dict[str, Union[torch.Tensor, List[str]]]:
     """Run forward pass on the dataset, and generate embeddings and logits"""
-    # get model
-    if cf["model"]["backbone"] == "resnet50":
-        aug_func = get_srh_base_aug
-    elif cf["model"]["backbone"] == "vit":
+
+
+    # above code if argparser is used
+    if cf.model_backbone.startswith("vit"):
         aug_func = get_srh_vit_base_aug
     else:
-        raise NotImplementedError()
+        aug_func = get_srh_base_aug
 
-    # get dataset / loader
-    train_dset = OpenSRHDataset(data_root=cf["data"]["db_root"],
-                                studies="train",
-                                transform=Compose(aug_func()),
-                                balance_patch_per_class=False)
 
-    train_loader = torch.utils.data.DataLoader(
-        train_dset,
-        batch_size=cf["eval"]["predict_batch_size"],
-        drop_last=False,
-        pin_memory=True,
-        # num_workers=get_num_worker(),
-        persistent_workers=False)
 
-    val_dset = OpenSRHDataset(data_root=cf["data"]["db_root"],
-                              studies="val",
-                              transform=Compose(aug_func()),
-                              balance_patch_per_class=False)
+    train_dset = OpenSRHDataset(data_root=cf.data_db_root,
+                                                studies="train",
+                                                transform=Compose(aug_func()),
+                                                balance_patch_per_class=False)
 
-    val_loader = torch.utils.data.DataLoader(
-        val_dset,
-        batch_size=cf["eval"]["predict_batch_size"],
-        drop_last=False,
-        pin_memory=True,
-        # num_workers=get_num_worker(),
-        persistent_workers=False)
 
-    # load model from checkpoint
-    ckpt_path = cf["eval"]["ckpt_path"]
-    model = HiDiscModel(cf)
-    msg = model.load_state_dict(torch.load(ckpt_path)["state_dict"])
-    log.info(f"Loaded model from {ckpt_path} with message {msg}")
+    train_loader = torch.utils.data.DataLoader( train_dset, batch_size=cf.eval_predict_batch_size,
+                                                drop_last=False, pin_memory=True, persistent_workers=False)
+
+
+    val_dset = OpenSRHDataset(data_root=cf.data_db_root, studies="val",
+                              transform=Compose(aug_func()), balance_patch_per_class=False)
+
+
+    val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf.eval_predict_batch_size,
+                                             drop_last=False, pin_memory=True, persistent_workers=False)
+    ckpt_path = cf.eval_ckpt_path
+    model_dict = {"model": {"backbone": cf.model_backbone, "mlp_hidden": cf.model_mlp_hidden,
+                            "num_embedding_out": cf.model_num_embedding_out
+                            }
+                  }
+    model = HiDiscModel(model_dict)
+    dual_bn = True if cf.model_backbone == "resnet50_multi_bn" else False
+
+    ckpt = torch.load(ckpt_path)
+
+    if "state_dict" in ckpt.keys():
+        msg = model.load_state_dict(ckpt["state_dict"])
+        epoch = ckpt["epoch"]
+    else:
+        ckpt_weights = ckpt["model"]
+        epoch = ckpt["epoch"]
+        ckpt_weights = {k.replace("module.model", "model"): v for k, v in ckpt_weights.items()}
+        msg = model.load_state_dict(ckpt_weights)
+
+    log.info(f"Loaded model from {ckpt_path} Epoch {epoch} with message {msg}")
     model.to("cuda")
     model.eval()
 
@@ -125,8 +134,9 @@ def get_embeddings(cf: Dict[str, Any],
 
         images = batch["image"].to("cuda")
         labels = batch["label"].to("cuda")
+
         with torch.no_grad():
-            outputs = model.get_features(images)
+            outputs = model.get_features(images, bn_name="normal") if dual_bn else model.get_features(images)
 
         d = {"embeddings": outputs, "label": labels, "path": batch["path"]}
         log.info(f"BATCH {i} {d['embeddings'].shape} {d['label'].shape}")
@@ -140,7 +150,7 @@ def get_embeddings(cf: Dict[str, Any],
         images = batch["image"].to("cuda")
         labels = batch["label"].to("cuda")
         with torch.no_grad():
-            outputs = model.get_features(images)
+            outputs = model.get_features(images, bn_name="normal") if dual_bn else model.get_features(images)
 
         d = {"embeddings": outputs, "label": labels, "path": batch["path"]}
 
@@ -170,7 +180,8 @@ def get_embeddings(cf: Dict[str, Any],
     log.info(train_predictions["label"].shape)
 
     # knn evaluation
-    batch_size = cf["eval"]["knn_batch_size"]
+    # batch_size = cf["eval"]["knn_batch_size"]
+    batch_size = cf.eval_knn_batch_size
     all_scores = []
     for k in tqdm(range(val_embs.shape[0] // batch_size + 1)):
         start_coeff = batch_size * k
@@ -193,7 +204,7 @@ def get_embeddings(cf: Dict[str, Any],
     return val_predictions
 
 
-def make_specs(predictions: Dict[str, Union[torch.Tensor, List[str]]]) -> None:
+def make_specs(predictions: Dict[str, Union[torch.Tensor, List[str]]], log) -> None:
     """Compute all specs for an experiment"""
 
     # aggregate prediction into a dataframe
@@ -274,31 +285,70 @@ def make_specs(predictions: Dict[str, Union[torch.Tensor, List[str]]]) -> None:
 
     return
 
+def get_args():
+    parser = argparse.ArgumentParser()
 
+    parser.add_argument('--seed', type=int, default=1000)
 
-@hydra.main(version_base=None, config_path="conf", config_name="eval")
-def main(cf):
+    parser.add_argument('--data_db_root', type=str, default=r'F:\Code\datasets\hidisc_data_small')
+    parser.add_argument('--data_meta_json', type=str, default='opensrh.json')
+    parser.add_argument('--data_meta_split_json', type=str, default='train_val_split.json')
 
-    setup_seed(cf["seed"])
+    parser.add_argument('--model_backbone', type=str, default='resnet50')
+    parser.add_argument('--model_mlp_hidden', nargs='*', type=int, default=[])
+    parser.add_argument('--model_num_embedding_out', type=int, default=128)
+    parser.add_argument('--model_train_alg', type=str, default='hidisc')
 
+    parser.add_argument('--eval_predict_batch_size', type=int, default=128)
+    parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
+    parser.add_argument('--eval_ckpt_path', type=str, default=r'F:\Code\Projects\ckpt-epoch35199.ckpt')
+    parser.add_argument('--save_results_path', type=str, default='eval_knn_results')
+
+    args = parser.parse_args()
+
+    return args
+
+def main():
+
+    cf = get_args()
+
+    results_path = cf.save_results_path
+    if not os.path.exists(results_path):
+        os.makedirs(results_path, exist_ok=True)
+
+    ckpt_path = cf.eval_ckpt_path
+    ckpt = torch.load(ckpt_path)
+    epoch = ckpt["epoch"]
+    del ckpt
+
+    log_dir = os.path.join(results_path, f"{cf.model_backbone}_epoch{epoch}_eval.log")
+    logging.basicConfig(filename=log_dir, filemode="a",
+                        format="%(name)s → %(levelname)s: %(message)s")
+    log = logging.getLogger(__name__)
+    log.setLevel(logging.INFO)
+
+    # create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+
+    # add console handler to logger
+    log.addHandler(ch)
     log.info("Info level message")
-    # log.debug("Debug level message")
 
-    log.info(f"Current working directory : {os.getcwd()}")
-    log.info(f"Orig working directory    : {get_original_cwd()}")
 
-    prediction_path = os.path.join(cf['eval']['save_predictions_path'], "predictions.pt")
+    setup_seed(cf.seed)
+    prediction_path = os.path.join(cf.save_results_path, "predictions.pt")
 
     if os.path.exists(prediction_path):
         log.info("loading predictions")
         predictions = torch.load(prediction_path)
     else:
         log.info("generating predictions")
-        predictions = get_embeddings(cf, None)
+        predictions = get_embeddings(cf, None, log=log)
         torch.save(predictions, prediction_path)
 
     # generate specs
-    make_specs(predictions)
+    make_specs(predictions, log=log)
 
 
 if __name__ == "__main__":

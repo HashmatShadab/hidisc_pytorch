@@ -18,11 +18,13 @@ from losses.hidisc import HiDiscLoss
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
 from models import resnetv2_50, resnetv2_50_gn
+from models import timm_wideresnet50_2, timm_resnet50, timm_resnetv2_50
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from ft_validate import validate_clean
 from utils import save_checkpoints, restart_from_checkpoint
 from timm.layers import convert_sync_batchnorm
+
 
 
 log = logging.getLogger(__name__)
@@ -54,6 +56,18 @@ class HiDiscModel(torch.nn.Module):
             bb = partial(resnetv2_50)
         elif cf["model"]["backbone"] == "resnetv2_50_gn":
             bb = partial(resnetv2_50_gn)
+        elif cf["model"]["backbone"] == "wide_resnet50_2":
+            bb = partial(timm_wideresnet50_2, pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm":
+            bb = partial(timm_resnet50, pretrained=False)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm":
+            bb = partial(timm_resnetv2_50, pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm_pretrained":
+            bb = partial(timm_resnet50, pretrained=True)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm_pretrained":
+            bb = partial(timm_resnetv2_50, pretrained=True)
+        elif cf["model"]["backbone"] == "wide_resnet50_2_pretrained":
+            bb = partial(timm_wideresnet50_2, pretrained=True)
         else:
             raise NotImplementedError()
 
@@ -143,10 +157,13 @@ def main(args):
         lambda_patch=crit_params["lambda_patch"],
         supcon_loss_params=crit_params["supcon_params"])
 
-    if args.model.backbone == "resnetv2_50":
-        model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
+
+        if args.model.backbone == "resnet50_multi_bn" or args.model.backbone == "resnet50":
+            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+        else:
+            model = convert_sync_batchnorm(model)
 
         unused_params = True if args.model.backbone == "resnet50_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
@@ -157,6 +174,13 @@ def main(args):
 
     # Training loop
     strength = 1.0
+    best_clean_loss = 100000000000.0
+    best_adv_loss = 100000000000.0
+    epsilon_values_for_each_epoch = [args.training.attack.eps]*args.training.num_epochs
+    epsilon_warmup_epochs = args.training.attack.warmup_epochs
+    if epsilon_warmup_epochs > 0:
+        epsilon_values_for_each_epoch[:epsilon_warmup_epochs] = np.linspace(1, args.training.attack.eps, epsilon_warmup_epochs)
+
     for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
         if args['data']['dynamic_aug']:
@@ -166,16 +190,18 @@ def main(args):
             if before_strength != strength:
                 train_loader, _ = get_dataloaders(args, strength=strength, dynamic_aug=True)
                 log.info(f"==> [Dynamic Augmentation: Strength changed from {before_strength} to {strength}]")
-
+        epsilon = epsilon_values_for_each_epoch[epoch]
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
                                       optimizer=optimizer, criterion=criterion, scheduler=scheduler,
-                                      attack_type=args.training.attack.name, attack_eps=args.training.attack.eps,
+                                      attack_type=args.training.attack.name, attack_eps=epsilon,
                                       attack_alpha=args.training.attack.alpha,
                                       attack_iters=args.training.attack.iters,
                                       dual_bn=dual_bn,
                                       dynamic_aug=args['data']['dynamic_aug'],
                                       dynamic_strength=strength,
                                       dynamic_weights_lamda=args['training']['dynamic_weights_lamda'],
+                                      only_adv = args['training']['only_adv'],
+                                      adv_loss_type = args['training']['attack']['loss_type'],
                                       )
 
         #  Save the checkpoints
@@ -183,13 +209,28 @@ def main(args):
             save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
                                name=f'checkpoint_{epoch+1}.pth')
 
+
         if is_main_process():
             save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
                                name=f'checkpoint.pth')
 
+            clean_loss_for_epoch = train_stats['clean_loss']
+            adv_loss_for_epoch = train_stats['adv_loss']
+            if clean_loss_for_epoch < best_clean_loss and clean_loss_for_epoch != 0.0:
+                best_clean_loss = clean_loss_for_epoch
+                save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                               name=f'best_clean_loss_checkpoint.pth')
+                log.info(f"==> [Best Clean Loss: {best_clean_loss}]")
+            if adv_loss_for_epoch < best_adv_loss and adv_loss_for_epoch != 0.0:
+                best_adv_loss = adv_loss_for_epoch
+                save_checkpoints(epoch+1, model, optimizer, scheduler, train_stats,
+                               name=f'best_adv_loss_checkpoint.pth')
+                log.info(f"==> [Best Adv Loss: {best_adv_loss}]")
+
         # Log the epoch stats
         log_stats_train = {
             'Epoch': epoch,
+            'Epsilon': epsilon,
             **{f'train_{key}': value for key, value in train_stats.items() if "acc5" not in key},
         }
 
@@ -202,6 +243,8 @@ def main(args):
 
     if is_main_process():
        log.info("Training completed successfully")
+       log.info(f"==> Best Clean Loss: {best_clean_loss}]")
+       log.info(f"==> Best Adv Loss: {best_adv_loss}")
 
 if __name__ == "__main__":
     main()

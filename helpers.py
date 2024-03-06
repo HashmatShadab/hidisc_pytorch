@@ -122,6 +122,12 @@ def setup_for_distributed(is_master):
 
 
 def init_distributed_mode(args):
+    if args.single_gpu:
+        log.info('Will run the code on one GPU without distributed mode.')
+        args.rank, args.gpu, args.world_size = 0, 0, 1
+        args.distributed = False
+        return
+
     if 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
         log.info("RANK and WORLD_SIZE are already set in the environment")
         args.rank = int(os.environ["RANK"])
