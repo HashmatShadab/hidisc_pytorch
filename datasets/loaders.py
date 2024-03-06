@@ -1,4 +1,4 @@
-from .improc import get_srh_aug_list, get_srh_base_aug, get_dynacl_aug_v1
+from .improc import get_srh_aug_list, get_srh_base_aug, get_dynacl_aug_v1, get_ft_aug_v1
 from .srh_dataset import HiDiscDataset, OpenSRHDataset
 import os
 from functools import partial
@@ -70,10 +70,18 @@ def get_dataloaders(cf, strength=1.0, dynamic_aug=False):
 def get_dataloaders_ft(cf):
     """Create dataloader for contrastive experiments."""
 
+    aug_version = cf["data"]["aug_version"]
+
+    if aug_version == "v0":
+        train_transform = Compose(get_srh_aug_list(cf["data"]["train_augmentation"]))
+        val_transform = Compose(get_srh_base_aug())
+    elif aug_version == "v1":
+        train_transform = Compose(get_ft_aug_v1())
+        val_transform = Compose(get_srh_base_aug())
+    else:
+        raise ValueError(f"Augmentation version {aug_version} not supported")
 
 
-    train_transform = Compose(get_srh_aug_list(cf["data"]["train_augmentation"]))
-    val_transform = Compose(get_srh_base_aug())
 
     train_dset = OpenSRHDataset(
         data_root=cf["data"]["db_root"],

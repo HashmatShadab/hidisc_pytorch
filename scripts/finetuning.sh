@@ -17,7 +17,7 @@ then
     echo "Saving Results in  $out_dir"
 
     python finetuning.py distributed.single_gpu=True data.balance_study_per_class=True \
-    model.backbone=$model_name model.start_from_ssl_ckpt=false model.finetuning=linear model.num_classes=7 \
+    model.backbone=$model_name model.start_from_ssl_ckpt=$ssl_ckpt model.finetuning=linear model.num_classes=7 \
     training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=pgd training.attack_eps=8.0 training.attack_steps=7 \
     out_dir=$out_dir \
     wandb.exp_name=$wandb_exp_name wandb.use=False

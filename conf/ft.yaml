@@ -21,6 +21,7 @@ data:
   db_root: F:\Code\datasets\hidisc_data_small
   meta_json: "opensrh.json"
   meta_split_json: "train_val_split.json"
+  aug_version: "v1"
   train_augmentation:
     - which: random_horiz_flip
       params: {}

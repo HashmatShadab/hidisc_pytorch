@@ -157,7 +157,7 @@ def get_ft_aug_v1():
     strong_aug = [Normalize(u16_min, u16_max), GetThirdChannel(), MinMaxChop()]
 
     # Append transformations to the list
-    strong_aug.append(transforms.RandomResizedCrop((300,300) , scale=(1.0 - 0.9 * strength, 1.0), interpolation=3))
+    strong_aug.append(transforms.Resize((300,300)))
     strong_aug.append(transforms.RandomHorizontalFlip())
 
 

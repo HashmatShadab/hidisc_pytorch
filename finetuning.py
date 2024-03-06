@@ -26,6 +26,17 @@ from helpers import  accuracy, MetricLogger, setup_seed
 from timm.layers import convert_sync_batchnorm
 from attacks import PGD, FGSM, FFGSM
 
+def plot_grid(w, save=False, name="grid.png"):
+    import matplotlib.pyplot as plt
+    grid_img = torchvision.utils.make_grid(w)
+    plt.imshow(grid_img.permute(1,2,0).cpu())
+    if save:
+        plt.savefig(name)
+    plt.show()
+
+
+
+
 log = logging.getLogger(__name__)
 
 
@@ -151,6 +162,7 @@ def main(args):
         no need to pass the checkpoints path.
 
         """
+        log.info(f"Loading SSL weights from checkpoint {args.model.start_from_ssl_ckpt}")
         checkpoint = torch.load(args.model.start_from_ssl_ckpt, pickle_module=dill)
         model_weights = checkpoint["model"]
         # remove the module from the keys
@@ -159,7 +171,7 @@ def main(args):
         model_weights = {k.replace("model.", ""): v for k, v in model_weights.items()}
 
         msg = model.load_state_dict(model_weights, strict=False)
-        log.info(f"Load model with msg: {msg}")
+        log.info(f"Loaded SSL weights in model with msg: {msg}")
 
 
 
@@ -282,14 +294,14 @@ def train_one_epoch(epoch, train_loader, model,
     for i, batch in enumerate(metric_logger.log_every(train_loader, print_freq, header)):
 
         # Move the tensors to the GPUs
-        im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-        im_reshaped = im_reshaped.to("cuda", non_blocking=True)
+        images = batch["image"]
+        images = images.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
 
         if train_attack:
-            adv_images = train_attack(im_reshaped, targets, dual_bn=dual_bn)
+            adv_images = train_attack(images, targets, dual_bn=dual_bn)
         else:
-            adv_images = im_reshaped
+            adv_images = images
         outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
 
         loss = criterion(outputs, targets)
@@ -338,12 +350,12 @@ def validate_clean(val_loader, model, criterion, dual_bn=False):
         for i, batch in enumerate(metric_logger.log_every(val_loader, 10, header)):
             # Move the tensors to the GPUs
             # Move the tensors to the GPUs
-            im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-            im_reshaped = im_reshaped.to("cuda", non_blocking=True)
+            images = batch["image"]
+            images = images.to("cuda", non_blocking=True)
             targets = batch["label"].to("cuda", non_blocking=True)
 
             # Forward pass to the network
-            outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
+            outputs = model(images, 'normal') if dual_bn else model(images)
 
 
             # Calculate loss
@@ -354,7 +366,7 @@ def validate_clean(val_loader, model, criterion, dual_bn=False):
             acc5 = accuracy(outputs, targets, topk=(5,))[0]
 
             # Update the losses & top1 accuracy list
-            batch_size = im_reshaped.shape[0]
+            batch_size = images.shape[0]
             metric_logger.update(loss=loss.item())
             metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
             metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
@@ -378,13 +390,13 @@ def validate_adv(val_loader, model, criterion, dual_bn=False, eval_attack=None):
     for i, batch in enumerate(metric_logger.log_every(val_loader, 10, header)):
         # Move the tensors to the GPUs
         # Move the tensors to the GPUs
-        im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-        im_reshaped = im_reshaped.to("cuda", non_blocking=True)
+        images = batch["image"]
+        images = images.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
 
         # Forward pass to the network
-        adv_images = eval_attack(im_reshaped, targets, dual_bn=dual_bn)
-        outputs = model(adv_images, 'pgd') if dual_bn else model(im_reshaped)
+        adv_images = eval_attack(images, targets, dual_bn=dual_bn)
+        outputs = model(adv_images, 'pgd') if dual_bn else model(images)
 
 
         # Calculate loss
@@ -395,7 +407,7 @@ def validate_adv(val_loader, model, criterion, dual_bn=False, eval_attack=None):
         acc5 = accuracy(outputs, targets, topk=(5,))[0]
 
         # Update the losses & top1 accuracy list
-        batch_size = im_reshaped.shape[0]
+        batch_size = images.shape[0]
         metric_logger.update(loss=loss.item())
         metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
         metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
