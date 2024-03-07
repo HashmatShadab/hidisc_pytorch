@@ -15,8 +15,7 @@ wandb:
   mode: "online"
   use:
   exp_name: "main"
-  group_name: "FT""
-
+  group_name: "FT"
 
 data:
   db_root: F:\Code\datasets\hidisc_data_small
