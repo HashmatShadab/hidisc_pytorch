@@ -124,7 +124,7 @@ def main(args):
 
         if args.wandb.use:
             wandb.init(project=args.wandb.project, entity=args.wandb.entity, mode=args.wandb.mode,
-                       name=args.wandb.exp_name)
+                       name=args.wandb.exp_name, group=args.wandb.group_name)
 
         log.info(f"Saving output to {os.path.join(os.getcwd())}")
 
