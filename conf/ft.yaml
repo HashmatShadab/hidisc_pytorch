@@ -10,17 +10,19 @@ eval_only:
 
 
 wandb:
-  project: "my_project"
-  entity: "my_entity"
+  project: "HiDisc"
+  entity: "hashmatshadab"
   mode: "online"
   use:
-  exp_name: "my_exp"
+  exp_name: "main"
+  group_name: "FT""
 
 
 data:
   db_root: F:\Code\datasets\hidisc_data_small
   meta_json: "opensrh.json"
   meta_split_json: "train_val_split.json"
+  aug_version: "v1"
   train_augmentation:
     - which: random_horiz_flip
       params: {}
@@ -52,11 +54,8 @@ data:
     - which: random_erasing
       params: {}
 
-  hidisc:
-    num_slide_samples: 1
-    num_patch_samples: 1
-    num_transforms: 1
-  balance_study_per_class: true
+  balance_study_per_class: false
+
 model:
   backbone: resnet50
   start_from_ssl_ckpt:
@@ -67,19 +66,23 @@ model:
 
 
 training:
-  batch_size: 10
-  num_epochs: 40000
-  optimizer: adamw # [sgd, adam, adamw]
-  learn_rate: 1.0e-3
+  batch_size: 128
+  num_epochs: 40
+  optimizer: sgd # [sgd, adam, adamw]
+  learn_rate: 0.1
   scheduler:
     which: cos_warmup
     params:
       num_warmup_steps: 0.1
       num_cycles: 0.5
   imagenet_backbone_checkpoint: null
-  eval_ckpt_ep_freq: 400
+  eval_ckpt_ep_freq: 5
+  train_attack:
+  attack_eps: 8.0
+  attack_steps: 7
 
 distributed:
+  single_gpu:
   world_size: 1
   local_rank: -1
   dist_on_itp: False

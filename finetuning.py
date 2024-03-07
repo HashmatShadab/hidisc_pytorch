@@ -19,10 +19,23 @@ from helpers import init_distributed_mode, get_rank, is_main_process, get_world_
 from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
 from models import resnetv2_50, resnetv2_50_gn
+from models import timm_wideresnet50_2, timm_resnet50, timm_resnetv2_50
 from scheduler import make_optimizer_and_schedule
 import torch
 from helpers import  accuracy, MetricLogger, setup_seed
 from timm.layers import convert_sync_batchnorm
+from attacks import PGD, FGSM, FFGSM
+
+def plot_grid(w, save=False, name="grid.png"):
+    import matplotlib.pyplot as plt
+    grid_img = torchvision.utils.make_grid(w)
+    plt.imshow(grid_img.permute(1,2,0).cpu())
+    if save:
+        plt.savefig(name)
+    plt.show()
+
+
+
 
 log = logging.getLogger(__name__)
 
@@ -55,11 +68,23 @@ class FineTuneModel(torch.nn.Module):
             backbone = resnetv2_50()
         elif cf["model"]["backbone"] == "resnetv2_50_gn":
             backbone = resnetv2_50_gn()
+        elif cf["model"]["backbone"] == "wide_resnet50_2":
+            backbone = timm_wideresnet50_2(pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm":
+            backbone = timm_resnet50(pretrained=False)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm":
+            backbone = timm_resnetv2_50(pretrained=False)
+        elif cf["model"]["backbone"] == "resnet50_timm_pretrained":
+            backbone = timm_resnet50(pretrained=True)
+        elif cf["model"]["backbone"] == "resnetv2_50_timm_pretrained":
+            backbone = timm_resnetv2_50(pretrained=True)
+        elif cf["model"]["backbone"] == "wide_resnet50_2_pretrained":
+            backbone = timm_wideresnet50_2(pretrained=True)
         else:
             raise NotImplementedError()
 
         self.bb = backbone
-        self.linear_head = torch.nn.Linear(in_features=2048, out_features=num_classes)
+        self.fc = torch.nn.Linear(in_features=2048, out_features=num_classes)
 
 
     def forward(self, img, bn_name=None):
@@ -69,7 +94,7 @@ class FineTuneModel(torch.nn.Module):
         else:
             features = self.bb(img)
 
-        logits = self.linear_head(features)
+        logits = self.fc(features)
 
         return logits
 
@@ -94,15 +119,12 @@ def main(args):
     if is_main_process():
         log.info(OmegaConf.to_yaml(args))  # log.info all the command line arguments
 
-    # Create the output director if not exits
+        # Create the output director if not exits
     if get_rank() == 0 and args.out_dir is not None:
 
         if args.wandb.use:
-            name = args.out_dir.replace("/", "_")
             wandb.init(project=args.wandb.project, entity=args.wandb.entity, mode=args.wandb.mode,
-                       name=name, group=args.wandb.exp_name)
-            config = wandb.config
-            config.update(args)
+                       name=args.wandb.exp_name, group=args.wandb.group_name)
 
         log.info(f"Saving output to {os.path.join(os.getcwd())}")
 
@@ -112,22 +134,35 @@ def main(args):
     dual_bn = True if args.model.backbone == "resnet50_multi_bn" else False
     model.to(device="cuda")
 
-    def get_n_params(model):
-        total = 0
-        for p in list(model.parameters()):
-            total += np.prod(p.size())
-        return total
 
-    log.info(f'==> [Number of parameters of the model is {get_n_params(model)}]')
+
+    if args.model.finetuning == 'linear':
+        # Freeze the backbone
+        for name, param in model.named_parameters():
+            if 'fc' not in name:
+                param.requires_grad = False
+        parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
+
+    elif args.model.finetuning == 'full':
+        parameters =list(model.parameters())
+    else:
+        raise NotImplementedError()
+
+
+    log.info(f'==> [Number of parameters of the model is {len(parameters)}]')
 
     if args.model.start_from_ssl_ckpt:
+
+        if not os.path.isfile(args.model.start_from_ssl_ckpt):
+            print(f": No checkpoints found in {os.getcwd()}")
+            raise FileNotFoundError
         """
         Loads only model weights for evaluation.
         if restart_from_ckpt, then model weights will be loaded from the output dir,
         no need to pass the checkpoints path.
 
         """
-        log.info(f"Loading model weights from {args.model.start_from_ssl_ckpt}")
+        log.info(f"Loading SSL weights from checkpoint {args.model.start_from_ssl_ckpt}")
         checkpoint = torch.load(args.model.start_from_ssl_ckpt, pickle_module=dill)
         model_weights = checkpoint["model"]
         # remove the module from the keys
@@ -136,19 +171,10 @@ def main(args):
         model_weights = {k.replace("model.", ""): v for k, v in model_weights.items()}
 
         msg = model.load_state_dict(model_weights, strict=False)
-        log.info(f"Load model with msg: {msg}")
+        log.info(f"Loaded SSL weights in model with msg: {msg}")
 
 
 
-    if args.model.finetuning == 'linear':
-        # Freeze the backbone
-        for param in model.bb.parameters():
-            param.requires_grad = False
-    elif args.model.finetuning == 'full':
-        for param in model.bb.parameters():
-            param.requires_grad = True
-    else:
-        raise NotImplementedError()
 
     parma_list = list(filter(lambda p: p.requires_grad, model.parameters()))
 
@@ -162,17 +188,18 @@ def main(args):
     if is_main_process():
         log.info(f"Total number of learnable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
-    if args.model.backbone == "resnetv2_50":
-        model = convert_sync_batchnorm(model)
 
     if args.distributed.distributed:
+        if args.model.backbone == "resnet50_multi_bn" or args.model.backbone == "resnet50":
+            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+        else:
+            model = convert_sync_batchnorm(model)
         unused_params = True if args.model.backbone == "resnet50_multi_bn" else False
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.distributed.gpu],
                                                           find_unused_parameters=unused_params,
                                                           broadcast_buffers=False)
 
     start_epoch, loss = restart_from_checkpoint("checkpoint.pth", model, optimizer, scheduler)
-    args.training.num_epochs = args.training.num_epochs - start_epoch
 
     # Perform evaluation and exit if `eval_only` is set
     if args.eval_only:
@@ -180,24 +207,54 @@ def main(args):
         validate_clean(validation_loader, model, criterion)
         return  # Safe exit
 
+    if args.training.train_attack == 'pgd':
+        train_attack = PGD(model=model, steps=7, eps=8/255.0)
+    else:
+        train_attack = False
+
+    eval_attack = FFGSM(model=model, eps=8/255.0)
+
     # Training loop
-    for epoch in range(args.training.num_epochs):
+    best_clean_accuracy = 0
+    best_adv_accuracy = 0
+    for epoch in range(start_epoch, args.training.num_epochs):
         # Train for one epoch
         train_stats = train_one_epoch(epoch=epoch, train_loader=train_loader, model=model,
-                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler, dual_bn=dual_bn)
+                                      optimizer=optimizer, criterion=criterion, scheduler=scheduler,
+                                      dual_bn=dual_bn, train_attack=train_attack)
 
         val_stats = validate_clean(validation_loader, model, criterion, dual_bn=dual_bn)
-        # if scheduler:
-        #     scheduler.step()
+        adv_stats = validate_adv(validation_loader, model, criterion, dual_bn=dual_bn, eval_attack=eval_attack)
+
 
         #  Save the checkpoints
-        save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
-                         name='checkpoint.pth')
+        if (epoch + 1) % args.training.save_checkpoint_interval == 0 and is_main_process():
+            save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                             name=f'checkpoint_{epoch + 1}.pth')
+
+        if is_main_process():
+            save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                             name=f'checkpoint.pth')
+
+            clean_acc_for_epoch = val_stats['acc1']
+            adv_acc_for_epoch = adv_stats['acc1']
+            if clean_acc_for_epoch < best_clean_accuracy:
+                best_clean_accuracy = clean_acc_for_epoch
+                save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                                 name=f'best_clean_acc_checkpoint.pth')
+                log.info(f"==> [Best Clean Acc: {best_clean_accuracy}]")
+            if adv_acc_for_epoch < best_adv_accuracy :
+                best_adv_accuracy = adv_acc_for_epoch
+                save_checkpoints(epoch + 1, model, optimizer, scheduler, train_stats,
+                                 name=f'best_adv_acc_checkpoint.pth')
+                log.info(f"==> [Best Adv Acc: {best_adv_accuracy}]")
 
         # Log the epoch stats
         log_stats_train = {
             'Epoch': epoch,
-            **{f'train_{key}': value for key, value in train_stats.items() if "acc5" not in key},
+            **{f'train_{key}': value for key, value in train_stats.items()},
+            **{f'val_{key}': value for key, value in val_stats.items() if "acc5" not in key},
+            **{f'adv_val_{key}': value for key, value in adv_stats.items() if "acc5" not in key}
         }
 
         if args.out_dir and is_main_process():
@@ -212,7 +269,7 @@ def main(args):
 
 
 def train_one_epoch(epoch, train_loader, model,
-                    optimizer, criterion, scheduler, print_freq=50, dual_bn=False):
+                    optimizer, criterion, scheduler, print_freq=50, dual_bn=False, train_attack=None):
 
     """
     :param epoch: The current epoch number.
@@ -237,27 +294,20 @@ def train_one_epoch(epoch, train_loader, model,
     for i, batch in enumerate(metric_logger.log_every(train_loader, print_freq, header)):
 
         # Move the tensors to the GPUs
-        im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-        orig_im = batch['base_image'].reshape(-1, *batch['base_image'].shape[-3:])
-        im_reshaped = im_reshaped.to("cuda", non_blocking=True)
+        images = batch["image"]
+        images = images.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
 
-        # adv_images = pgd_attack(model=model, criterion=criterion, targets=targets, images=im_reshaped, eps=1/255, alpha=1/255, iters=7, shape=batch["image"].shape[:4])
-        # adv_outputs = model(adv_images)
-        # adv_outputs = adv_outputs.reshape(*batch["image"].shape[:4], adv_outputs.shape[-1])
-        # adv_losses = criterion(adv_outputs, targets)
-        # adv_loss = adv_losses["sum_loss"]
-        # if using Dual Stream model, then use the following line
-        # model(inputs, 'normal') for clean images and model(inputs, 'pgd') for adversarial images
-        # also fopr attack pass model(images + delta, 'pgd')
+        if train_attack:
+            adv_images = train_attack(images, targets, dual_bn=dual_bn)
+        else:
+            adv_images = images
+        outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
 
-
-        clean_outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
-
-        clean_loss = criterion(clean_outputs, targets)
+        loss = criterion(outputs, targets)
 
         optimizer.zero_grad()
-        clean_loss.backward()
+        loss.backward()
         optimizer.step()
         scheduler.step()
 
@@ -265,7 +315,7 @@ def train_one_epoch(epoch, train_loader, model,
         torch.cuda.synchronize()
 
 
-        metric_logger.update(loss=clean_loss.item())
+        metric_logger.update(loss=loss.item())
 
 
 
@@ -300,12 +350,12 @@ def validate_clean(val_loader, model, criterion, dual_bn=False):
         for i, batch in enumerate(metric_logger.log_every(val_loader, 10, header)):
             # Move the tensors to the GPUs
             # Move the tensors to the GPUs
-            im_reshaped = batch["image"].reshape(-1, *batch["image"].shape[-3:])
-            im_reshaped = im_reshaped.to("cuda", non_blocking=True)
+            images = batch["image"]
+            images = images.to("cuda", non_blocking=True)
             targets = batch["label"].to("cuda", non_blocking=True)
 
             # Forward pass to the network
-            outputs = model(im_reshaped, 'normal') if dual_bn else model(im_reshaped)
+            outputs = model(images, 'normal') if dual_bn else model(images)
 
 
             # Calculate loss
@@ -316,10 +366,51 @@ def validate_clean(val_loader, model, criterion, dual_bn=False):
             acc5 = accuracy(outputs, targets, topk=(5,))[0]
 
             # Update the losses & top1 accuracy list
-            batch_size = im_reshaped.shape[0]
+            batch_size = images.shape[0]
             metric_logger.update(loss=loss.item())
             metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
             metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
+
+    # Gather the stats from all processes
+    metric_logger.synchronize_between_processes()
+    log.info(f"* Acc@1 {metric_logger.acc1.global_avg:.3f} Acc@5 {metric_logger.acc5.global_avg:.3f} loss {metric_logger.loss.global_avg:.3f}")
+
+    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+
+
+def validate_adv(val_loader, model, criterion, dual_bn=False, eval_attack=None):
+    # Distributed metric logger
+    metric_logger = MetricLogger(delimiter="  ")
+    header = 'Adv Test:'
+
+    # Switch to evaluation mode
+    model.eval()
+
+    # Evaluate and return the loss and accuracy
+    for i, batch in enumerate(metric_logger.log_every(val_loader, 10, header)):
+        # Move the tensors to the GPUs
+        # Move the tensors to the GPUs
+        images = batch["image"]
+        images = images.to("cuda", non_blocking=True)
+        targets = batch["label"].to("cuda", non_blocking=True)
+
+        # Forward pass to the network
+        adv_images = eval_attack(images, targets, dual_bn=dual_bn)
+        outputs = model(adv_images, 'pgd') if dual_bn else model(images)
+
+
+        # Calculate loss
+        loss = criterion(outputs, targets)
+
+        # Measure accuracy
+        acc1 = accuracy(outputs, targets, topk=(1,))[0]
+        acc5 = accuracy(outputs, targets, topk=(5,))[0]
+
+        # Update the losses & top1 accuracy list
+        batch_size = images.shape[0]
+        metric_logger.update(loss=loss.item())
+        metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
+        metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
 
     # Gather the stats from all processes
     metric_logger.synchronize_between_processes()
@@ -382,4 +473,4 @@ def restart_from_checkpoint(checkpoint_name, model, optimizer,
     return start_epoch, loss
 
 if __name__ == "__main__":
-    best_certified_accuracy = main()
+    main()

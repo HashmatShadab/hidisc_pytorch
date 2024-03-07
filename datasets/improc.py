@@ -149,6 +149,21 @@ def get_dynacl_aug_v1(strength):
 
     return strong_aug
 
+def get_ft_aug_v1():
+    u16_min = (0, 0)
+    u16_max = (65536, 65536)  # 2^16
+
+    # Base augmentations
+    strong_aug = [Normalize(u16_min, u16_max), GetThirdChannel(), MinMaxChop()]
+
+    # Append transformations to the list
+    strong_aug.append(transforms.Resize((300,300)))
+    strong_aug.append(transforms.RandomHorizontalFlip())
+
+
+
+    return strong_aug
+
 
 
 
