@@ -18,7 +18,7 @@ then
 
     echo "Saving Results in  $out_dir"
 
-    python finetuning.py distributed.single_gpu=True data.balance_study_per_class=false \
+    python finetuning.py distributed.single_gpu=True data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.balance_study_per_class=false \
     model.backbone=$model_name model.start_from_ssl_ckpt=$ssl_ckpt model.finetuning=linear model.num_classes=7 \
     training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=pgd training.attack_eps=8.0 training.attack_steps=7 \
     out_dir=$out_dir \
@@ -33,7 +33,7 @@ then
 
     echo "Saving Results in  $out_dir"
 
-    python finetuning.py distributed.single_gpu=True data.balance_study_per_class=false \
+    python finetuning.py distributed.single_gpu=True data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.balance_study_per_class=false \
     model.backbone=$model_name model.start_from_ssl_ckpt=false model.finetuning=full model.num_classes=7 \
     training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=pgd training.attack_eps=8.0 training.attack_steps=7 \
     out_dir=$out_dir \
@@ -49,7 +49,7 @@ then
 
     echo "Saving Results in  $out_dir"
 
-    python finetuning.py distributed.single_gpu=True data.balance_study_per_class=false \
+    python finetuning.py distributed.single_gpu=True data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.balance_study_per_class=false \
     model.backbone=$model_name model.start_from_ssl_ckpt=false model.finetuning=full model.num_classes=7 \
     training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=false training.attack_eps=8.0 training.attack_steps=7 \
     out_dir=$out_dir \
@@ -65,7 +65,7 @@ then
 
     echo "Saving Results in  $out_dir"
 
-    python finetuning.py distributed.single_gpu=True data.balance_study_per_class=false \
+    python finetuning.py distributed.single_gpu=True data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.balance_study_per_class=false \
     model.backbone=$model_name model.start_from_ssl_ckpt=$ssl_ckpt model.finetuning=linear model.num_classes=7 \
     training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=pgd training.attack_eps=8.0 training.attack_steps=7 \
     out_dir=$out_dir \
