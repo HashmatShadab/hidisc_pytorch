@@ -79,6 +79,7 @@ training:
   train_attack:
   attack_eps: 8.0
   attack_steps: 7
+  save_checkpoint_interval: 5
 
 distributed:
   single_gpu:
