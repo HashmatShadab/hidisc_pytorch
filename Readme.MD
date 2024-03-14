@@ -13,6 +13,18 @@ pip install scikit-learn
 pip install tqdm
 pip install torchmetrics
 pip install pandas
+
+## Adding mamba models ##
+pip install packaging
+pip install causal-conv1d==1.1.1
+pip install mamba-ssm==1.1.4
+pip install torchinfo timm numba
+pip install monai==1.3.0
+
+## Additional Packages for VMamba ##
+pip install fvcore
+cd VMamba/kernels/selective_scan && pip install .
+
 ```
 
 

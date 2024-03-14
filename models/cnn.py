@@ -47,7 +47,7 @@ class ContrastiveLearningNetwork(torch.nn.Module):
 
     def __init__(self, backbone: callable, proj: callable):
         super(ContrastiveLearningNetwork, self).__init__()
-        self.bb = backbone()
+        self.bb = backbone
         self.proj = proj()
 
     def forward(self, x: torch.Tensor, bn_name) -> torch.Tensor:

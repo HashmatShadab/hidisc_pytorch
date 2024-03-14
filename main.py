@@ -19,6 +19,7 @@ from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
 from models import resnetv2_50, resnetv2_50_gn
 from models import timm_wideresnet50_2, timm_resnet50, timm_resnetv2_50
+from vmamba_models import build_vssm_model
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from ft_validate import validate_clean
@@ -49,25 +50,34 @@ class HiDiscModel(torch.nn.Module):
         self.cf_ = cf
 
         if cf["model"]["backbone"] == "resnet50":
-            bb = partial(resnet_backbone, arch=cf["model"]["backbone"])
+            bb = resnet_backbone(arch=cf["model"]["backbone"])
         elif cf["model"]["backbone"] == "resnet50_multi_bn":
-            bb = partial(resnet50_multi_bn, bn_names=["normal", "pgd"])
+            bb = resnet50_multi_bn(bn_names=["normal", "pgd"])
         elif cf["model"]["backbone"] == "resnetv2_50":
-            bb = partial(resnetv2_50)
+            bb = resnetv2_50()
         elif cf["model"]["backbone"] == "resnetv2_50_gn":
-            bb = partial(resnetv2_50_gn)
+            bb = resnetv2_50_gn()
         elif cf["model"]["backbone"] == "wide_resnet50_2":
-            bb = partial(timm_wideresnet50_2, pretrained=False)
+            bb = timm_wideresnet50_2(pretrained=False)
         elif cf["model"]["backbone"] == "resnet50_timm":
-            bb = partial(timm_resnet50, pretrained=False)
+            bb = timm_resnet50(pretrained=False)
         elif cf["model"]["backbone"] == "resnetv2_50_timm":
-            bb = partial(timm_resnetv2_50, pretrained=False)
+            bb = timm_resnetv2_50(pretrained=False)
         elif cf["model"]["backbone"] == "resnet50_timm_pretrained":
-            bb = partial(timm_resnet50, pretrained=True)
+            bb = timm_resnet50(pretrained=True)
         elif cf["model"]["backbone"] == "resnetv2_50_timm_pretrained":
-            bb = partial(timm_resnetv2_50, pretrained=True)
+            bb = timm_resnetv2_50(pretrained=True)
         elif cf["model"]["backbone"] == "wide_resnet50_2_pretrained":
-            bb = partial(timm_wideresnet50_2, pretrained=True)
+            bb = timm_wideresnet50_2(pretrained=True)
+        elif cf["model"]["backbone"] == "vssm_tiny_0220":
+            bb = build_vssm_model(model_type="vssm_tiny_0220")
+        elif cf["model"]["backbone"] == "vssm_tiny_0220_pretrained":
+            bb = build_vssm_model(model_type="vssm_tiny_0220")
+            ckpt = torch.load(cf["model"]["checkpoints_path"])
+            msg = bb.load_state_dict(ckpt["model"])
+            print(msg)
+
+
         else:
             raise NotImplementedError()
 
