@@ -339,13 +339,13 @@ def main():
     setup_seed(cf.seed)
     prediction_path = os.path.join(cf.save_results_path, "predictions.pt")
 
-    if os.path.exists(prediction_path):
-        log.info("loading predictions")
-        predictions = torch.load(prediction_path)
-    else:
-        log.info("generating predictions")
-        predictions = get_embeddings(cf, None, log=log)
-        torch.save(predictions, prediction_path)
+    # if os.path.exists(prediction_path):
+    #     log.info("loading predictions")
+    #     predictions = torch.load(prediction_path)
+
+    log.info("generating predictions")
+    predictions = get_embeddings(cf, None, log=log)
+    torch.save(predictions, prediction_path)
 
     # generate specs
     make_specs(predictions, log=log)
