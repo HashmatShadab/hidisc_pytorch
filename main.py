@@ -80,9 +80,12 @@ class HiDiscModel(torch.nn.Module):
 
         else:
             raise NotImplementedError()
-
+        if cf["model"]["backbone"].startswith("vssm"):
+            n_in = 768
+        else:
+            n_in = 2048
         mlp = partial(MLP,
-                      n_in=2048,
+                      n_in=n_in,
                       hidden_layers=cf["model"]["mlp_hidden"],
                       n_out=cf["model"]["num_embedding_out"])
         self.model = ContrastiveLearningNetwork(bb, mlp)
