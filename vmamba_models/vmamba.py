@@ -1278,7 +1278,6 @@ class VSSM(nn.Module):
             permute=(Permute(0, 3, 1, 2) if not self.channel_first else nn.Identity()),
             avgpool=nn.AdaptiveAvgPool2d(1),
             flatten=nn.Flatten(1),
-            head=nn.Linear(self.num_features, num_classes),
         ))
 
         self.apply(self._init_weights)
