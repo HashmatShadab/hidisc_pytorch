@@ -19,7 +19,7 @@ from models import MLP, resnet_backbone, ContrastiveLearningNetwork
 from models.resnet_multi_bn_stl import resnet50 as resnet50_multi_bn
 from models import resnetv2_50, resnetv2_50_gn
 from models import timm_wideresnet50_2, timm_resnet50, timm_resnetv2_50
-from vmamba_models import build_vssm_model
+# from vmamba_models import build_vssm_model
 from scheduler import make_optimizer_and_schedule
 from train import train_one_epoch
 from ft_validate import validate_clean
