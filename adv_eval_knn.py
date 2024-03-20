@@ -162,7 +162,7 @@ def get_embeddings(cf: Dict[str, Any],
         adv_images = attack(images, labels, dual_bn)
 
         with torch.no_grad():
-            outputs = model.get_features(adv_images, bn_name="normal") if dual_bn else model.get_features(images)
+            outputs = model.get_features(adv_images, bn_name="normal") if dual_bn else model.get_features(adv_images)
 
         d = {"embeddings": outputs, "label": labels, "path": batch["path"]}
 
