@@ -22,6 +22,7 @@ def setup_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
 
 def get_mean_std(normalize):
     if normalize is None:
