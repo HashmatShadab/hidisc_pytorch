@@ -311,7 +311,7 @@ def get_args():
     parser.add_argument('--model_num_embedding_out', type=int, default=128)
     parser.add_argument('--model_train_alg', type=str, default='hidisc')
 
-    parser.add_argument('--eval_predict_batch_size', type=int, default=8)
+    parser.add_argument('--eval_predict_batch_size', type=int, default=32)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
     parser.add_argument('--eval_ckpt_path', type=str, default=r'F:\Code\Projects\ckpt-epoch35199.ckpt')
     parser.add_argument('--save_results_path', type=str, default='eval_knn_results')
