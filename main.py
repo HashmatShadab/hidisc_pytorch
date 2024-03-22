@@ -132,7 +132,7 @@ def main(args):
         log.info(OmegaConf.to_yaml(args)) # log.info all the command line arguments
 
     # Create the output director if not exits
-    if get_rank() == 0 and args.out_dir is not None:
+    if is_main_process() and args.out_dir is not None:
 
         if args.wandb.use:
             wandb.init(project=args.wandb.project, entity=args.wandb.entity, mode=args.wandb.mode,
@@ -161,6 +161,8 @@ def main(args):
     # Define loss, create optimizer and scheduler
     num_it_per_ep = len(train_loader)
     log.info(f"==> [Number of iterations per epoch: {num_it_per_ep}], Length of train_loader: {len(train_loader)}, world_size: {get_world_size()}]")
+    log.info(f"==> [Batch size: {args['training']['batch_size']}, Learning rate: {args['training']['learn_rate']}]")
+    args['training']['learn_rate'] = args['training']['learn_rate'] * args['training']['batch_size'] * get_world_size() / 64
     optimizer, scheduler = make_optimizer_and_schedule(args, model, parma_list, num_it_per_ep)
 
     crit_params = args["training"]["objective"]["params"]
