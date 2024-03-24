@@ -235,6 +235,8 @@ then
 fi
 
 
+
+
 if [ $exp_num -eq 20 ]
 then
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
@@ -289,8 +291,97 @@ then
 fi
 
 
+##############################################################################################################
+# Experiment 24-27 : Are for testing the effect of embedding size on the adversarial training: Exp 19 is repeated with different embedding sizes
+if [ $exp_num -eq 24 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name model.num_embedding_out=256 \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256 wandb.use=True
 
+fi
 
+if [ $exp_num -eq 25 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name model.num_embedding_out=512 \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512 wandb.use=True
+
+fi
+
+if [ $exp_num -eq 26 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name model.num_embedding_out=768 \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp26_with_embedding768 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp26_with_embedding768 wandb.use=True
+
+fi
+
+if [ $exp_num -eq 27 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name model.num_embedding_out=1024 \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp27_with_embedding1024 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp27_with_embedding1024 wandb.use=True
+
+fi
+
+#######################################################################################################################
+# Experiment 28: Testing the effect of patch loss only on the adversarial training, Increase the batch size accordingly by 4 times
+if [ $exp_num -eq 28 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    data.hidisc.num_slide_samples=1 data.hidisc.num_patch_samples=1 \
+    model.backbone=$model_name  \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28 wandb.use=True
+
+fi
+
+#######################################################################################################################
+# Experiment 29-30 Testing the effect of multi-layer MLP on the adversarial training. Exp 29 is based on NeuriPS method and Exp 30 is based on the baseline code
+
+if [ $exp_num -eq 29 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name model.proj_head=True model.num_embedding_out=2048 \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29 wandb.use=True
+
+fi
+
+if [ $exp_num -eq 30 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048 \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30 wandb.use=True
+
+fi
 
 
 
