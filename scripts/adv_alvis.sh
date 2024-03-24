@@ -342,7 +342,7 @@ then
 fi
 
 #######################################################################################################################
-# Experiment 28: Testing the effect of patch loss only on the adversarial training, Increase the batch size accordingly by 4 times
+# Experiment 28: Testing the effect of patch loss only on the adversarial training, Increase the batch size accordingly by 4 times. Exp 19 is repeated with patch loss only
 if [ $exp_num -eq 28 ]
 then
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
@@ -357,7 +357,7 @@ then
 fi
 
 #######################################################################################################################
-# Experiment 29-30 Testing the effect of multi-layer MLP on the adversarial training. Exp 29 is based on NeuriPS method and Exp 30 is based on the baseline code
+# Experiment 29-30 Testing the effect of multi-layer MLP on the adversarial training. Exp 29 is based on NeuriPS method and Exp 30 is based on the baseline code. Exp 19 is repeated with multi-layer MLP
 
 if [ $exp_num -eq 29 ]
 then
