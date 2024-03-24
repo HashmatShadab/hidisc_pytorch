@@ -30,6 +30,48 @@ from timm.layers import convert_sync_batchnorm
 
 log = logging.getLogger(__name__)
 
+class proj_head(torch.nn.Module):
+    def __init__(self, ch):
+        super(proj_head, self).__init__()
+        self.in_features = ch
+
+        self.fc1 = torch.nn.Linear(ch, ch)
+        self.bn1 = torch.nn.BatchNorm1d(ch)
+        self.fc2 = torch.nn.Linear(ch, ch, bias=False)
+        self.bn2 = torch.nn.BatchNorm1d(ch)
+
+        self.fc3 = torch.nn.Linear(ch, ch, bias=False)
+        self.bn3 = torch.nn.BatchNorm1d(ch)
+
+        self.relu = torch.nn.ReLU(inplace=True)
+
+        def init_weights(m):
+            if isinstance(m, torch.nn.Linear):
+                torch.nn.init.xavier_uniform_(m.weight)
+                m.bias.data.fill_(0.01)
+
+        self.layers.apply(init_weights)
+
+
+    def forward(self, x):
+        # debug
+        # print("adv attack: {}".format(flag_adv))
+
+        x = self.fc1(x)
+        x = self.bn1(x)
+
+        x = self.relu(x)
+
+        x = self.fc2(x)
+        x = self.bn2(x)
+        x = self.relu(x)
+
+        x = self.fc3(x)
+        x = self.bn3(x)
+
+        return x
+
+
 class HiDiscModel(torch.nn.Module):
     """
     HiDiscModel
@@ -84,10 +126,13 @@ class HiDiscModel(torch.nn.Module):
             n_in = 768
         else:
             n_in = 2048
-        mlp = partial(MLP,
-                      n_in=n_in,
-                      hidden_layers=cf["model"]["mlp_hidden"],
-                      n_out=cf["model"]["num_embedding_out"])
+        if cf["model"]["proj_head"]:
+            mlp = partial(proj_head, ch=n_in)
+        else:
+            mlp = partial(MLP,
+                          n_in=n_in,
+                          hidden_layers=cf["model"]["mlp_hidden"],
+                          n_out=cf["model"]["num_embedding_out"])
         self.model = ContrastiveLearningNetwork(bb, mlp)
 
 
