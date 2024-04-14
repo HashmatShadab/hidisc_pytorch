@@ -358,7 +358,7 @@ fi
 
 if [ $exp_num -eq 281 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    HYDRA_FULL_ERROR=1  torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
     data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
     data.hidisc.num_slide_samples=1 data.hidisc.num_patch_samples=1 \
     model.backbone=$model_name  \
