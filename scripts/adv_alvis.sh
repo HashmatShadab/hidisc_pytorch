@@ -343,7 +343,7 @@ fi
 
 #######################################################################################################################
 # Experiment 28: Testing the effect of patch loss only on the adversarial training, Increase the batch size accordingly by 4 times. Exp 19 is repeated with patch loss only
-if [ $exp_num -eq 28 ]
+if [ $exp_num -eq 28 ] # ran this one, but kept the batch size 16
 then
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
     data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
@@ -353,6 +353,19 @@ then
     training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
     out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28 \
     wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28 wandb.use=True
+
+fi
+
+if [ $exp_num -eq 281 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    data.hidisc.num_slide_samples=1 data.hidisc.num_patch_samples=1 \
+    model.backbone=$model_name  \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp281 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp281 wandb.use=True
 
 fi
 
