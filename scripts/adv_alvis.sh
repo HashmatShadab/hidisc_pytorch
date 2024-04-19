@@ -397,10 +397,36 @@ then
 fi
 
 
+####################################################################################################################################
 
 
 
+##############################################################################################################
+# Experiment 31-34 : Exp 19 is repeated with different  attack loss : pt and s_pt
+if [ $exp_num -eq 31 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name  \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt wandb.use=True
 
+fi
+
+if [ $exp_num -eq 32 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name  \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt wandb.use=True
+
+
+fi
 
 
 
