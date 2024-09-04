@@ -14,8 +14,8 @@ echo "saving results to: $ckpt_dir/eval_knn_results"
 # loop over all the checkpoints in the directory ending with .pth
 for ckpt_path in $ckpt_dir/*.pth; do
 
-#    python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name \
-#    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-     echo $ckpt_path
+    echo $ckpt_path
+    python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name \
+    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
 
 done
