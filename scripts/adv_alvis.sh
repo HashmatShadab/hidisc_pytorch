@@ -210,7 +210,7 @@ then
 
 fi
 
-if [ $exp_num -eq 18 ]
+if [ $exp_num -eq 18 ] # Baseline
 then
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
     data.db_root=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH data.dynamic_aug=False data.dynamic_aug_version=v0 \
@@ -252,7 +252,7 @@ fi
 
 
 
-
+#################################################Single GPU #########################################################
 if [ $exp_num -eq 21 ]
 then
     python main.py distributed.single_gpu=True \
@@ -290,8 +290,8 @@ then
 
 fi
 
-
 ##############################################################################################################
+
 # Experiment 24-27 : Are for testing the effect of embedding size on the adversarial training: Exp 19 is repeated with different embedding sizes
 if [ $exp_num -eq 24 ]
 then
@@ -370,7 +370,8 @@ then
 fi
 
 #######################################################################################################################
-# Experiment 29-30 Testing the effect of multi-layer MLP on the adversarial training. Exp 29 is based on NeuriPS method and Exp 30 is based on the baseline code. Exp 19 is repeated with multi-layer MLP
+# Experiment 29-30 Testing the effect of multi-layer MLP on the adversarial training. Exp 29 is based on NeuriPS method and Exp 30 is based on the baseline code.
+# Exp 19 is repeated with multi-layer MLP
 
 if [ $exp_num -eq 29 ]
 then
