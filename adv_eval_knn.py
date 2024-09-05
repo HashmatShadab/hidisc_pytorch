@@ -110,7 +110,7 @@ def get_embeddings(cf: Dict[str, Any],
                                              drop_last=False, pin_memory=True, persistent_workers=False)
     ckpt_path = cf.eval_ckpt_path
     model_dict = {"model": {"backbone": cf.model_backbone, "mlp_hidden": cf.model_mlp_hidden,
-                            "num_embedding_out": cf.model_num_embedding_out
+                            "num_embedding_out": cf.model_num_embedding_out, "proj_head": cf.model_proj_head,
                             }
                   }
     model = HiDiscModel(model_dict)
@@ -310,6 +310,7 @@ def get_args():
     parser.add_argument('--model_mlp_hidden', nargs='*', type=int, default=[])
     parser.add_argument('--model_num_embedding_out', type=int, default=128)
     parser.add_argument('--model_train_alg', type=str, default='hidisc')
+    parser.add_argument('--model_proj_head', default=False, type=lambda x: (str(x).lower() == 'true'))
 
     parser.add_argument('--eval_predict_batch_size', type=int, default=32)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
