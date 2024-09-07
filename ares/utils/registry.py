@@ -113,7 +113,7 @@ class Registry:
         if name in cls.mapping["paths"]:
             return
         if not os.path.exists(path):
-            os.makedirs(path)
+            os.makedirs(path, exist_ok=True)
         cls.mapping["paths"][name] = path
 
     @classmethod
