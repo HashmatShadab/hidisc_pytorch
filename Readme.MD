@@ -1,3 +1,5 @@
+from numpy.distutils.system_info import openblas_clapack_info
+
 ### Requirements
 
 ```python
@@ -13,7 +15,8 @@ pip install scikit-learn
 pip install tqdm
 pip install torchmetrics
 pip install pandas
-
+pip install opencv-python
+pip install gdown
 ## Adding mamba models ##
 pip install packaging
 pip install causal-conv1d==1.1.1

@@ -25,8 +25,14 @@ from train import train_one_epoch
 from ft_validate import validate_clean
 from utils import save_checkpoints, restart_from_checkpoint
 from timm.layers import convert_sync_batchnorm
+from ares.utils.registry import registry
 
 
+def is_model_ares(model_name):
+    return model_name in ["resnet50_normal", "resnet50_at", "resnet101_normal", "resnet101_at", "resnet152_normal", "resnet152_at",
+                          "wresnet50_normal", "wresnet50_at", "convs_normal", "convb_normal", "convl_normal", "convnexts_at", "convnextb_at",
+                          "convnextl_at", "swins_normal", "swinb_normal", "swinl_21k", "swins_at", "swinb_at", "swinl_at", "vits_normal",
+                          "vits_at", "vitb_normal", "vitb_at", "vitl_normal"]
 
 log = logging.getLogger(__name__)
 
@@ -99,18 +105,25 @@ class HiDiscModel(torch.nn.Module):
             bb = timm_resnetv2_50(pretrained=True)
         elif cf["model"]["backbone"] == "wide_resnet50_2_pretrained":
             bb = timm_wideresnet50_2(pretrained=True)
-        elif cf["model"]["backbone"] == "vssm_tiny_0220":
-            bb = build_vssm_model(model_type="vssm_tiny_0220")
-        elif cf["model"]["backbone"] == "vssm_tiny_0220_pretrained":
-            bb = build_vssm_model(model_type="vssm_tiny_0220")
-            ckpt = torch.load(cf["model"]["checkpoints_path"])
-            msg = bb.load_state_dict(ckpt["model"])
-            print(msg)
-
+        elif is_model_ares(cf["model"]["backbone"]):
+            model_cls = registry.get_model('RobustImageNetEncoders')
+            bb = model_cls(cf["model"]["backbone"], normalize=True)
+            bb.has_normalizer = True
+        # elif cf["model"]["backbone"] == "vssm_tiny_0220":
+        #     bb = build_vssm_model(model_type="vssm_tiny_0220")
+        # elif cf["model"]["backbone"] == "vssm_tiny_0220_pretrained":
+        #     bb = build_vssm_model(model_type="vssm_tiny_0220")
+        #     ckpt = torch.load(cf["model"]["checkpoints_path"])
+        #     msg = bb.load_state_dict(ckpt["model"])
+        #     print(msg)
 
         else:
             raise NotImplementedError()
         if cf["model"]["backbone"].startswith("vssm"):
+            n_in = 768
+        elif cf["model"]["backbone"] == "vits_at":
+            n_in = 384
+        elif cf["model"]["backbone"] == "convnexts_at":
             n_in = 768
         else:
             n_in = 2048
