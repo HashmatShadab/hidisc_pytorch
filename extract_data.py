@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # loop through all the files in the data_root directory
     for file in os.listdir(data_root):
         # check if the file is a tar file
-        if file.endswith('.tar.gz'):
+        if file.endswith('.tgz'):
             # extract the file
             print(f"Extracting {file}")
             extract_data(os.path.join(data_root, file), data_root)
@@ -20,4 +20,4 @@ if __name__ == '__main__':
             # Remove the tar file
             os.remove(os.path.join(data_root, file))
         else:
-            print(f"File {file} is not a tar file")
+            print(f"File {file} is not a tgz file")
