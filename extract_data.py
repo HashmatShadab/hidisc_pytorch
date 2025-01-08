@@ -8,7 +8,7 @@ def extract_data(file_path, extract_path):
 
 
 if __name__ == '__main__':
-    data_root = r"F:\Code\datasets\train_check"
+    data_root = r"/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data/studies"
     # loop through all the files in the data_root directory
     for file in os.listdir(data_root):
         # check if the file is a tar file
