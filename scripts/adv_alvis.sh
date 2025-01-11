@@ -212,6 +212,7 @@ fi
 
 if [ $exp_num -eq 18 ] # Baseline
 then
+    echo "Running Experiment 18"
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
@@ -224,6 +225,7 @@ fi
 
 if [ $exp_num -eq 19 ]
 then
+    echo "Running Experiment 19"
     torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
