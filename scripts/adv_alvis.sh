@@ -5,6 +5,7 @@ NUM_GPUS=$1
 BATCH_SIZE=$2
 exp_num=$3
 model_name=$4
+random=${5:-25900}  # if random is not provided, use 25900 as default
 
 # if exp_num == 1, run the firstscript
 
@@ -12,7 +13,7 @@ model_name=$4
 if [ $exp_num -eq 1 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
     training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True \
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True wandb.use=False
 fi
@@ -20,7 +21,7 @@ fi
 if [ $exp_num -eq 2 ]
 then
     echo "Running Adv Training  with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=False"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False model.backbone=$model_name \
     training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_False\
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_False wandb.use=False
 fi
@@ -28,7 +29,7 @@ fi
 if [ $exp_num -eq 3 ]
 then
     echo "Running Adv Training  with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
     training.attack.name=pgd_2  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_2_eps_8_dynaug_True \
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_2_eps_8_dynamic_aug_True wandb.use=False
 fi
@@ -36,7 +37,7 @@ fi
 if [ $exp_num -eq 4 ]
 then
     echo "Running Adv Training  with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=False"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False model.backbone=$model_name \
     training.attack.name=pgd_2  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_2_eps_8_dynaug_False\
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_2_eps_8_dynamic_aug_False wandb.use=False
 fi
@@ -44,7 +45,7 @@ fi
 if [ $exp_num -eq 5 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True v1"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
     training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True_v1_model_train_before_loss \
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_v1_model_train_before_loss wandb.use=False data.dynamic_aug_version=v1
 fi
@@ -52,7 +53,7 @@ fi
 if [ $exp_num -eq 6 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True v1"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
     training.attack.name=pgd_2  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_2_eps_8_dynaug_True_v1_model_train_before_loss \
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_2_eps_8_dynamic_aug_True_v1_model_train_before_loss wandb.use=False data.dynamic_aug_version=v1
 fi
@@ -60,7 +61,7 @@ fi
 if [ $exp_num -eq 7 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
     training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True_sanity_check \
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_sanity_check wandb.use=False
 fi
@@ -68,7 +69,7 @@ fi
 if [ $exp_num -eq 8 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=True"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True model.backbone=$model_name \
     training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_True_sanity_check_only_adv_loss \
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_True_sanity_check_only_adv_loss wandb.use=False training.only_adv=True
 fi
@@ -76,7 +77,7 @@ fi
 if [ $exp_num -eq 9 ]
 then
   echo "Running Adv Training with $NUM_GPUS GPUs and batch size $BATCH_SIZE and dynamic_aug=False"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False  model.backbone=$model_name \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False  model.backbone=$model_name \
     training.attack.name=pgd  training.attack.eps=8 training.batch_size=$BATCH_SIZE  out_dir=Results/Adv/${model_name}_attack_pgd_eps_8_dynaug_False_sanity_check_only_adv_loss \
     wandb.exp_name=Adv_backbone_${model_name}_attack_pgd_eps_8_dynamic_aug_False_sanity_check_only_adv_loss wandb.use=False training.only_adv=True
 fi
@@ -84,7 +85,7 @@ fi
 if [ $exp_num -eq 10 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=False \
@@ -97,7 +98,7 @@ fi
 if [ $exp_num -eq 100 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=False \
@@ -110,7 +111,7 @@ fi
 if [ $exp_num -eq 11 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=False \
@@ -122,7 +123,7 @@ fi
 if [ $exp_num -eq 12 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=False \
@@ -135,7 +136,7 @@ fi
 if [ $exp_num -eq 13 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=False \
@@ -148,7 +149,7 @@ fi
 if [ $exp_num -eq 14 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -161,7 +162,7 @@ fi
 if [ $exp_num -eq 144 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -174,7 +175,7 @@ fi
 if [ $exp_num -eq 15 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -187,7 +188,7 @@ fi
 if [ $exp_num -eq 16 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -200,7 +201,7 @@ fi
 if [ $exp_num -eq 17 ]
 then
      # Dynamic Augmentation True, Attack PGD, Epsilon 8, Dynamic Augmentation Version v0, only_adv False, attack loss_type p_s_pt, attack_warmup epsilon false
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -213,7 +214,7 @@ fi
 if [ $exp_num -eq 18 ] # Baseline
 then
     echo "Running Experiment 18"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=False data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=False \
@@ -226,7 +227,7 @@ fi
 if [ $exp_num -eq 19 ]
 then
     echo "Running Experiment 19"
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -241,7 +242,7 @@ fi
 
 if [ $exp_num -eq 20 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name \
     training.batch_size=$BATCH_SIZE training.only_adv=False training.num_epochs=80000 \
@@ -297,7 +298,7 @@ fi
 # Experiment 24-27 : Are for testing the effect of embedding size on the adversarial training: Exp 19 is repeated with different embedding sizes
 if [ $exp_num -eq 24 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name model.num_embedding_out=256 \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -309,7 +310,7 @@ fi
 
 if [ $exp_num -eq 25 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name model.num_embedding_out=512 \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -321,7 +322,7 @@ fi
 
 if [ $exp_num -eq 26 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name model.num_embedding_out=768 \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -333,7 +334,7 @@ fi
 
 if [ $exp_num -eq 27 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name model.num_embedding_out=1024 \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -347,7 +348,7 @@ fi
 # Experiment 28: Testing the effect of patch loss only on the adversarial training, Increase the batch size accordingly by 4 times. Exp 19 is repeated with patch loss only
 if [ $exp_num -eq 28 ] # ran this one, but kept the batch size 16
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     data.hidisc.num_slide_samples=1 data.hidisc.num_patch_samples=1 \
     model.backbone=$model_name  \
@@ -360,7 +361,7 @@ fi
 
 if [ $exp_num -eq 281 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     data.hidisc.num_slide_samples=1 data.hidisc.num_patch_samples=1 \
     model.backbone=$model_name  \
@@ -377,7 +378,7 @@ fi
 
 if [ $exp_num -eq 29 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name model.proj_head=True model.num_embedding_out=2048 \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -389,7 +390,7 @@ fi
 
 if [ $exp_num -eq 30 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048 \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -408,7 +409,7 @@ fi
 # Experiment 31-34 : Exp 19 is repeated with different  attack loss : pt and s_pt
 if [ $exp_num -eq 31 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name  \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
@@ -420,7 +421,7 @@ fi
 
 if [ $exp_num -eq 32 ]
 then
-    torchrun --nproc_per_node=$NUM_GPUS --master_port="$RANDOM" main.py \
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
     data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
     model.backbone=$model_name  \
     training.batch_size=$BATCH_SIZE training.only_adv=True \
