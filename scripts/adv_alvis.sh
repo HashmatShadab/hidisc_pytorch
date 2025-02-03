@@ -308,6 +308,18 @@ then
 
 fi
 
+if [ $exp_num -eq 244 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
+    data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    model.backbone=$model_name model.num_embedding_out=128 \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp244_with_embedding128 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp244_with_embedding128 wandb.use=True
+
+fi
+
 if [ $exp_num -eq 25 ]
 then
     torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
