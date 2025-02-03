@@ -1,8 +1,7 @@
 #!/bin/bash
 
-DATA_PATH=/mimer/NOBACKUP/groups/alvis_cvl/Fahad/OpenSRH
+DATA_PATH=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data
 
-model_name=$1
 
 
 
@@ -96,6 +95,7 @@ model_name=$1
 #Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30
 
 ###################### Exp 18 ########################################
+model_name="resnet50_timm_pretrained"
 echo "Exp 18"
 ckpt_dir="Results/Baseline/resnet50_timm_pretrained_exp18"
 
@@ -117,6 +117,7 @@ done
 
 
 ###################### Exp 18 ########################################
+model_name="resnet50"
 echo "Exp 18"
 ckpt_dir="Results/Baseline/resnet50_exp18"
 
@@ -138,6 +139,7 @@ done
 
 
 ###################### Exp 19 ########################################
+model_name="resnet50_timm_pretrained"
 echo "Exp 19"
 ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
 
@@ -156,6 +158,7 @@ for ckpt_path in $ckpt_dir/*.pth; do
 done
 
 ###################### Exp 19 ########################################
+model_name="resnet50"
 echo "Exp 19"
 ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
 
@@ -174,6 +177,7 @@ for ckpt_path in $ckpt_dir/*.pth; do
 done
 
 ###################### Exp 19 ########################################
+model_name="resnet50_at"
 echo "Exp 19"
 ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
 
@@ -192,6 +196,8 @@ for ckpt_path in $ckpt_dir/*.pth; do
 done
 
 ###################### Exp 24 ########################################
+model_name="resnet50_timm_pretrained"
+
 echo "Exp 24"
 ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256"
 
@@ -210,6 +216,8 @@ for ckpt_path in $ckpt_dir/*.pth; do
 done
 
 ###################### Exp 25 ########################################
+model_name="resnet50_timm_pretrained"
+
 echo "Exp 25"
 ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512"
 
@@ -229,6 +237,8 @@ done
 
 
 ###################### Exp 26 ########################################
+model_name="resnet50_timm_pretrained"
+
 echo "Exp 26"
 ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp26_with_embedding768"
 
@@ -248,6 +258,8 @@ done
 
 
 ###################### Exp 27 ########################################
+model_name="resnet50_timm_pretrained"
+
 echo "Exp 27"
 ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp27_with_embedding1024"
 
