@@ -339,7 +339,7 @@ def main():
 
 
     setup_seed(cf.seed)
-    prediction_path = os.path.join(cf.save_results_path, "predictions.pt")
+    prediction_path = os.path.join(cf.save_results_path, f"predictions_epoch_{epoch}.pt")
 
     # if os.path.exists(prediction_path):
     #     log.info("loading predictions")
