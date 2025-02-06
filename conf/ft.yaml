@@ -66,6 +66,7 @@ model:
 
 training:
   batch_size: 128
+  eval_batch_size: 128
   num_epochs: 40
   optimizer: sgd # [sgd, adam, adamw]
   learn_rate: 0.1

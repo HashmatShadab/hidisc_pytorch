@@ -104,13 +104,13 @@ def get_dataloaders_ft(cf):
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dset, num_replicas=num_tasks, rank=global_rank, shuffle=True)
         val_sampler = torch.utils.data.distributed.DistributedSampler(val_dset, num_replicas=num_tasks, rank=global_rank, shuffle=True)
         train_loader = torch.utils.data.DataLoader(train_dset, batch_size=cf['training']['batch_size'], sampler=train_sampler, drop_last=False)
-        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], sampler=val_sampler, drop_last=False)
+        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['eval_batch_size'], sampler=val_sampler, drop_last=False)
 
 
     else:
 
         train_loader = torch.utils.data.DataLoader(train_dset, batch_size=cf['training']['batch_size'], shuffle=True, drop_last=False)
-        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['batch_size'], shuffle=False, drop_last=False)
+        val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf['training']['eval_batch_size'], shuffle=False, drop_last=False)
 
     return train_loader, val_loader
 

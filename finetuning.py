@@ -84,8 +84,13 @@ class FineTuneModel(torch.nn.Module):
             raise NotImplementedError()
 
         self.bb = backbone
-        self.fc = torch.nn.Linear(in_features=2048, out_features=num_classes)
-
+        #self.fc = torch.nn.Linear(in_features=2048, out_features=num_classes)
+        self.fc = torch.nn.Sequential(
+            torch.nn.Linear(2048, 512),
+            torch.nn.BatchNorm1d(512),  # Helps with stable learning
+            torch.nn.ReLU(),
+            torch.nn.Linear(512, num_classes)
+        )
 
     def forward(self, img, bn_name=None):
 
