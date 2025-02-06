@@ -2,6 +2,13 @@ import matplotlib.pyplot as plt
 import json
 import numpy as np
 import os
+import seaborn as sns
+import json
+import os
+import matplotlib.pyplot as plt
+
+
+
 
 def plot_loss_individual_logs(keys_to_plot, keys_to_title, log_files, colors):
     """
@@ -26,10 +33,10 @@ def plot_loss_individual_logs(keys_to_plot, keys_to_title, log_files, colors):
             plt.figure(figsize=(8, 6))
 
             # Plot
-            plt.plot(values, linewidth=2)
-            plt.title(keys_to_title[key], fontsize=14)
-            plt.xlabel("Epoch", fontsize=12)
-            plt.ylabel("Loss", fontsize=12)
+            plt.plot(values, linewidth=1)
+            plt.title(keys_to_title[key], fontsize=16, fontweight='bold')
+            plt.xlabel("Epoch", fontsize=16, fontweight='bold')
+            plt.ylabel("Loss", fontsize=16, fontweight='bold')
             plt.grid(True, linestyle='--', alpha=0.6)
 
             # save the plot using base path from log file and key name using keys_to_title
@@ -41,7 +48,7 @@ def plot_loss_individual_logs(keys_to_plot, keys_to_title, log_files, colors):
             plt.close()
 
 
-def plot_loss_combined_logs(keys_to_plot, keys_to_title, log_files, colors):
+def plot_loss_combined_logs(keys_to_plot, keys_to_title, log_files, log_files_to_title, colors):
     """
     For each key, combine data from all logs into a single plot.
 
@@ -62,15 +69,24 @@ def plot_loss_combined_logs(keys_to_plot, keys_to_title, log_files, colors):
             values = [entry[key] for entry in data]
 
             # Label will be derived from log_file name
-            label = log_file.split(".")[0]
-            plt.plot(values, color=colors[i], label=label, linewidth=2)
+            plt.plot(values, color=colors[i], label=log_files_to_title[i], linewidth=1)
 
-        plt.xlabel("Epoch", fontsize=12)
-        plt.ylabel("Loss", fontsize=12)
-        plt.title(keys_to_title.get(key, key), fontsize=14)
+        plt.title(keys_to_title[key], fontsize=16, fontweight='bold')
+        plt.xlabel("Epoch", fontsize=16, fontweight='bold')
+        plt.ylabel("Loss", fontsize=16, fontweight='bold')
+
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.legend()
-        plt.show()
+
+        for log_file in log_files:
+
+            # save the plot using base path from log file and key name using keys_to_title
+            base_save_path = os.path.dirname(log_file)
+            filename = keys_to_title[key].replace(" ", "_").lower()
+            filename =  "".join([f"{title}_" for title in log_files_to_title]) + filename
+            plt.savefig(os.path.join(base_save_path, f"{filename}.png"), dpi=300, bbox_inches='tight')
+        # plt.show()
+        plt.close()
 
 
 
@@ -87,6 +103,8 @@ if __name__ == '__main__':
     log_files = [r"F:\Code\Projects\hidisc_pytorch\Results\Baseline\resnet50_timm_pretrained_exp18\log.txt",
                  r"F:\Code\Projects\hidisc_pytorch\Results\Baseline\resnet50_exp18\log.txt",
                  r"F:\Code\Projects\hidisc_pytorch\Results\Baseline\resnet50_at_exp18\log.txt"]
+
+    log_files_to_titles = ["ResNet-50(ImageNet)", "ResNet-50(Scratch)", "ResNet-50(AT)"]
 
     colors = plt.cm.viridis(np.linspace(0, 1, len(log_files)))
 
@@ -115,5 +133,5 @@ if __name__ == '__main__':
     plot_loss_individual_logs(keys_to_plot, keys_to_title, log_files, colors)
 
     # 2. Plot combined logs
-    # plot_loss_combined_logs(keys_to_plot, keys_to_title, log_files, colors)
+    plot_loss_combined_logs(keys_to_plot, keys_to_title, log_files, log_files_to_titles, colors)
 
