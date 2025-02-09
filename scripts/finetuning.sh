@@ -20,13 +20,15 @@ if [ $exp_num -eq 1 ]; then
 
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
-  wandb_exp_name="FT_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
+
   
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
        echo "Starting finetuning with checkpoint: $ckpt_path"
+       ckpt_name=$(basename "$ckpt_path" .pth)
+       wandb_exp_name="FT_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+       out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
@@ -47,14 +49,16 @@ if [ $exp_num -eq 2 ]; then
 
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
-  wandb_exp_name="FT_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
+
 
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
 
       echo "Starting finetuning with checkpoint: $ckpt_path"
+      ckpt_name=$(basename "$ckpt_path" .pth)
+      wandb_exp_name="FT_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+      out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
@@ -76,14 +80,16 @@ if [ $exp_num -eq 3 ]; then
 
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
-  wandb_exp_name="FT_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
 
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
 
       echo "Starting finetuning with checkpoint: $ckpt_path"
+      ckpt_name=$(basename "$ckpt_path" .pth)
+      wandb_exp_name="FT_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+      out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
@@ -107,14 +113,16 @@ if [ $exp_num -eq 4 ]; then
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
 
-  wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
+
 
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
 
-        echo "Starting finetuning with checkpoint: $ckpt_path"
+      echo "Starting finetuning with checkpoint: $ckpt_path"
+      ckpt_name=$(basename "$ckpt_path" .pth)
+      wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+      out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
@@ -135,14 +143,14 @@ if [ $exp_num -eq 5 ]; then
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
 
-  wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
 
-        echo "Starting finetuning with checkpoint: $ckpt_path"
+      echo "Starting finetuning with checkpoint: $ckpt_path"
+      ckpt_name=$(basename "$ckpt_path" .pth)
+      wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+      out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
@@ -164,14 +172,16 @@ if [ $exp_num -eq 6 ]; then
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
 
-  wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
+
 
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
 
-       echo "Starting finetuning with checkpoint: $ckpt_path"
+      echo "Starting finetuning with checkpoint: $ckpt_path"
+      ckpt_name=$(basename "$ckpt_path" .pth)
+      wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+      out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
@@ -195,14 +205,16 @@ if [ $exp_num -eq 7 ]; then
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
 
-  wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
+
 
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
 
-       echo "Starting finetuning with checkpoint: $ckpt_path"
+      echo "Starting finetuning with checkpoint: $ckpt_path"
+      ckpt_name=$(basename "$ckpt_path" .pth)
+      wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+      out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
@@ -224,14 +236,16 @@ if [ $exp_num -eq 8 ]; then
 
   echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
-  wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
+
 
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
 
-       echo "Starting finetuning with checkpoint: $ckpt_path"
+      echo "Starting finetuning with checkpoint: $ckpt_path"
+      ckpt_name=$(basename "$ckpt_path" .pth)
+      wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+      out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
@@ -254,13 +268,16 @@ if [ $exp_num -eq 9 ]; then
     echo "Finetuning experiment with $model_name and finetuning type: $finetuning_type. Attack: $train_attack. Class Balance: $class_balance. Eps: $eps. PGD Steps: $pgd_steps"
 
 
-  wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
-  out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}"
+
 
   # loop over all the checkpoints in the directory ending with .pth
   for ckpt_path in $ckpt_dir/checkpoint.pth; do
 
        echo "Starting finetuning with checkpoint: $ckpt_path"
+       # Extract checkpoint filename without extension
+       ckpt_name=$(basename "$ckpt_path" .pth)
+       wandb_exp_name="FT_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_mlp_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
+       out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
        model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
