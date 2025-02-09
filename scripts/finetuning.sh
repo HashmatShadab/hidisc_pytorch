@@ -32,7 +32,7 @@ if [ $exp_num -eq 1 ]; then
        out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -62,7 +62,7 @@ if [ $exp_num -eq 2 ]; then
       out_dir="FT_Results/ssl_Baseline_${model_name}_exp18_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -93,7 +93,7 @@ if [ $exp_num -eq 3 ]; then
 
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -126,7 +126,7 @@ if [ $exp_num -eq 4 ]; then
       out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -154,7 +154,7 @@ if [ $exp_num -eq 5 ]; then
       out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -185,7 +185,7 @@ if [ $exp_num -eq 6 ]; then
       out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -218,7 +218,7 @@ if [ $exp_num -eq 7 ]; then
       out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -250,7 +250,7 @@ if [ $exp_num -eq 8 ]; then
 
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
@@ -281,7 +281,7 @@ if [ $exp_num -eq 9 ]; then
        out_dir="FT_Results/ssl_Adv_${model_name}_dynamicaug_true_epsilon_warmup_5000_exp20_train_${finetuning_type}_adv_${train_attack}_class_balanced_${class_balance}_eps_${eps}_pgd_steps_${pgd_steps}_${ckpt_name}"
 
        python finetuning.py distributed.single_gpu=True data.db_root=$DATA_PATH data.balance_study_per_class=$class_balance \
-       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning model.num_classes=7 \
+       model.backbone=$model_name model.start_from_ssl_ckpt=$ckpt_path model.finetuning=$finetuning_type model.num_classes=7 \
        training.num_epochs=20 training.batch_size=$BATCH_SIZE training.train_attack=$train_attack training.attack_eps=$eps training.attack_steps=$pgd_steps \
        out_dir=$out_dir \
        wandb.exp_name=$wandb_exp_name wandb.use=True
