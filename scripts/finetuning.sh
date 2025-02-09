@@ -10,6 +10,7 @@ class_balance=${7:-false} # true, false
 
 # get the parent name of ssl_ckpt
 
+DATA_PATH=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data
 
 
 ###################### Exp 18 ########################################
