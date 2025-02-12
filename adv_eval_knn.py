@@ -351,6 +351,7 @@ def main():
     # add console handler to logger
     log.addHandler(ch)
     log.info("Info level message")
+    log.info("Logs will be saved in %s", log_dir)
 
 
     setup_seed(cf.seed)
