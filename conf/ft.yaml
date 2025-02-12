@@ -79,7 +79,7 @@ training:
   eval_ckpt_ep_freq: 5
   train_attack:
   attack_eps: 8.0
-  attack_steps: 7
+  attack_steps: 10
   save_checkpoint_interval: 5
 
 distributed:

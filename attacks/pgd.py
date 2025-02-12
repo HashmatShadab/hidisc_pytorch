@@ -54,6 +54,7 @@ class PGD(Attack):
             adv_images = adv_images + torch.empty_like(adv_images).uniform_(-self.eps, self.eps)
             adv_images = torch.clamp(adv_images, min=0, max=1).detach()
 
+        cost_list=[]
         for _ in range(self.steps):
             adv_images.requires_grad = True
             outputs = self.get_logits(adv_images, dual_bn)
@@ -64,7 +65,7 @@ class PGD(Attack):
                 cost = -loss(outputs, target_labels)
             else:
                 cost = loss(outputs, labels)
-
+            cost_list.append(cost.item())
             # Update adversarial images
             grad = torch.autograd.grad(cost, adv_images,
                                        retain_graph=False, create_graph=False)[0]
@@ -73,7 +74,9 @@ class PGD(Attack):
             delta = torch.clamp(adv_images - images, min=-self.eps, max=self.eps)
             adv_images = torch.clamp(images + delta, min=0, max=1).detach()
 
-        return adv_images
+        # only keep the first and last cost values
+        cost_list = [cost_list[0], cost_list[-1]]
+        return adv_images, cost_list
 
 
 

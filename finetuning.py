@@ -213,7 +213,7 @@ def main(args):
         return  # Safe exit
 
     if args.training.train_attack == 'pgd':
-        train_attack = PGD(model=model, steps=7, eps=8/255.0)
+        train_attack = PGD(model=model, steps=args.training.attack_steps, eps=args.training.attack_eps/255.0)
     else:
         train_attack = False
 
@@ -304,7 +304,7 @@ def train_one_epoch(epoch, train_loader, model,
         targets = batch["label"].to("cuda", non_blocking=True)
 
         if train_attack:
-            adv_images = train_attack(images, targets, dual_bn=dual_bn)
+            adv_images, adv_images_losses = train_attack(images, targets, dual_bn=dual_bn)
         else:
             adv_images = images
         outputs = model(adv_images, 'pgd') if dual_bn else model(adv_images)
@@ -321,6 +321,7 @@ def train_one_epoch(epoch, train_loader, model,
 
 
         metric_logger.update(loss=loss.item())
+        metric_logger.update(cost_adv_diff=adv_images_losses[1] - adv_images_losses[0])
 
 
 
