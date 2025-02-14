@@ -12,6 +12,7 @@ from typing import List, Union, Dict, Any
 from hydra.utils import get_original_cwd
 from omegaconf import OmegaConf
 import hydra
+import sys
 
 import yaml
 import numpy as np
@@ -79,13 +80,12 @@ def knn_predict(feature, feature_bank, feature_labels, classes: int,
     return pred_labels, pred_scores
 
 
-def get_embeddings(cf: Dict[str, Any],
-                   exp_root: str, log) -> Dict[str, Union[torch.Tensor, List[str]]]:
+def get_embeddings(cf, experiments, log) :
     """Run forward pass on the dataset, and generate embeddings and logits"""
 
 
     # above code if argparser is used
-    if cf.model_backbone.startswith("vit"):
+    if cf.source_model_backbone.startswith("vit"):
         aug_func = get_srh_vit_base_aug
     else:
         aug_func = get_srh_base_aug
@@ -111,26 +111,32 @@ def get_embeddings(cf: Dict[str, Any],
 
 
     ### Loading Source Model
-    source_ckpt_path = cf.source_eval_ckpt_path
-    source_model_dict = {"model": {"backbone": cf.source_model_backbone, "mlp_hidden": cf.source_model_mlp_hidden,
-                            "num_embedding_out": cf.source_model_num_embedding_out, "proj_head": cf.source_model_proj_head,
+    source_ckpt_path = cf.source_ckpt_path
+
+
+    source_model_dict = {"model": {"backbone": cf.source_model_backbone, "mlp_hidden": experiments[cf.source_exp_no]["model.mlp_hidden"],
+                            "num_embedding_out": experiments[cf.source_exp_no]["model.num_embedding_out"], "proj_head": experiments[cf.source_exp_no]["model.proj_head"],
                             }
                   }
     source_model = HiDiscModel(source_model_dict)
     dual_bn = True if cf.source_model_backbone == "resnet50_multi_bn" else False
 
-    source_ckpt = torch.load(source_ckpt_path)
+    if cf.load_source_from_ssl:
+        source_ckpt = torch.load(source_ckpt_path)
 
-    if "state_dict" in source_ckpt.keys():
-        msg = source_model.load_state_dict(source_ckpt["state_dict"])
-        source_epoch = source_ckpt["epoch"]
+        if "state_dict" in source_ckpt.keys():
+            msg = source_model.load_state_dict(source_ckpt["state_dict"])
+            source_epoch = source_ckpt["epoch"]
+        else:
+            source_ckpt_weights = source_ckpt["model"]
+            source_epoch = source_ckpt["epoch"]
+            source_ckpt_weights = {k.replace("module.model", "model"): v for k, v in source_ckpt_weights.items()}
+            msg = source_model.load_state_dict(source_ckpt_weights)
+
+        log.info(f"Loaded Source model {cf.source_model_backbone} from {source_ckpt_path} Epoch {source_epoch} with message {msg}")
     else:
-        source_ckpt_weights = source_ckpt["model"]
-        source_epoch = source_ckpt["epoch"]
-        source_ckpt_weights = {k.replace("module.model", "model"): v for k, v in source_ckpt_weights.items()}
-        msg = source_model.load_state_dict(source_ckpt_weights)
+        log.info(f"Loaded Source model {cf.source_model_backbone} trained on ImageNet")
 
-    log.info(f"Loaded model from {source_ckpt_path} Epoch {source_epoch} with message {msg}")
     source_model.to("cuda")
     source_model.eval()
 
@@ -141,9 +147,9 @@ def get_embeddings(cf: Dict[str, Any],
 
 
     ### Loading Target Model
-    target_ckpt_path = cf.target_eval_ckpt_path
-    target_model_dict = {"model": {"backbone": cf.target_model_backbone, "mlp_hidden": cf.target_model_mlp_hidden,
-                            "num_embedding_out": cf.target_model_num_embedding_out, "proj_head": cf.target_model_proj_head,
+    target_ckpt_path = cf.target_ckpt_path
+    target_model_dict = {"model": {"backbone": cf.target_model_backbone, "mlp_hidden": experiments[cf.target_exp_no]["model.mlp_hidden"],
+                            "num_embedding_out": experiments[cf.target_exp_no]["model.num_embedding_out"], "proj_head": experiments[cf.target_exp_no]["model.proj_head"],
                             }
                   }
     target_model = HiDiscModel(target_model_dict)
@@ -160,7 +166,7 @@ def get_embeddings(cf: Dict[str, Any],
         target_ckpt_weights = {k.replace("module.model", "model"): v for k, v in target_ckpt_weights.items()}
         msg = target_model.load_state_dict(target_ckpt_weights)
 
-    log.info(f"Loaded model from {target_ckpt_path} Epoch {target_epoch} with message {msg}")
+    log.info(f"Loaded target model {cf.target_model_backbone} from {target_ckpt_path} Epoch {target_epoch} with message {msg}")
     target_model.to("cuda")
     target_model.eval()
 
@@ -335,22 +341,22 @@ def get_args():
     parser.add_argument('--data_meta_json', type=str, default='opensrh.json')
     parser.add_argument('--data_meta_split_json', type=str, default='train_val_split.json')
 
-    parser.add_argument('--source_model_backbone', type=str, default='resnet50')
-    parser.add_argument('--source_model_mlp_hidden', nargs='*', type=int, default=[])
-    parser.add_argument('--source_model_num_embedding_out', type=int, default=128)
-    parser.add_argument('--source_model_proj_head', default=False, type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument('--source_model_backbone', type=str, default='resnet50_at')
+    parser.add_argument('--source_exp_no', type=int, default=18)
+    parser.add_argument('--source_ckpt_path', type=str, default=r'Results/Baseline/resnet50_at_exp18/checkpoint_40000.pth')
+    parser.add_argument('--load_source_from_ssl', default=True, type=lambda x: (str(x).lower() == 'true'))
+
+
 
 
     parser.add_argument('--target_model_backbone', type=str, default='resnet50')
-    parser.add_argument('--target_model_mlp_hidden', nargs='*', type=int, default=[])
-    parser.add_argument('--target_model_num_embedding_out', type=int, default=128)
-    parser.add_argument('--target_model_proj_head', default=False, type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument('--target_exp_no', type=int, default=18)
+    parser.add_argument('--target_ckpt_path', type=str, default=r'Results/Baseline/resnet50_exp18/checkpoint_40000.pth')
 
-    parser.add_argument('--eval_predict_batch_size', type=int, default=32)
+
+    parser.add_argument('--eval_predict_batch_size', type=int, default=8)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
 
-    parser.add_argument('--source_ckpt_path', type=str, default=r'F:\Code\Projects\ckpt-epoch35199.ckpt')
-    parser.add_argument('--target_ckpt_path', type=str, default=r'F:\Code\Projects\ckpt-epoch35199.ckpt')
     parser.add_argument('--save_results_path', type=str, default='eval_knn_transf_results')
 
     parser.add_argument('--attack_name', type=str, default='pgd_knn')
@@ -363,23 +369,51 @@ def get_args():
 
 def main():
 
+
+    experiments = {
+        18: {"model.num_embedding_out": 128, "model.proj_head": False, "model.mlp_hidden": []},
+        19: {"model.num_embedding_out": 128, "model.proj_head": False, "model.mlp_hidden": []},
+        20: {"model.num_embedding_out": 128, "model.proj_head": False, "model.mlp_hidden": []},
+        28: {"model.num_embedding_out": 128, "model.proj_head": False, "model.mlp_hidden": []},
+        244: {"model.num_embedding_out": 128, "model.proj_head": False, "model.mlp_hidden": []},
+        24: {"model.num_embedding_out": 256, "model.proj_head": False, "model.mlp_hidden": []},
+        25: {"model.num_embedding_out": 512, "model.proj_head": False, "model.mlp_hidden": []},
+        26: {"model.num_embedding_out": 768, "model.proj_head": False, "model.mlp_hidden": []},
+        27: {"model.num_embedding_out": 1024, "model.proj_head": False, "model.mlp_hidden": []},
+        29: {"model.num_embedding_out": 2048, "model.proj_head": True, "model.mlp_hidden": []},
+        30: {"model.num_embedding_out": 2048, "model.proj_head": False, "model.mlp_hidden": [2048, 2048]}
+    }
+
     cf = get_args()
 
     results_path = cf.save_results_path
     if not os.path.exists(results_path):
         os.makedirs(results_path, exist_ok=True)
 
-    source_ckpt_path = cf.source_eval_ckpt_path
-    source_ckpt = torch.load(source_ckpt_path)
-    source_epoch = source_ckpt["epoch"]
-    del source_ckpt
+    if cf.load_source_from_ssl:
 
-    target_ckpt_path = cf.target_eval_ckpt_path
+        source_exp_no = cf.source_exp_no
+        source_ckpt_path = cf.source_ckpt_path
+        if not os.path.exists(source_ckpt_path):
+            print(f"Checkpoint file {source_ckpt_path} does not exist. Exiting.")
+            sys.exit(1)
+
+        source_ckpt = torch.load(source_ckpt_path)
+        source_epoch = source_ckpt["epoch"]
+        del source_ckpt
+
+    target_exp_no = cf.target_exp_no
+    target_ckpt_path = cf.target_ckpt_path
     target_ckpt = torch.load(target_ckpt_path)
     target_epoch = target_ckpt["epoch"]
     del target_ckpt
 
-    log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_epoch{source_epoch}_T_{cf.target_model_backbone}_epoch{target_epoch}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log")
+
+    if cf.load_source_from_ssl:
+        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log")
+    else:
+        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log")
+
     logging.basicConfig(filename=log_dir, filemode="a",
                         format="%(name)s → %(levelname)s: %(message)s")
     log = logging.getLogger(__name__)
@@ -393,17 +427,24 @@ def main():
     log.addHandler(ch)
     log.info("Info level message")
     log.info("Logs will be saved in %s", log_dir)
+    # log the source model name, target model name, attack name, eps, steps, load_source_from_ssl, target_exp_no, target_epoch, target_ckp_path
+    log.info(f"Source Model: {cf.source_model_backbone} Target Model: {cf.target_model_backbone} Attack: {cf.attack_name} Eps: {cf.eps} Steps: {cf.steps}"
+             f" Load Source from SSL: {cf.load_source_from_ssl} Target Exp No: {cf.target_exp_no} Target Epoch: {target_epoch} Target CKP Path: {cf.target_ckpt_path}")
 
 
     setup_seed(cf.seed)
-    prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_epoch{source_epoch}_T_{cf.target_model_backbone}_epoch{target_epoch}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.pt")
+    if cf.load_source_from_ssl:
+        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.pt")
+    else:
+        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.pt")
+
 
     # if os.path.exists(prediction_path):
     #     log.info("loading predictions")
     #     predictions = torch.load(prediction_path)
 
     log.info("generating predictions")
-    predictions = get_embeddings(cf, None, log=log)
+    predictions = get_embeddings(cf, experiments, log=log)
     torch.save(predictions, prediction_path)
 
     # generate specs
