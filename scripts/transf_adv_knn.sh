@@ -12,12 +12,12 @@ if [ $EXP_NUMBER -eq 18 ]; then
   bash scripts/eval_transf_adv_knn.sh resnet50_timm_pretrained 18 Results/Baseline/resnet50_timm_pretrained_exp18 8 10
   bash scripts/eval_transf_adv_knn.sh resnet50_at 18 Results/Baseline/resnet50_at_exp18 8 10
 
+  bash scripts/eval_transf_adv_knn.sh wresnet50_normal 18 Results/Baseline/wresnet50_normal_exp18 8 10
+  bash scripts/eval_transf_adv_knn.sh wresnet50_at 18 Results/Baseline/wresnet50_at_exp18 8 10
+  bash scripts/eval_transf_adv_knn.sh resnet101_normal 18 Results/Baseline/resnet101_normal_exp18 8 10
+  bash scripts/eval_transf_adv_knn.sh resnet101_at 18 Results/Baseline/resnet101_at_exp18 8 10
   echo "All evaluation scripts executed successfully!"
 
-#  bash scripts/eval_transf_adv_knn.sh wresnet50_normal 18 Results/Baseline/wresnet50_normal_exp18 8 10
-#  bash scripts/eval_transf_adv_knn.sh wresnet50_at 18 Results/Baseline/wresnet50_at_exp18 8 10
-#  bash scripts/eval_transf_adv_knn.sh resnet101_normal 18 Results/Baseline/resnet101_normal_exp18 8 10
-#  bash scripts/eval_transf_adv_knn.sh resnet101_at 18 Results/Baseline/resnet101_at_exp18 8 10
 
 fi
 
@@ -44,8 +44,8 @@ if [ $EXP_NUMBER -eq 20 ]; then
 
   echo "Running evaluation scripts for experiment 20 source models"
   bash scripts/eval_transf_adv_knn.sh resnet50 20 Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20 8 10
-  bash scripts/eval_transf_adv_knn.sh resnet50 20 Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20 8 10
-  bash scripts/eval_transf_adv_knn.sh resnet50 20 Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_exp20 8 10
+  bash scripts/eval_transf_adv_knn.sh resnet50_at 20 Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20 8 10
+  bash scripts/eval_transf_adv_knn.sh resnet50_timm_pretrained 20 Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_exp20 8 10
 
 
 #  bash scripts/eval_transf_adv_knn.sh wresnet50_at 20 Results/Adv/wresnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20 8 10
