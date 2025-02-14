@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#DATA_PATH=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data
-DATA_PATH="F:/Code/datasets/hidisc_data_small"
+DATA_PATH=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data
+#DATA_PATH="F:/Code/datasets/hidisc_data_small"
 
 
 source_model=${1:-"resnet50"}
