@@ -31,6 +31,7 @@ import clip
 from torch import nn
 from torchvision import transforms
 import torch.nn.functional as F
+import open_clip
 
 
 class Normalize(nn.Module):
@@ -62,6 +63,18 @@ class CLIPVisionModel(nn.Module):
         return image_features
 
 
+class MedCLIPVisionModel(nn.Module):
+    def __init__(self, model):
+        super(MedCLIPVisionModel, self).__init__()
+        self.model = model
+
+    def forward(self, image_tensor):
+        """Encodes an image tensor into feature space using the CLIP vision model and allows gradients for backpropagation."""
+        image_tensor = F.interpolate(image_tensor, size=(224, 224), mode='bilinear', align_corners=False)
+        image_features = self.model.encode_image(image_tensor)
+        return image_features
+
+
 
 
 
@@ -83,6 +96,28 @@ def get_clip_model(clip_variant_name):
                 break
 
         model_image = nn.Sequential(Normalize(mean, std), model_image)
+
+    elif clip_variant_name.startswith("MedCLIP-"):
+        from open_clip import create_model_and_transforms, get_mean_std, HFTokenizer
+
+        clip_variant_name = clip_variant_name.split("MedCLIP-")[1]
+        text_encoder_name = "microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract"  # available pretrained weights ["microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract", "microsoft/BiomedNLP-BiomedBERT-large-uncased-abstract"]
+        # Load pretrained model with transforms
+        mean, std = get_mean_std()
+        model, _, preprocess = create_model_and_transforms(
+            clip_variant_name,
+            "./unimed_clip_vit_b16.pt",
+            precision='amp',
+            device='cuda',
+            force_quick_gelu=True,
+            mean=mean, std=std,
+            inmem=True,
+            text_encoder_name=text_encoder_name, )
+        model_image = MedCLIPVisionModel(model)
+
+        model_image = nn.Sequential(Normalize(mean, std), model_image)
+    else:
+        raise ValueError(f"Model {clip_variant_name} not implemented")
 
     return model_image
 
@@ -377,7 +412,7 @@ def get_args():
     parser.add_argument('--data_meta_json', type=str, default='opensrh.json')
     parser.add_argument('--data_meta_split_json', type=str, default='train_val_split.json')
 
-    parser.add_argument('--source_model_backbone', type=str, default='CLIP-ViT-B/16')
+    parser.add_argument('--source_model_backbone', type=str, default='MedCLIP-ViT-B-16-quickgelu')
     parser.add_argument('--attack_features', type=str, default='pre_projection_features_all_layers',
                         choices=['projection_features', 'pre_projection_features', 'pre_projection_features_all_layers'])
 
