@@ -17,6 +17,7 @@ pip install torchmetrics
 pip install pandas
 pip install opencv-python
 pip install gdown
+pip install ftfy regex tqdm
 ## Adding mamba models ##
 pip install packaging
 pip install causal-conv1d==1.1.1

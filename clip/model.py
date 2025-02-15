@@ -228,16 +228,28 @@ class VisionTransformer(nn.Module):
         x = x + self.positional_embedding.to(x.dtype)
         x = self.ln_pre(x)
 
+        all_layer_features = []
         x = x.permute(1, 0, 2)  # NLD -> LND
-        x = self.transformer(x)
+
+        for i, layer in enumerate(self.transformer.resblocks):
+            x = layer(x)
+            all_layer_features.append(x)
+        # permute all_layer_features to NLD
+        all_layer_features = [x.permute(1, 0, 2) for x in all_layer_features]
+
         x = x.permute(1, 0, 2)  # LND -> NLD
 
-        x = self.ln_post(x[:, 0, :])
+
+        x_ln_post = self.ln_post(x[:, 0, :])
 
         if self.proj is not None:
-            x = x @ self.proj
+            x_proj = x_ln_post @ self.proj
 
-        return x
+        return {
+            "pre_projection_features_all_layers": all_layer_features,  # Before LN
+            "pre_projection_features": x,  # Before Projection
+            "projection_features": x_proj  # After Projection
+        }
 
 
 class CLIP(nn.Module):

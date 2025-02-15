@@ -5,16 +5,9 @@ Licensed under the MIT License. See LICENSE for license information.
 """
 
 import os
-import logging
-from shutil import copy2
-from functools import partial
 from typing import List, Union, Dict, Any
-from hydra.utils import get_original_cwd
-from omegaconf import OmegaConf
-import hydra
-import sys
 
-import yaml
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
@@ -28,15 +21,72 @@ from torchmetrics import AveragePrecision, Accuracy
 
 from datasets.srh_dataset import OpenSRHDataset
 from datasets.improc import get_srh_base_aug, get_srh_vit_base_aug
-# from helpers import (parse_args, get_exp_name, config_loggers,
-#                                  get_num_worker)
-from datasets.loaders import get_num_worker
 from main import HiDiscModel
 import argparse
 
 import logging
 
-from attacks.pgd import PGD_KNN
+from attacks.pgd import PGD_KNN, PGD_CLIP
+import clip
+from torch import nn
+from torchvision import transforms
+import torch.nn.functional as F
+
+
+class Normalize(nn.Module):
+    def __init__(self, mean, std):
+        super(Normalize, self).__init__()
+        self.register_buffer('mean', torch.Tensor(mean))
+        self.register_buffer('std', torch.Tensor(std))
+
+    def forward(self, input):
+        # Broadcasting
+        if torch.max(input) > 1:
+            input = input / 255.0
+        mean = self.mean.reshape(1, 3, 1, 1)
+        std = self.std.reshape(1, 3, 1, 1)
+        return (input - mean.to(device=input.device)) / std.to(
+            device=input.device)
+
+
+
+class CLIPVisionModel(nn.Module):
+    def __init__(self, model):
+        super(CLIPVisionModel, self).__init__()
+        self.model = model
+
+    def forward(self, image_tensor):
+        """Encodes an image tensor into feature space using the CLIP vision model and allows gradients for backpropagation."""
+        image_tensor = F.interpolate(image_tensor, size=(224, 224), mode='bilinear', align_corners=False)
+        image_features = self.model.encode_image(image_tensor)
+        return image_features
+
+
+
+
+
+
+def get_clip_model(clip_variant_name):
+    if clip_variant_name.startswith("CLIP-"):
+        clip_variant_name = clip_variant_name.split("CLIP-")[1]
+
+        model, preprocess = clip.load(clip_variant_name, jit=False)
+        model_image = CLIPVisionModel(model)
+        # Extract only the normalization part from preprocess
+        normalization = None
+        for t in preprocess.transforms:
+            if isinstance(t, transforms.Normalize):
+                normalization = t
+                # get the mean and std
+                mean = list(normalization.mean)
+                std = list(normalization.std)
+                break
+
+        model_image = nn.Sequential(Normalize(mean, std), model_image)
+
+    return model_image
+
+
 
 
 
@@ -111,37 +161,19 @@ def get_embeddings(cf, experiments, log) :
 
 
     ### Loading Source Model
-    source_ckpt_path = cf.source_ckpt_path
 
 
-    source_model_dict = {"model": {"backbone": cf.source_model_backbone, "mlp_hidden": experiments[cf.source_exp_no]["model.mlp_hidden"],
-                            "num_embedding_out": experiments[cf.source_exp_no]["model.num_embedding_out"], "proj_head": experiments[cf.source_exp_no]["model.proj_head"],
-                            }
-                  }
-    source_model = HiDiscModel(source_model_dict)
-    dual_bn = True if cf.source_model_backbone == "resnet50_multi_bn" else False
 
-    if cf.load_source_from_ssl:
-        source_ckpt = torch.load(source_ckpt_path)
+    source_model = get_clip_model(cf.source_model_backbone)
 
-        if "state_dict" in source_ckpt.keys():
-            msg = source_model.load_state_dict(source_ckpt["state_dict"])
-            source_epoch = source_ckpt["epoch"]
-        else:
-            source_ckpt_weights = source_ckpt["model"]
-            source_epoch = source_ckpt["epoch"]
-            source_ckpt_weights = {k.replace("module.model", "model"): v for k, v in source_ckpt_weights.items()}
-            msg = source_model.load_state_dict(source_ckpt_weights)
 
-        log.info(f"Loaded Source model {cf.source_model_backbone} from {source_ckpt_path} Epoch {source_epoch} with message {msg}")
-    else:
-        log.info(f"Loaded Source model {cf.source_model_backbone} trained on ImageNet")
+    log.info(f"Loaded Source model {cf.source_model_backbone} ")
 
     source_model.to("cuda")
     source_model.eval()
 
     if cf.attack_name == "pgd_knn":
-        attack = PGD_KNN(model=source_model, eps=cf.eps/255.0, alpha=2/255, steps=cf.steps)
+        attack = PGD_CLIP(model=source_model, eps=cf.eps/255.0, alpha=2/255, steps=cf.steps, feature_loss=cf.attack_features)
     else:
         raise ValueError(f"Attack {cf.attack_name} not implemented")
 
@@ -198,6 +230,10 @@ def get_embeddings(cf, experiments, log) :
 
         with torch.no_grad():
             outputs = target_model.get_features(adv_images, bn_name="normal") if dual_bn else target_model.get_features(adv_images)
+            clean_outputs = target_model.get_features(images, bn_name="normal") if dual_bn else target_model.get_features(images)
+            # compute cosine similarity between clean and adv features
+            cos_sim = F.cosine_similarity(outputs, clean_outputs, dim=1)
+            log.info(f"Batch {i} Cosine Similarity {cos_sim.mean()}")
 
         d = {"embeddings": outputs, "label": labels, "path": batch["path"]}
 
@@ -341,10 +377,9 @@ def get_args():
     parser.add_argument('--data_meta_json', type=str, default='opensrh.json')
     parser.add_argument('--data_meta_split_json', type=str, default='train_val_split.json')
 
-    parser.add_argument('--source_model_backbone', type=str, default='resnet50_at')
-    parser.add_argument('--source_exp_no', type=int, default=18)
-    parser.add_argument('--source_ckpt_path', type=str, default=r'Results/Baseline/resnet50_at_exp18/checkpoint_40000.pth')
-    parser.add_argument('--load_source_from_ssl', default=True, type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument('--source_model_backbone', type=str, default='CLIP-ViT-B/16')
+    parser.add_argument('--attack_features', type=str, default='pre_projection_features_all_layers',
+                        choices=['projection_features', 'pre_projection_features', 'pre_projection_features_all_layers'])
 
 
 
@@ -357,7 +392,7 @@ def get_args():
     parser.add_argument('--eval_predict_batch_size', type=int, default=32)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
 
-    parser.add_argument('--save_results_path', type=str, default='eval_knn_transf_results')
+    parser.add_argument('--save_results_path', type=str, default='eval_knn_transf_clip_results')
 
     parser.add_argument('--attack_name', type=str, default='pgd_knn')
     parser.add_argument('--eps', type=int, default=8)
@@ -390,17 +425,7 @@ def main():
     if not os.path.exists(results_path):
         os.makedirs(results_path, exist_ok=True)
 
-    if cf.load_source_from_ssl:
 
-        source_exp_no = cf.source_exp_no
-        source_ckpt_path = cf.source_ckpt_path
-        if not os.path.exists(source_ckpt_path):
-            print(f"Checkpoint file {source_ckpt_path} does not exist. Exiting.")
-            sys.exit(1)
-
-        source_ckpt = torch.load(source_ckpt_path)
-        source_epoch = source_ckpt["epoch"]
-        del source_ckpt
 
     target_exp_no = cf.target_exp_no
     target_ckpt_path = cf.target_ckpt_path
@@ -409,10 +434,12 @@ def main():
     del target_ckpt
 
 
-    if cf.load_source_from_ssl:
-        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log")
-    else:
-        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log")
+    source_model_name = cf.source_model_backbone
+    source_model_name = source_model_name.replace("/", "_")
+    source_model_name = source_model_name.replace("-", "_")
+
+
+    log_dir = os.path.join(results_path, f"S_{source_model_name}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_features_{cf.attack_features}.log")
 
     logging.basicConfig(filename=log_dir, filemode="a",
                         format="%(name)s → %(levelname)s: %(message)s")
@@ -428,15 +455,12 @@ def main():
     log.info("Info level message")
     log.info("Logs will be saved in %s", log_dir)
     # log the source model name, target model name, attack name, eps, steps, load_source_from_ssl, target_exp_no, target_epoch, target_ckp_path
-    log.info(f"Source Model: {cf.source_model_backbone} Target Model: {cf.target_model_backbone} Attack: {cf.attack_name} Eps: {cf.eps} Steps: {cf.steps}"
-             f" Load Source from SSL: {cf.load_source_from_ssl} Target Exp No: {cf.target_exp_no} Target Epoch: {target_epoch} Target CKP Path: {cf.target_ckpt_path}")
+    log.info(f"Source Model: {cf.source_model_backbone} Target Model: {cf.target_model_backbone} Attack: {cf.attack_name} Eps: {cf.eps} Steps: {cf.steps} Attack Features: {cf.attack_features}" 
+             f" Target Exp No: {cf.target_exp_no} Target Epoch: {target_epoch} Target CKP Path: {cf.target_ckpt_path}")
 
 
     setup_seed(cf.seed)
-    if cf.load_source_from_ssl:
-        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.pt")
-    else:
-        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.pt")
+    prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{source_model_name}_T_{cf.target_model_backbone}_epoch{target_epoch}_exp_{target_exp_no}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_features_{cf.attack_features}.pt")
 
 
     # if os.path.exists(prediction_path):
