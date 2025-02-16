@@ -5,6 +5,7 @@ EXP_NUMBER=$1
 adv_eval=${2:-"true"}
 epsilon=${3:-8}
 steps=${4:-7}
+batch_size=${5:-64}
 
 
 
@@ -42,7 +43,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -64,7 +65,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
        if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -87,7 +88,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
        if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -117,7 +118,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -140,7 +141,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -162,7 +163,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
       echo $ckpt_path
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -191,7 +192,7 @@ if [ $EXP_NUMBER -eq 20 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -214,7 +215,7 @@ if [ $EXP_NUMBER -eq 20 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -237,7 +238,7 @@ if [ $EXP_NUMBER -eq 20 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -267,7 +268,7 @@ if [ $EXP_NUMBER -eq 24 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 256   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 256   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -292,7 +293,7 @@ if [ $EXP_NUMBER -eq 24 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 256   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 256   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -322,7 +323,7 @@ if [ $EXP_NUMBER -eq 244 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 128   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 128   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -346,7 +347,7 @@ if [ $EXP_NUMBER -eq 244 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 128   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 128   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -375,7 +376,7 @@ if [ $EXP_NUMBER -eq 25 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 512   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 512   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -399,7 +400,7 @@ if [ $EXP_NUMBER -eq 25 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 512   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 512   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -428,7 +429,7 @@ if [ $EXP_NUMBER -eq 26 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 768   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 768   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -452,7 +453,7 @@ if [ $EXP_NUMBER -eq 26 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 768   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 768   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -480,7 +481,7 @@ if [ $EXP_NUMBER -eq 27 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 1024   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 1024   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -505,7 +506,7 @@ if [ $EXP_NUMBER -eq 27 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 1024   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name --model_num_embedding_out 1024   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -534,7 +535,7 @@ if [ $EXP_NUMBER -eq 28 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -559,7 +560,7 @@ if [ $EXP_NUMBER -eq 28 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -584,7 +585,7 @@ if [ $EXP_NUMBER -eq 28 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -618,7 +619,7 @@ if [ $EXP_NUMBER -eq 29 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.proj_head=True model.num_embedding_out=2048    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.proj_head=True model.num_embedding_out=2048   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -643,7 +644,7 @@ if [ $EXP_NUMBER -eq 29 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.proj_head=True model.num_embedding_out=2048   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.proj_head=True model.num_embedding_out=2048   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -668,7 +669,7 @@ if [ $EXP_NUMBER -eq 29 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.proj_head=True model.num_embedding_out=2048   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.proj_head=True model.num_embedding_out=2048   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -698,7 +699,7 @@ if [ $EXP_NUMBER -eq 30 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -723,7 +724,7 @@ if [ $EXP_NUMBER -eq 30 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -748,7 +749,7 @@ if [ $EXP_NUMBER -eq 30 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name model.mlp_hidden=[2048,2048] model.num_embedding_out=2048   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -779,7 +780,7 @@ if [ $EXP_NUMBER -eq 31 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -804,7 +805,7 @@ if [ $EXP_NUMBER -eq 31 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -830,7 +831,7 @@ if [ $EXP_NUMBER -eq 31 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -860,7 +861,7 @@ if [ $EXP_NUMBER -eq 32 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -885,7 +886,7 @@ if [ $EXP_NUMBER -eq 32 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
@@ -911,7 +912,7 @@ if [ $EXP_NUMBER -eq 32 ]; then
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size
       else
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results

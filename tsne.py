@@ -40,6 +40,10 @@ import argparse
 import logging
 
 from attacks.pgd import PGD_KNN
+import numpy as np
+from sklearn.model_selection import StratifiedShuffleSplit
+from torch.utils.data import Subset
+from collections import Counter
 
 
 
@@ -108,9 +112,34 @@ def get_embeddings(cf, experiments, log) :
     val_dset = OpenSRHDataset(data_root=cf.data_db_root, studies="val",
                               transform=Compose(aug_func()), balance_patch_per_class=False)
 
+    # Define the fraction of data you want to keep
+    fraction = cf.data_fraction
 
-    val_loader = torch.utils.data.DataLoader(val_dset, batch_size=cf.eval_predict_batch_size,
+    # Extract labels and convert them to integers
+    labels = np.array([int(val_dset[i]["label"]) for i in range(len(val_dset))])
+
+    # Print original dataset class distribution
+    original_counts = Counter(labels)
+    print("Original dataset class distribution:", original_counts)
+
+    # Use StratifiedShuffleSplit to maintain class balance
+    splitter = StratifiedShuffleSplit(n_splits=1, test_size=1 - fraction, random_state=42)
+    train_idx, _ = next(splitter.split(np.zeros(len(labels)), labels))
+
+    # Create a subset of the dataset
+    val_subset = Subset(val_dset, train_idx)
+
+    # Get labels for the subset and convert them to integers
+    subset_labels = [int(val_dset[i]["label"]) for i in train_idx]
+
+    # Print subset dataset class distribution
+    subset_counts = Counter(subset_labels)
+    print("Subset dataset class distribution:", subset_counts)
+
+    val_loader = torch.utils.data.DataLoader(val_subset, batch_size=cf.eval_predict_batch_size,
                                              drop_last=False, pin_memory=True, persistent_workers=False)
+
+
 
 
     ### Loading Source Model
@@ -209,6 +238,8 @@ def get_args():
     parser.add_argument('--data_db_root', type=str, default=r'F:\Code\datasets\hidisc_data_small')
     parser.add_argument('--data_meta_json', type=str, default='opensrh.json')
     parser.add_argument('--data_meta_split_json', type=str, default='train_val_split.json')
+    parser.add_argument('--data_fraction', type=float, default=0.2)
+
 
     parser.add_argument('--source_model_backbone', type=str, default='resnet50_at')
     parser.add_argument('--source_exp_no', type=int, default=18)
@@ -223,7 +254,7 @@ def get_args():
     parser.add_argument('--eval_predict_batch_size', type=int, default=32)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
 
-    parser.add_argument('--save_results_path', type=str, default='eval_tsne_results')
+    parser.add_argument('--save_results_path', type=str, default='Results/eval_tsne_results')
 
     parser.add_argument('--attack_name', type=str, default='pgd_knn')
     parser.add_argument('--eps', type=int, default=8)
@@ -272,9 +303,9 @@ def main():
 
 
     if cf.load_source_from_ssl:
-        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log")
+        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.log")
     else:
-        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log")
+        log_dir = os.path.join(results_path, f"S_{cf.source_model_backbone}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.log")
 
     logging.basicConfig(filename=log_dir, filemode="a",
                         format="%(name)s → %(levelname)s: %(message)s")
@@ -295,9 +326,9 @@ def main():
 
     setup_seed(cf.seed)
     if cf.load_source_from_ssl:
-        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log.pt")
+        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.pt")
     else:
-        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.log.pt")
+        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.pt")
 
 
     # if os.path.exists(prediction_path):
@@ -311,38 +342,48 @@ def main():
     X = X_adv['embeddings'].cpu().numpy()  # Convert PyTorch tensor to NumPy array
     Y = X_adv['label'].cpu().numpy()  # Convert labels to NumPy array
 
+    # Generate unique colors for each class
+    num_classes = len(np.unique(Y))
+    unique_labels = np.unique(Y)
+    colors = plt.cm.jet(np.linspace(0, 1, num_classes))  # Generate distinct colors
+
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, perplexity=30, random_state=42)
     X_embedded = tsne.fit_transform(X)
 
     # Scatter plot of t-SNE embeddings
     plt.figure(figsize=(8, 6))
-    scatter = plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap='jet', alpha=0.7)
-    plt.colorbar(label="Class Labels")
-    plt.xlabel("t-SNE Component 1")
-    plt.ylabel("t-SNE Component 2")
-    plt.title("t-SNE Visualization of Feature Embeddings")
+    for i, label in enumerate(unique_labels):
+        plt.scatter(X_embedded[Y == label, 0], X_embedded[Y == label, 1],
+                    color=colors[i], label=f'Class {label}', alpha=0.7)
+    plt.legend()
+    # scatter = plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap='jet', alpha=0.7)
+    # plt.colorbar(label="Class Labels")
+    plt.title("t-SNE Visualization of Adversarial Feature Embeddings")
     if cf.load_source_from_ssl:
-        plt.savefig(os.path.join(results_path, f"t-SNE_adv_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_{cf.attack_name}_{cf.steps}_eps{cf.eps}.png"))
+        plt.savefig(os.path.join(results_path, f"t-SNE_adv_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.png"))
     else:
 
-        plt.savefig(os.path.join(results_path, f"t-SNE_adv_S_{cf.source_model_backbone}_{cf.attack_name}_{cf.steps}_eps{cf.eps}.png"))
+        plt.savefig(os.path.join(results_path, f"t-SNE_adv_S_{cf.source_model_backbone}_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.png"))
     plt.close()
 
     # Extract embeddings and labels from X_clean
-    X_clean = X_clean['embeddings'].cpu().numpy()  # Convert PyTorch tensor to NumPy array
-    Y_clean = X_clean['label'].cpu().numpy()  # Convert labels to NumPy array
+    X = X_clean['embeddings'].cpu().numpy()  # Convert PyTorch tensor to NumPy array
+    Y = X_clean['label'].cpu().numpy()  # Convert labels to NumPy array
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, perplexity=30, random_state=42)
-    X_clean_embedded = tsne.fit_transform(X_clean)
+    X_embedded = tsne.fit_transform(X)
 
     # Scatter plot of t-SNE embeddings
     plt.figure(figsize=(8, 6))
-    scatter = plt.scatter(X_clean_embedded[:, 0], X_clean_embedded[:, 1], c=Y_clean, cmap='jet', alpha=0.7)
-    plt.colorbar(label="Class Labels")
-    plt.xlabel("t-SNE Component 1")
-    plt.ylabel("t-SNE Component 2")
+    for i, label in enumerate(unique_labels):
+        plt.scatter(X_embedded[Y == label, 0], X_embedded[Y == label, 1],
+                    color=colors[i], label=f'Class {label}', alpha=0.7)
+    plt.legend()
+
+    # scatter = plt.scatter(X_clean_embedded[:, 0], X_clean_embedded[:, 1], c=Y, cmap='jet', alpha=0.7)
+    # plt.colorbar(label="Class Labels")
     plt.title("t-SNE Visualization of Clean Feature Embeddings")
     if cf.load_source_from_ssl:
         plt.savefig(os.path.join(results_path,
