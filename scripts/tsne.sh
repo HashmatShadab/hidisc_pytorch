@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#DATA_PATH=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data
-DATA_PATH="F:/Code/datasets/hidisc_data_small"
+DATA_PATH=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data
+#DATA_PATH="F:/Code/datasets/hidisc_data_small"
 
 
 epsilon=${1:-8}
@@ -42,9 +42,9 @@ source_exp_no=18
 source_ckpt_dir="Results/Baseline/resnet50_timm_pretrained_exp18/checkpoint_40000.pth"
 
 
-  python tsne.py --data_db_root $DATA_PATH  --source_model_backbone $source_model    \
-  --source_exp_no $source_exp_no \
-  --source_ckpt_path $source_ckpt_dir  --save_results_path  Results/tsne_eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --data_fraction $data_fraction  
+python tsne.py --data_db_root $DATA_PATH  --source_model_backbone $source_model    \
+--source_exp_no $source_exp_no \
+--source_ckpt_path $source_ckpt_dir  --save_results_path  Results/tsne_eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --data_fraction $data_fraction
 
 
 
