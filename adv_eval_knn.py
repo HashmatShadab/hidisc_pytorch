@@ -35,7 +35,7 @@ import argparse
 
 import logging
 
-from attacks.pgd import PGD_KNN
+from attacks.pgd import PGD_KNN, FFGSM_KNN, BIM_KNN, MIFGSM_KNN
 
 
 
@@ -133,6 +133,12 @@ def get_embeddings(cf: Dict[str, Any],
 
     if cf.attack_name == "pgd_knn":
         attack = PGD_KNN(model=model, eps=cf.eps/255.0, alpha=2/255, steps=cf.steps)
+    elif cf.attack_name == "ffgsm_knn":
+        attack = FFGSM_KNN(model=model, eps=cf.eps/255.0)
+    elif cf.attack_name == "bim_knn":
+        attack = BIM_KNN(model=model, eps=cf.eps/255.0, alpha=2/255, steps=cf.steps)
+    elif cf.attack_name == "mifgsm_knn":
+        attack = MIFGSM_KNN(model=model, eps=cf.eps/255.0, alpha=2/255, steps=cf.steps)
     else:
         raise ValueError(f"Attack {cf.attack_name} not implemented")
 
@@ -314,10 +320,10 @@ def get_args():
 
     parser.add_argument('--eval_predict_batch_size', type=int, default=32)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
-    parser.add_argument('--eval_ckpt_path', type=str, default=r'F:\Code\Projects\ckpt-epoch35199.ckpt')
-    parser.add_argument('--save_results_path', type=str, default='eval_knn_results')
+    parser.add_argument('--eval_ckpt_path', type=str, default=r'Results/Baseline/resnet50_exp18/checkpoint_40000.pth')
+    parser.add_argument('--save_results_path', type=str, default='delete_eval_knn_results')
 
-    parser.add_argument('--attack_name', type=str, default='pgd_knn')
+    parser.add_argument('--attack_name', type=str, default='pgd_knn', choices=['pgd_knn', 'ffgsm_knn', 'bim_knn', 'mifgsm_knn'])
     parser.add_argument('--eps', type=int, default=8)
     parser.add_argument('--steps', type=int, default=7)
 

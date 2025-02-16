@@ -162,6 +162,249 @@ class PGD_KNN(Attack):
         return adv_images
 
 
+class BIM_KNN(Attack):
+    r"""
+    BIM or iterative-FGSM in the paper 'Adversarial Examples in the Physical World'
+    [https://arxiv.org/abs/1607.02533]
+
+    Distance Measure : Linf
+
+    Arguments:
+        model (nn.Module): model to attack.
+        eps (float): maximum perturbation. (Default: 8/255)
+        alpha (float): step size. (Default: 2/255)
+        steps (int): number of steps. (Default: 10)
+
+    .. note:: If steps set to 0, steps will be automatically decided following the paper.
+
+    Shape:
+        - images: :math:`(N, C, H, W)` where `N = number of batches`, `C = number of channels`,        `H = height` and `W = width`. It must have a range [0, 1].
+        - labels: :math:`(N)` where each value :math:`y_i` is :math:`0 \leq y_i \leq` `number of labels`.
+        - output: :math:`(N, C, H, W)`.
+
+    Examples::
+
+    """
+
+    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, loss_fn="cosine"):
+        super().__init__("BIM", model)
+        self.eps = eps
+        self.alpha = alpha
+        if steps == 0:
+            self.steps = int(min(eps * 255 + 4, 1.25 * eps * 255))
+        else:
+            self.steps = steps
+        self.supported_mode = ["default", "targeted"]
+        self.loss_fn = loss_fn
+
+    def forward(self, images, labels, dual_bn):
+        r"""
+        Overridden.
+        """
+
+        images = images.clone().detach().to(self.device)
+
+        if self.loss_fn == "cosine":
+            loss = nn.CosineSimilarity()
+        elif self.loss_fn == "mse":
+            loss = nn.MSELoss()
+        elif self.loss_fn == "l1":
+            loss = nn.L1Loss()
+
+        # adv_images = images.clone().detach()
+        orig_images = images.clone().detach()
+
+        for _ in range(self.steps):
+            images.requires_grad = True
+
+            outputs = self.get_logits(images, dual_bn)
+            outputs = outputs.reshape(images.shape[0], -1)
+            clean_outputs = self.get_logits(orig_images.clone().detach(), dual_bn)
+            clean_outputs = clean_outputs.reshape(images.shape[0], -1)
+
+            cost = loss(clean_outputs, outputs).mean()
+
+            if self.loss_fn == "cosine":
+                cost = -cost
+
+            # Update adversarial images
+            grad = torch.autograd.grad(
+                cost, images, retain_graph=False, create_graph=False
+            )[0]
+
+            print(f"  Cost {cost.item()}")
+
+            adv_images = images + self.alpha * grad.sign()
+            a = torch.clamp(orig_images - self.eps, min=0)
+            b = (adv_images >= a).float() * adv_images + (
+                adv_images < a
+            ).float() * a  # nopep8
+            c = (b > orig_images + self.eps).float() * (orig_images + self.eps) + (
+                b <= orig_images + self.eps
+            ).float() * b  # nopep8
+            images = torch.clamp(c, max=1).detach()
+
+        return images
+
+
+
+
+class FFGSM_KNN(Attack):
+    r"""
+    New FGSM proposed in 'Fast is better than free: Revisiting adversarial training'
+    [https://arxiv.org/abs/2001.03994]
+
+    Distance Measure : Linf
+
+    Arguments:
+        model (nn.Module): model to attack.
+        eps (float): maximum perturbation. (Default: 8/255)
+        alpha (float): step size. (Default: 10/255)
+
+    Shape:
+        - images: :math:`(N, C, H, W)` where `N = number of batches`, `C = number of channels`,        `H = height` and `W = width`. It must have a range [0, 1].
+        - labels: :math:`(N)` where each value :math:`y_i` is :math:`0 \leq y_i \leq` `number of labels`.
+        - output: :math:`(N, C, H, W)`.
+
+    Examples::
+        >>> attack = torchattacks.FFGSM(model, eps=8/255, alpha=10/255)
+        >>> adv_images = attack(images, labels)
+    """
+
+    def __init__(self, model, eps=8 / 255, alpha=10 / 255, loss_fn="cosine"):
+        super().__init__("FFGSM", model)
+        self.eps = eps
+        self.alpha = alpha
+        self.supported_mode = ["default", "targeted"]
+        self.loss_fn = loss_fn
+
+    def forward(self, images, labels, dual_bn):
+        r"""
+        Overridden.
+        """
+
+        images = images.clone().detach().to(self.device)
+
+        if self.loss_fn == "cosine":
+            loss = nn.CosineSimilarity()
+        elif self.loss_fn == "mse":
+            loss = nn.MSELoss()
+        elif self.loss_fn == "l1":
+            loss = nn.L1Loss()
+
+        orig_images = images.clone().detach()
+
+        adv_images = images + torch.randn_like(images).uniform_(
+            -self.eps, self.eps
+        )  # nopep8
+        adv_images = torch.clamp(adv_images, min=0, max=1).detach()
+        adv_images.requires_grad = True
+
+        outputs = self.get_logits(adv_images, dual_bn)
+        outputs = outputs.reshape(images.shape[0], -1)
+        clean_outputs = self.get_logits(orig_images.clone().detach(), dual_bn)
+        clean_outputs = clean_outputs.reshape(images.shape[0], -1)
+        cost = loss(clean_outputs, outputs).mean()
+
+        if self.loss_fn == "cosine":
+            cost = -cost
+
+        # Update adversarial images
+        grad = torch.autograd.grad(
+            cost, adv_images, retain_graph=False, create_graph=False
+        )[0]
+
+        print(f"  Cost {cost.item()}")
+
+        adv_images = adv_images + self.alpha * grad.sign()
+        delta = torch.clamp(adv_images - images, min=-self.eps, max=self.eps)
+        adv_images = torch.clamp(images + delta, min=0, max=1).detach()
+
+        return adv_images
+
+class MIFGSM_KNN(Attack):
+    r"""
+    MI-FGSM in the paper 'Boosting Adversarial Attacks with Momentum'
+    [https://arxiv.org/abs/1710.06081]
+
+    Distance Measure : Linf
+
+    Arguments:
+        model (nn.Module): model to attack.
+        eps (float): maximum perturbation. (Default: 8/255)
+        alpha (float): step size. (Default: 2/255)
+        decay (float): momentum factor. (Default: 1.0)
+        steps (int): number of iterations. (Default: 10)
+
+    Shape:
+        - images: :math:`(N, C, H, W)` where `N = number of batches`, `C = number of channels`,        `H = height` and `W = width`. It must have a range [0, 1].
+        - labels: :math:`(N)` where each value :math:`y_i` is :math:`0 \leq y_i \leq` `number of labels`.
+        - output: :math:`(N, C, H, W)`.
+
+    Examples::
+        >>> attack = torchattacks.MIFGSM(model, eps=8/255, steps=10, decay=1.0)
+        >>> adv_images = attack(images, labels)
+
+    """
+
+    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, decay=1.0, loss_fn="cosine"):
+        super().__init__("MIFGSM", model)
+        self.eps = eps
+        self.steps = steps
+        self.decay = decay
+        self.alpha = alpha
+        self.supported_mode = ["default", "targeted"]
+        self.loss_fn = loss_fn
+
+    def forward(self, images, labels, dual_bn):
+        r"""
+        Overridden.
+        """
+
+        images = images.clone().detach().to(self.device)
+
+
+
+        momentum = torch.zeros_like(images).detach().to(self.device)
+
+        if self.loss_fn == "cosine":
+            loss = nn.CosineSimilarity()
+        elif self.loss_fn == "mse":
+            loss = nn.MSELoss()
+        elif self.loss_fn == "l1":
+            loss = nn.L1Loss()
+
+        orig_images = images.clone().detach()
+        adv_images = images.clone().detach()
+
+        for _ in range(self.steps):
+            adv_images.requires_grad = True
+            outputs = self.get_logits(adv_images, dual_bn)
+            outputs = outputs.reshape(images.shape[0], -1)
+
+            clean_outputs = self.get_logits(orig_images.clone().detach(), dual_bn)
+            clean_outputs = clean_outputs.reshape(images.shape[0], -1)
+
+            cost = loss(clean_outputs, outputs).mean()
+
+            if self.loss_fn == "cosine":
+                cost = -cost
+
+            # Update adversarial images
+            grad = torch.autograd.grad(
+                cost, adv_images, retain_graph=False, create_graph=False
+            )[0]
+
+            print(f"  Cost {cost.item()}")
+            grad = grad / torch.mean(torch.abs(grad), dim=(1, 2, 3), keepdim=True)
+            grad = grad + momentum * self.decay
+            momentum = grad
+
+            adv_images = adv_images.detach() + self.alpha * grad.sign()
+            delta = torch.clamp(adv_images - images, min=-self.eps, max=self.eps)
+            adv_images = torch.clamp(images + delta, min=0, max=1).detach()
+
+        return adv_images
 
 
 class PGD_CLIP(Attack):
