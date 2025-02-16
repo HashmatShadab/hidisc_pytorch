@@ -16,6 +16,7 @@ import sys
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 import torch
+import seaborn as sns
 
 import yaml
 import numpy as np
@@ -250,7 +251,7 @@ def get_args():
 
 
 
-
+    parser.add_argument('--perplexity', type=int, default=10)
     parser.add_argument('--eval_predict_batch_size', type=int, default=32)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
 
@@ -326,40 +327,82 @@ def main():
 
     setup_seed(cf.seed)
     if cf.load_source_from_ssl:
-        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.pt")
+        prediction_clean_path = os.path.join(cf.save_results_path, f"clean_embeddings_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.npz")
+        prediction_adv_path = os.path.join(cf.save_results_path, f"adv_embeddings_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.npz")
+
     else:
-        prediction_path = os.path.join(cf.save_results_path, f"predictions_S_{cf.source_model_backbone}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.pt")
+        prediction_clean_path = os.path.join(cf.save_results_path, f"clean_embeddings_S_{cf.source_model_backbone}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.npz")
+        prediction_adv_path = os.path.join(cf.save_results_path, f"adv_embeddings_S_{cf.source_model_backbone}_TSNE_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.npz")
 
 
-    # if os.path.exists(prediction_path):
-    #     log.info("loading predictions")
-    #     predictions = torch.load(prediction_path)
 
-    log.info("generating predictions")
-    X_adv, X_clean = get_embeddings(cf, experiments, log=log)
 
-    # Extract embeddings and labels from X_adv
-    X = X_adv['embeddings'].cpu().numpy()  # Convert PyTorch tensor to NumPy array
-    Y = X_adv['label'].cpu().numpy()  # Convert labels to NumPy array
+    log.info("generating Embeddings")
+    prediction_clean_path = prediction_clean_path.replace("\\", "/")
+    prediction_adv_path = prediction_adv_path.replace("\\", "/")
+    if os.path.exists(prediction_clean_path) and os.path.exists(prediction_adv_path):
+        # replace \\ with / for windows
+
+        log.info("loading Embeddings")
+        data = np.load(prediction_adv_path)
+        X_a = data["embeddings"]
+        Y_a = data["label"]
+        data = np.load(prediction_clean_path)
+        X_c = data["embeddings"]
+        Y_c = data["label"]
+    else:
+        X_adv, X_clean = get_embeddings(cf, experiments, log=log)
+
+        # Extract embeddings and labels from X_adv
+        X_a = X_adv['embeddings'].cpu().numpy()  # Convert PyTorch tensor to NumPy array
+        Y_a = X_adv['label'].cpu().numpy()  # Convert labels to NumPy array
+
+        # Extract embeddings and labels from X_clean
+        X_c = X_clean['embeddings'].cpu().numpy()  # Convert PyTorch tensor to NumPy array
+        Y_c = X_clean['label'].cpu().numpy()  # Convert labels to NumPy array
+
+        np.savez(prediction_adv_path, embeddings=X_a, label=Y_a)
+        np.savez(prediction_clean_path, embeddings=X_c, label=Y_c)
 
     # Generate unique colors for each class
-    num_classes = len(np.unique(Y))
-    unique_labels = np.unique(Y)
+    num_classes = len(np.unique(Y_a))
+    unique_labels = np.unique(Y_a)
     colors = plt.cm.jet(np.linspace(0, 1, num_classes))  # Generate distinct colors
 
+
     # Apply t-SNE for dimensionality reduction
-    tsne = TSNE(n_components=2, perplexity=30, random_state=42)
-    X_embedded = tsne.fit_transform(X)
+    tsne = TSNE(n_components=2, perplexity=cf.perplexity, random_state=42)
+    X_embedded = tsne.fit_transform(X_a)
 
     # Scatter plot of t-SNE embeddings
-    plt.figure(figsize=(8, 6))
+
+    # Define a beautiful color palette
+    palette = sns.color_palette("husl", len(unique_labels))  # Husl gives distinguishable colors
+
+    plt.figure(figsize=(10, 8), dpi=400)
+
+    # Scatter plot with better aesthetics
     for i, label in enumerate(unique_labels):
-        plt.scatter(X_embedded[Y == label, 0], X_embedded[Y == label, 1],
-                    color=colors[i], label=f'Class {label}', alpha=0.7)
-    plt.legend()
-    # scatter = plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap='jet', alpha=0.7)
-    # plt.colorbar(label="Class Labels")
-    plt.title("t-SNE Visualization of Adversarial Feature Embeddings")
+        plt.scatter(
+            X_embedded[Y_a == label, 0], X_embedded[Y_a == label, 1],
+            color=palette[i],  s=25, edgecolors='black', alpha=0.7
+        )
+
+    # Adding a clean grid
+    plt.grid(True, which='major', linestyle='-', linewidth=0.5, alpha=0.3)
+    plt.grid(True, which='minor', linestyle='--', linewidth=0.3, alpha=0.1)
+    plt.minorticks_on()
+
+    # Remove axis ticks for a clean look
+    plt.xticks([])
+    plt.yticks([])
+
+    # Title with nice font
+    plt.title("Visualization of Adversarial Feature Embeddings", fontsize=14, fontweight='bold')
+
+    # Add a legend outside the plot
+    # plt.legend(loc='upper right', fontsize=10, frameon=True, fancybox=True)
+
     if cf.load_source_from_ssl:
         plt.savefig(os.path.join(results_path, f"t-SNE_adv_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.png"))
     else:
@@ -367,31 +410,39 @@ def main():
         plt.savefig(os.path.join(results_path, f"t-SNE_adv_S_{cf.source_model_backbone}_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.png"))
     plt.close()
 
-    # Extract embeddings and labels from X_clean
-    X = X_clean['embeddings'].cpu().numpy()  # Convert PyTorch tensor to NumPy array
-    Y = X_clean['label'].cpu().numpy()  # Convert labels to NumPy array
 
     # Apply t-SNE for dimensionality reduction
-    tsne = TSNE(n_components=2, perplexity=30, random_state=42)
-    X_embedded = tsne.fit_transform(X)
+    tsne = TSNE(n_components=2, perplexity=cf.perplexity, random_state=42)
+    X_embedded = tsne.fit_transform(X_c)
 
-    # Scatter plot of t-SNE embeddings
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 8), dpi=400)
+
+
+    # Scatter plot with better aesthetics
     for i, label in enumerate(unique_labels):
-        plt.scatter(X_embedded[Y == label, 0], X_embedded[Y == label, 1],
-                    color=colors[i], label=f'Class {label}', alpha=0.7)
-    plt.legend()
+        plt.scatter(
+            X_embedded[Y_c == label, 0], X_embedded[Y_c == label, 1],
+            color=palette[i],  s=25, edgecolors='black', alpha=0.7
+        )
 
-    # scatter = plt.scatter(X_clean_embedded[:, 0], X_clean_embedded[:, 1], c=Y, cmap='jet', alpha=0.7)
-    # plt.colorbar(label="Class Labels")
-    plt.title("t-SNE Visualization of Clean Feature Embeddings")
+        # Adding a clean grid
+    plt.grid(True, which='major', linestyle='-', linewidth=0.5, alpha=0.3)
+    plt.grid(True, which='minor', linestyle='--', linewidth=0.3, alpha=0.1)
+    plt.minorticks_on()
+
+    # Remove axis ticks for a clean look
+    plt.xticks([])
+    plt.yticks([])
+
+    # Title with nice font
+    plt.title("Visualization of Clean Feature Embeddings", fontsize=14, fontweight='bold')
     if cf.load_source_from_ssl:
         plt.savefig(os.path.join(results_path,
-                                 f"t-SNE_clean_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_{cf.attack_name}_{cf.steps}_eps{cf.eps}.png"))
+                                 f"t-SNE_clean_S_{cf.source_model_backbone}_epoch{source_epoch}_exp_{source_exp_no}_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.png"))
     else:
 
         plt.savefig(os.path.join(results_path,
-                                 f"t-SNE_clean_S_{cf.source_model_backbone}_{cf.attack_name}_{cf.steps}_eps{cf.eps}.png"))
+                                 f"t-SNE_clean_S_{cf.source_model_backbone}_{cf.attack_name}_{cf.steps}_eps{cf.eps}_data_fraction_{cf.data_fraction}.png"))
     plt.close()
 
 
