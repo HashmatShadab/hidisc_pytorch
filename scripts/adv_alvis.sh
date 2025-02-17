@@ -448,6 +448,34 @@ fi
 
 
 
+# Experiment 33: HAT-Patch Testing the effect of patch loss only on the adversarial training, Increase the batch size accordingly by 4 times.
+if [ $exp_num -eq 33 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
+    data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    data.hidisc.num_slide_samples=1 data.hidisc.num_patch_samples=1 \
+    model.backbone=$model_name  \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33 wandb.use=True
+
+fi
+
+
+# Experiment 34: HAT-Patch Testing the effect of patch loss only on the adversarial training, Increase the batch size accordingly by 4 times.
+if [ $exp_num -eq 34 ]
+then
+    torchrun --nproc_per_node=$NUM_GPUS --master_port=$random main.py \
+    data.db_root=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data data.dynamic_aug=True data.dynamic_aug_version=v0 \
+    data.hidisc.num_patch_samples=1 \
+    model.backbone=$model_name  \
+    training.batch_size=$BATCH_SIZE training.only_adv=True \
+    training.attack.name=pgd  training.attack.eps=8 training.attack.warmup_epochs=5000 training.attack.loss_type=p_s_pt \
+    out_dir=Results/Adv/${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34 \
+    wandb.exp_name=Adv_backbone_${model_name}_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34 wandb.use=True
+
+fi
 
 
 
