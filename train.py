@@ -14,6 +14,56 @@ def plot_grid(w, save=False, name="grid.png"):
         plt.savefig(name)
     plt.show()
 
+import os
+import torch
+from torchvision import transforms
+
+def save_patient_images(im_reshaped, output_dir="patient_images"):
+    """
+    Save images in a structured folder format:
+    patient_images/
+    ├── patient_1/
+    │   ├── image_1_original.png
+    │   ├── image_1_augmented.png
+    │   ├── image_2_original.png
+    │   ├── image_2_augmented.png
+    ├── patient_2/
+    │   ├── image_1_original.png
+    │   ├── image_1_augmented.png
+
+    Args:
+        im_reshaped (torch.Tensor): A CUDA tensor of shape (16, 3, 300, 300).
+        output_dir (str): Directory where images will be saved.
+    """
+
+    # Ensure the tensor is on CPU before processing
+    im_reshaped = im_reshaped.cpu()
+
+    # Convert tensor to PIL images
+    to_pil = transforms.ToPILImage()
+
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    for i in range(0, 16, 2):  # Step by 2 since each original has an augmented version
+        patient_id = 1 if i < 8 else 2
+        image_num = (i // 2) + 1 if patient_id == 1 else ((i - 8) // 2) + 1
+
+        # Create patient folder
+        patient_folder = os.path.join(output_dir, f"patient_{patient_id}")
+        os.makedirs(patient_folder, exist_ok=True)
+
+        # Save original image
+        original_image = to_pil(im_reshaped[i])
+        original_image.save(os.path.join(patient_folder, f"image_{image_num}_original.png"))
+
+        # Save augmented image
+        augmented_image = to_pil(im_reshaped[i + 1])
+        augmented_image.save(os.path.join(patient_folder, f"image_{image_num}_augmented.png"))
+
+    print("Images saved successfully!")
+
+
 
 
 
@@ -141,6 +191,7 @@ def train_one_epoch(epoch, train_loader, model,
         im_reshaped = im_reshaped.to("cuda", non_blocking=True)
         targets = batch["label"].to("cuda", non_blocking=True)
         targets = targets.reshape(-1, 1)
+        #save_patient_images(im_reshaped, output_dir=f"patient_images_{i}")
 
         if attack_type == 'pgd' or attack_type == 'pgd_2':
             model.eval()
