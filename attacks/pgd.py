@@ -186,7 +186,8 @@ class BIM_KNN(Attack):
 
     """
 
-    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, loss_fn="cosine"):
+    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, loss_fn="cosine",
+                 random_start=True):
         super().__init__("BIM", model)
         self.eps = eps
         self.alpha = alpha
@@ -196,6 +197,7 @@ class BIM_KNN(Attack):
             self.steps = steps
         self.supported_mode = ["default", "targeted"]
         self.loss_fn = loss_fn
+        self.random_start = random_start
 
     def forward(self, images, labels, dual_bn):
         r"""
@@ -211,13 +213,19 @@ class BIM_KNN(Attack):
         elif self.loss_fn == "l1":
             loss = nn.L1Loss()
 
-        # adv_images = images.clone().detach()
+        adv_images = images.clone().detach()
         orig_images = images.clone().detach()
 
-        for _ in range(self.steps):
-            images.requires_grad = True
+        if self.random_start:
+            # Starting at a uniformly random point
+            adv_images = adv_images + torch.empty_like(adv_images).uniform_(-self.eps, self.eps)
+            adv_images = torch.clamp(adv_images, min=0, max=1).detach()
 
-            outputs = self.get_logits(images, dual_bn)
+
+        for _ in range(self.steps):
+            adv_images.requires_grad = True
+
+            outputs = self.get_logits(adv_images, dual_bn)
             outputs = outputs.reshape(images.shape[0], -1)
             clean_outputs = self.get_logits(orig_images.clone().detach(), dual_bn)
             clean_outputs = clean_outputs.reshape(images.shape[0], -1)
@@ -229,12 +237,12 @@ class BIM_KNN(Attack):
 
             # Update adversarial images
             grad = torch.autograd.grad(
-                cost, images, retain_graph=False, create_graph=False
+                cost, adv_images, retain_graph=False, create_graph=False
             )[0]
 
             print(f"  Cost {cost.item()}")
 
-            adv_images = images + self.alpha * grad.sign()
+            adv_images = adv_images.detach() + self.alpha * grad.sign()
             a = torch.clamp(orig_images - self.eps, min=0)
             b = (adv_images >= a).float() * adv_images + (
                 adv_images < a
@@ -242,9 +250,9 @@ class BIM_KNN(Attack):
             c = (b > orig_images + self.eps).float() * (orig_images + self.eps) + (
                 b <= orig_images + self.eps
             ).float() * b  # nopep8
-            images = torch.clamp(c, max=1).detach()
+            adv_images = torch.clamp(c, max=1).detach()
 
-        return images
+        return adv_images
 
 
 
@@ -347,7 +355,8 @@ class MIFGSM_KNN(Attack):
 
     """
 
-    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, decay=1.0, loss_fn="cosine"):
+    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, decay=1.0, loss_fn="cosine",
+                 random_start=True):
         super().__init__("MIFGSM", model)
         self.eps = eps
         self.steps = steps
@@ -355,6 +364,7 @@ class MIFGSM_KNN(Attack):
         self.alpha = alpha
         self.supported_mode = ["default", "targeted"]
         self.loss_fn = loss_fn
+        self.random_start = random_start
 
     def forward(self, images, labels, dual_bn):
         r"""
@@ -376,6 +386,12 @@ class MIFGSM_KNN(Attack):
 
         orig_images = images.clone().detach()
         adv_images = images.clone().detach()
+
+
+        if self.random_start:
+            # Starting at a uniformly random point
+            adv_images = adv_images + torch.empty_like(adv_images).uniform_(-self.eps, self.eps)
+            adv_images = torch.clamp(adv_images, min=0, max=1).detach()
 
         for _ in range(self.steps):
             adv_images.requires_grad = True
