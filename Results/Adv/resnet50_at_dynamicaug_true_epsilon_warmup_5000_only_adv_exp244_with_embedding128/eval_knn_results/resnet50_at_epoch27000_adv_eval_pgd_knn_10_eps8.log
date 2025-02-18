@@ -9055,3 +9055,74 @@ __main__ → INFO: BATCH 1788 torch.Size([32, 2048]) torch.Size([32])
 __main__ → INFO: BATCH 1789 torch.Size([32, 2048]) torch.Size([32])
 __main__ → INFO: BATCH 1790 torch.Size([32, 2048]) torch.Size([32])
 __main__ → INFO: BATCH 1791 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1792 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1793 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1794 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1795 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1796 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1797 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1798 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1799 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1800 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1801 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1802 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1803 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1804 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1805 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1806 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1807 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1808 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1809 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1810 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1811 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1812 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1813 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1814 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1815 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1816 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1817 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1818 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1819 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1820 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1821 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1822 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1823 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1824 torch.Size([32, 2048]) torch.Size([32])
+__main__ → INFO: BATCH 1825 torch.Size([23, 2048]) torch.Size([23])
+__main__ → INFO: torch.Size([232336, 2048])
+__main__ → INFO: torch.Size([232336])
+__main__ → INFO: 
+metrics
+__main__ → INFO:                     acc              t2  ...             mca             map
+patch    tensor(0.5948)  tensor(0.7703)  ...  tensor(0.5420)  tensor(0.5795)
+slide    tensor(0.7121)  tensor(0.9144)  ...  tensor(0.6530)  tensor(0.8239)
+patient  tensor(0.7000)  tensor(0.9167)  ...  tensor(0.6443)  tensor(0.8564)
+
+[3 rows x 5 columns]
+__main__ → INFO: 
+patch confusion matrix
+__main__ → INFO: [[ 4189  1095  1937  2837   355   401   230]
+ [  861  3423   416  1110   472   183    57]
+ [  575   447  8922   373    80   733    91]
+ [  760   124   745  4470    45   484    94]
+ [ 1147   505   189     8  1551   121     7]
+ [  505    81  1260   858    50 11135   244]
+ [  351   247  2940   160   339   155  1061]]
+__main__ → INFO: 
+slide confusion matrix
+__main__ → INFO: [[23  2  9 15  0  0  0]
+ [ 1 17  0  5  3  0  0]
+ [ 0  0 47  0  0  0  0]
+ [ 1  0  0 30  0  4  0]
+ [10  0  0  0 17  0  0]
+ [ 0  0  2  0  0 49  0]
+ [ 0  0 22  0  0  0  0]]
+__main__ → INFO: 
+patient confusion matrix
+__main__ → INFO: [[ 5  1  3  2  0  0  0]
+ [ 1  5  0  2  1  0  0]
+ [ 0  0 10  0  0  0  0]
+ [ 0  0  0  9  0  1  0]
+ [ 2  0  0  0  3  0  0]
+ [ 0  0  0  0  0 10  0]
+ [ 0  0  5  0  0  0  0]]
