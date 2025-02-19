@@ -10,6 +10,11 @@ batch_size=${3:-64}
 data_fraction=${4:-0.2}
 
 
+# echo all above values
+echo "epsilon: $epsilon"
+echo "steps: $steps"
+echo "batch_size: $batch_size"
+echo "data_fraction: $data_fraction"
 
 ############### Target models from Experiment 18 ####################
 
@@ -17,7 +22,7 @@ source_model="resnet50"
 source_exp_no=18
 source_ckpt_dir="Results/Baseline/resnet50_exp18/checkpoint_40000.pth"
 
-
+echo "Running evaluation scripts for experiment 18 source models"
 
 python tsne.py --data_db_root $DATA_PATH  --source_model_backbone $source_model    \
 --source_exp_no $source_exp_no \
@@ -105,6 +110,7 @@ source_model="resnet50"
 source_exp_no=19
 source_ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19/checkpoint_40000.pth"
 
+echo "Running evaluation scripts for experiment 19 source models"
 
 
 python tsne.py --data_db_root $DATA_PATH  --source_model_backbone $source_model    \
@@ -186,6 +192,7 @@ source_model="resnet50"
 source_exp_no=20
 source_ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20/checkpoint_40000.pth"
 
+echo "Running evaluation scripts for experiment 20 source models"
 
 
 python tsne.py --data_db_root $DATA_PATH  --source_model_backbone $source_model    \
