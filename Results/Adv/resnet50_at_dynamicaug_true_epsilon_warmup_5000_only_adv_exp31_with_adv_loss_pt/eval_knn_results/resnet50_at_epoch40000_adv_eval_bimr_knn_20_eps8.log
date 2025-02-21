@@ -4506,3 +4506,80 @@ __main__ → INFO: BATCH 869 torch.Size([64, 2048]) torch.Size([64])
 __main__ → INFO: BATCH 870 torch.Size([64, 2048]) torch.Size([64])
 __main__ → INFO: BATCH 871 torch.Size([64, 2048]) torch.Size([64])
 __main__ → INFO: BATCH 872 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 873 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 874 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 875 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 876 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 877 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 878 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 879 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 880 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 881 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 882 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 883 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 884 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 885 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 886 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 887 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 888 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 889 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 890 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 891 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 892 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 893 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 894 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 895 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 896 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 897 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 898 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 899 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 900 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 901 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 902 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 903 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 904 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 905 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 906 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 907 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 908 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 909 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 910 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 911 torch.Size([64, 2048]) torch.Size([64])
+__main__ → INFO: BATCH 912 torch.Size([55, 2048]) torch.Size([55])
+__main__ → INFO: torch.Size([232336, 2048])
+__main__ → INFO: torch.Size([232336])
+__main__ → INFO: 
+metrics
+__main__ → INFO:                     acc              t2  ...             mca             map
+patch    tensor(0.5144)  tensor(0.6945)  ...  tensor(0.4879)  tensor(0.5293)
+slide    tensor(0.7393)  tensor(0.8755)  ...  tensor(0.6814)  tensor(0.8149)
+patient  tensor(0.7333)  tensor(0.8667)  ...  tensor(0.6719)  tensor(0.8551)
+
+[3 rows x 5 columns]
+__main__ → INFO: 
+patch confusion matrix
+__main__ → INFO: [[5190 1434  969 2182  580  590   99]
+ [1481 3563  232  735  365   99   47]
+ [2575  563 6492  718  100  703   70]
+ [1071  146  512 4423  103  336  131]
+ [1139  416   93    1 1791   88    0]
+ [2359  280 2057 1115   12 8208  102]
+ [ 960  551 2371  257  423  303  388]]
+__main__ → INFO: 
+slide confusion matrix
+__main__ → INFO: [[32  4  1 11  0  1  0]
+ [ 3 20  0  3  0  0  0]
+ [ 1  0 46  0  0  0  0]
+ [ 2  0  0 30  0  3  0]
+ [10  0  0  0 17  0  0]
+ [ 3  0  3  0  0 45  0]
+ [ 2  0 18  0  2  0  0]]
+__main__ → INFO: 
+patient confusion matrix
+__main__ → INFO: [[ 7  1  1  2  0  0  0]
+ [ 2  6  0  1  0  0  0]
+ [ 0  0 10  0  0  0  0]
+ [ 0  0  0  9  0  1  0]
+ [ 2  0  0  0  3  0  0]
+ [ 0  0  1  0  0  9  0]
+ [ 0  0  5  0  0  0  0]]
