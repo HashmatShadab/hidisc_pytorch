@@ -12,86 +12,67 @@ attack_name=${6:-"pgd_knn"}
 ###################### Exp 18 ########################################
 if [ $EXP_NUMBER -eq 18 ]; then
 
-  model_name="resnet50_timm_pretrained"
-  ckpt_dir="Results/Baseline/resnet50_timm_pretrained_exp18"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
-  echo "Exp 18 with $model_name"
-
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-  # loop over all the checkpoints in the directory ending with .pth
-
-    if [ $adv_eval == "true" ]; then
-      python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-      --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-    else
-      python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-      --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-    fi
-
-    ###################### Exp 18 ########################################
-  model_name="resnet50"
-  ckpt_dir="Results/Baseline/resnet50_exp18"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
-
-  echo "Exp 18 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-
-   if [ $adv_eval == "true" ]; then
-    python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-  else
-    python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-  fi
-
+#  model_name="resnet50_timm_pretrained"
+#  ckpt_dir="Results/Baseline/resnet50_timm_pretrained_exp18"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#  echo "Exp 18 with $model_name"
+#
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#  # loop over all the checkpoints in the directory ending with .pth
+#
+#    if [ $adv_eval == "true" ]; then
+#      python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#      --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#    else
+#      python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#      --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#    fi
 
     ###################### Exp 18 ########################################
-  model_name="resnet50_at"
-  ckpt_dir="Results/Baseline/resnet50_at_exp18"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#  model_name="resnet50"
+#  ckpt_dir="Results/Baseline/resnet50_exp18"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#
+#  echo "Exp 18 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#   if [ $adv_eval == "true" ]; then
+#    python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#  else
+#    python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#  fi
 
-  echo "Exp 18 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-
-
-       if [ $adv_eval == "true" ]; then
-        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
 
     ###################### Exp 18 ########################################
-  model_name="wresnet50_normal"
-  ckpt_dir="Results/Baseline/wresnet50_normal_exp18"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#  model_name="resnet50_at"
+#  ckpt_dir="Results/Baseline/resnet50_at_exp18"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#
+#  echo "Exp 18 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#
+#       if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
 
-  echo "Exp 18 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-
-
-       if [ $adv_eval == "true" ]; then
-        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
-
-      ###################### Exp 18 ########################################
+    ###################### Exp 18 ########################################
+     ###################### Exp 18 ########################################
   model_name="wresnet50_at"
   ckpt_dir="Results/Baseline/wresnet50_at_exp18"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
@@ -111,25 +92,46 @@ if [ $EXP_NUMBER -eq 18 ]; then
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
       fi
 
+
+#  model_name="wresnet50_normal"
+#  ckpt_dir="Results/Baseline/wresnet50_normal_exp18"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#
+#  echo "Exp 18 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#
+#       if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
+
+
       ###################### Exp 18 ########################################
-  model_name="resnet101_normal"
-  ckpt_dir="Results/Baseline/resnet101_normal_exp18"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
-
-  echo "Exp 18 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-
-
-       if [ $adv_eval == "true" ]; then
-        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+#  model_name="resnet101_normal"
+#  ckpt_dir="Results/Baseline/resnet101_normal_exp18"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#
+#  echo "Exp 18 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#
+#       if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
 
       ###################### Exp 18 ########################################
   model_name="resnet101_at"
@@ -155,39 +157,126 @@ if [ $EXP_NUMBER -eq 18 ]; then
 fi
 
 
+
+###################### Exp 181 ########################################
+if [ $EXP_NUMBER -eq 181 ]; then
+
+
+
+  model_name="wresnet50_normal"
+  ckpt_dir="Results/Baseline/wresnet50_normal_exp18"
+  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+
+  echo "Exp 18 with $model_name"
+  echo "ckpt_dir: $ckpt_dir"
+  echo "saving results to: $ckpt_dir/eval_knn_results"
+  echo "ckpt_path: $ckpt_path"
+
+
+
+       if [ $adv_eval == "true" ]; then
+        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+      else
+        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+      fi
+
+
+      ###################### Exp 18 ########################################
+  model_name="resnet101_normal"
+  ckpt_dir="Results/Baseline/resnet101_normal_exp18"
+  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+
+  echo "Exp 18 with $model_name"
+  echo "ckpt_dir: $ckpt_dir"
+  echo "saving results to: $ckpt_dir/eval_knn_results"
+  echo "ckpt_path: $ckpt_path"
+
+
+
+       if [ $adv_eval == "true" ]; then
+        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+      else
+        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+      fi
+
+
+fi
+
+
 if [ $EXP_NUMBER -eq 19 ]; then
 
 
   ###################### Exp 19 ########################################
-  model_name="resnet50_timm_pretrained"
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
-  echo "Exp 19 with $model_name"
+#  model_name="resnet50_timm_pretrained"
+#  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#  echo "Exp 19 with $model_name"
+#
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#      if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
+#
 
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-
-      if [ $adv_eval == "true" ]; then
-        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  ###################### Exp 19 ########################################
+#  model_name="resnet50"
+#  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#
+#  echo "Exp 19 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#      if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
 
 
   ###################### Exp 19 ########################################
-  model_name="resnet50"
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#  model_name="resnet50_at"
+#  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#  echo "Exp 19 with $model_name"
+#
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#      if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
 
+    ###################### Exp 19 ########################################
+  model_name="wresnet50_at"
+  ckpt_dir="Results/Adv/wresnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 19 with $model_name"
+
   echo "ckpt_dir: $ckpt_dir"
   echo "saving results to: $ckpt_dir/eval_knn_results"
   echo "ckpt_path: $ckpt_path"
-
 
       if [ $adv_eval == "true" ]; then
         python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
@@ -196,11 +285,51 @@ if [ $EXP_NUMBER -eq 19 ]; then
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
       fi
+
+  ###################### Exp 19 ########################################
+#  model_name="wresnet50_normal"
+#  ckpt_dir="Results/Adv/wresnet50_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#
+#  echo "Exp 19 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#      if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
+
+
+
+    ###################### Exp 19 ########################################
+#  model_name="resnet101_normal"
+#  ckpt_dir="Results/Adv/resnet101_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+#
+#  echo "Exp 19 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path: $ckpt_path"
+#
+#
+#      if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
 
 
   ###################### Exp 19 ########################################
-  model_name="resnet50_at"
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  model_name="resnet101_at"
+  ckpt_dir="Results/Adv/resnet101_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 19 with $model_name"
 
@@ -215,6 +344,17 @@ if [ $EXP_NUMBER -eq 19 ]; then
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
       fi
+
+fi
+
+
+
+if [ $EXP_NUMBER -eq 191 ]; then
+
+
+
+
+
   ###################### Exp 19 ########################################
   model_name="wresnet50_normal"
   ckpt_dir="Results/Adv/wresnet50_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
@@ -235,23 +375,6 @@ if [ $EXP_NUMBER -eq 19 ]; then
       fi
 
 
-  ###################### Exp 19 ########################################
-  model_name="wresnet50_at"
-  ckpt_dir="Results/Adv/wresnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
-  echo "Exp 19 with $model_name"
-
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-      if [ $adv_eval == "true" ]; then
-        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
 
     ###################### Exp 19 ########################################
   model_name="resnet101_normal"
@@ -273,23 +396,6 @@ if [ $EXP_NUMBER -eq 19 ]; then
       fi
 
 
-  ###################### Exp 19 ########################################
-  model_name="resnet101_at"
-  ckpt_dir="Results/Adv/resnet101_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
-  echo "Exp 19 with $model_name"
-
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
-
-      if [ $adv_eval == "true" ]; then
-        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
 
 fi
 
@@ -319,6 +425,56 @@ if [ $EXP_NUMBER -eq 20 ]; then
 
 
   ###################### Exp 20 ########################################
+#  model_name="resnet50"
+#  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20"
+#  ckpt_path=$ckpt_dir/checkpoint_80000.pth
+#
+#  echo "Exp 20 with $model_name"
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path $ckpt_path"
+#
+#
+#
+#      if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
+#
+#
+#  ###################### Exp 20 ########################################
+#  model_name="resnet50_at"
+#  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20"
+#  ckpt_path=$ckpt_dir/checkpoint_80000.pth
+#  echo "Exp 20 with $model_name"
+#
+#  echo "ckpt_dir: $ckpt_dir"
+#  echo "saving results to: $ckpt_dir/eval_knn_results"
+#  echo "ckpt_path $ckpt_path"
+#
+#
+#
+#      if [ $adv_eval == "true" ]; then
+#        python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+#      else
+#        python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+#        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+#      fi
+
+
+fi
+
+
+if [ $EXP_NUMBER -eq 201 ]; then
+
+
+
+
+  ###################### Exp 20 ########################################
   model_name="resnet50"
   ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20"
   ckpt_path=$ckpt_dir/checkpoint_80000.pth
@@ -337,6 +493,15 @@ if [ $EXP_NUMBER -eq 20 ]; then
         python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
         --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
       fi
+
+
+fi
+
+
+if [ $EXP_NUMBER -eq 202 ]; then
+
+
+
 
 
   ###################### Exp 20 ########################################
