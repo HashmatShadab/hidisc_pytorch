@@ -1,0 +1,3 @@
+__main__ → INFO: Info level message
+__main__ → INFO: Logs will be saved in Results/Adv/resnet101_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19/eval_knn_results/resnet101_at_epoch28161_adv_eval_bimr_knn_10_eps4.log
+__main__ → INFO: generating predictions
