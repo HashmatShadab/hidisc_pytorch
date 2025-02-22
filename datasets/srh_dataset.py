@@ -160,6 +160,7 @@ class OpenSRHDataset(Dataset):
         self.classes_ = sorted(set(all_labels))
         self.class_to_idx_ = {c: i for i, c in enumerate(self.classes_)}
         logging.info("Labels: {}".format(self.classes_))
+        logging.info("Class to Index: {}".format(self.class_to_idx_))
         return
 
     def get_weights(self):

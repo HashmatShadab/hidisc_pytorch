@@ -330,7 +330,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
   ###################### Exp 19 ########################################
   model_name="resnet101_at"
   ckpt_dir="Results/Adv/resnet101_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  ckpt_path=$ckpt_dir/checkpoint.pth
   echo "Exp 19 with $model_name"
 
   echo "ckpt_dir: $ckpt_dir"
@@ -379,7 +379,7 @@ if [ $EXP_NUMBER -eq 191 ]; then
     ###################### Exp 19 ########################################
   model_name="resnet101_normal"
   ckpt_dir="Results/Adv/resnet101_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  ckpt_path=$ckpt_dir/checkpoint.pth
 
   echo "Exp 19 with $model_name"
   echo "ckpt_dir: $ckpt_dir"
