@@ -13,16 +13,17 @@ if __name__ == "__main__":
     compressed_directory = r"D:\hidisc_data\compressed"
 
     # create the compressed directory if it does not exist
-    if not os.path.exists(compressed_directory):
-        os.makedirs(compressed_directory)
+    if not os.path.exists(working_directory):
+        os.makedirs(working_directory)
 
     # loop over all the files in the working directory
-    for file in os.listdir(working_directory):
+    for file in os.listdir(compressed_directory):
         # check if the file is a .tgz file
         print(file)
         if file.endswith(".tgz"):
             # extract the contents of the .tgz file
-            os.system(f"tar -xvzf {os.path.join(working_directory, file)} -C {working_directory}")
+            os.system(f"tar -xvzf {os.path.join(compressed_directory, file)} -C {compressed_directory}")
            # move the .tgz file to the compressed directory
-            shutil.move(os.path.join(working_directory, file), compressed_directory)
+           #  shutil.move(os.path.join(working_directory, file), compressed_directory)
             # delete the .tgz file
+            os.remove(os.path.join(compressed_directory, file))
