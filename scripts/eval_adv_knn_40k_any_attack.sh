@@ -13,7 +13,7 @@ attack_name=${6:-"pgd_knn"}
 if [ $EXP_NUMBER -eq 18 ]; then
 
   model_name="resnet50_timm_pretrained"
-  ckpt_dir="Results/Baseline/resnet50_timm_pretrained_exp18"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet50_timm_pretrained_exp18"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 18 with $model_name"
 
@@ -33,7 +33,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
     ###################### Exp 18 ########################################
   model_name="resnet50"
-  ckpt_dir="Results/Baseline/resnet50_exp18"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet50_exp18"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 18 with $model_name"
@@ -53,7 +53,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
     ###################### Exp 18 ########################################
 #  model_name="resnet50_at"
-#  ckpt_dir="Results/Baseline/resnet50_at_exp18"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet50_at_exp18"
 #  ckpt_path=$ckpt_dir/checkpoint_40000.pth
 #
 #  echo "Exp 18 with $model_name"
@@ -74,7 +74,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
     ###################### Exp 18 ########################################
      ###################### Exp 18 ########################################
 #  model_name="wresnet50_at"
-#  ckpt_dir="Results/Baseline/wresnet50_at_exp18"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/wresnet50_at_exp18"
 #  ckpt_path=$ckpt_dir/checkpoint_40000.pth
 #
 #  echo "Exp 18 with $model_name"
@@ -94,7 +94,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
 
   model_name="wresnet50_normal"
-  ckpt_dir="Results/Baseline/wresnet50_normal_exp18"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/wresnet50_normal_exp18"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 18 with $model_name"
@@ -115,7 +115,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
       ###################### Exp 18 ########################################
   model_name="resnet101_normal"
-  ckpt_dir="Results/Baseline/resnet101_normal_exp18"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet101_normal_exp18"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 18 with $model_name"
@@ -135,7 +135,7 @@ if [ $EXP_NUMBER -eq 18 ]; then
 
       ###################### Exp 18 ########################################
 #  model_name="resnet101_at"
-#  ckpt_dir="Results/Baseline/resnet101_at_exp18"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet101_at_exp18"
 #  ckpt_path=$ckpt_dir/checkpoint_40000.pth
 #
 #  echo "Exp 18 with $model_name"
@@ -164,7 +164,7 @@ if [ $EXP_NUMBER -eq 181 ]; then
 
 
   model_name="wresnet50_normal"
-  ckpt_dir="Results/Baseline/wresnet50_normal_exp18"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/wresnet50_normal_exp18"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 18 with $model_name"
@@ -185,7 +185,7 @@ if [ $EXP_NUMBER -eq 181 ]; then
 
       ###################### Exp 18 ########################################
   model_name="resnet101_normal"
-  ckpt_dir="Results/Baseline/resnet101_normal_exp18"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet101_normal_exp18"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 18 with $model_name"
@@ -212,7 +212,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
   ###################### Exp 19 ########################################
   model_name="resnet50_timm_pretrained"
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 19 with $model_name"
 
@@ -232,7 +232,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
   ###################### Exp 19 ########################################
   model_name="resnet50"
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 19 with $model_name"
@@ -252,7 +252,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
   ###################### Exp 19 ########################################
 #  model_name="resnet50_at"
-#  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
 #  ckpt_path=$ckpt_dir/checkpoint_40000.pth
 #  echo "Exp 19 with $model_name"
 #
@@ -270,7 +270,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
     ###################### Exp 19 ########################################
 #  model_name="wresnet50_at"
-#  ckpt_dir="Results/Adv/wresnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/wresnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
 #  ckpt_path=$ckpt_dir/checkpoint_40000.pth
 #  echo "Exp 19 with $model_name"
 #
@@ -288,7 +288,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
   ###################### Exp 19 ########################################
   model_name="wresnet50_normal"
-  ckpt_dir="Results/Adv/wresnet50_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/wresnet50_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 19 with $model_name"
@@ -309,7 +309,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
     ###################### Exp 19 ########################################
   model_name="resnet101_normal"
-  ckpt_dir="Results/Adv/resnet101_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet101_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 19 with $model_name"
@@ -329,7 +329,7 @@ if [ $EXP_NUMBER -eq 19 ]; then
 
   ###################### Exp 19 ########################################
 #  model_name="resnet101_at"
-#  ckpt_dir="Results/Adv/resnet101_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet101_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
 #  ckpt_path=$ckpt_dir/checkpoint.pth
 #  echo "Exp 19 with $model_name"
 #
@@ -357,7 +357,7 @@ if [ $EXP_NUMBER -eq 191 ]; then
 
   ###################### Exp 19 ########################################
   model_name="wresnet50_normal"
-  ckpt_dir="Results/Adv/wresnet50_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/wresnet50_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 19 with $model_name"
@@ -378,7 +378,7 @@ if [ $EXP_NUMBER -eq 191 ]; then
 
     ###################### Exp 19 ########################################
   model_name="resnet101_normal"
-  ckpt_dir="Results/Adv/resnet101_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet101_normal_dynamicaug_true_epsilon_warmup_5000_only_adv_exp19"
   ckpt_path=$ckpt_dir/checkpoint.pth
 
   echo "Exp 19 with $model_name"
@@ -405,7 +405,7 @@ if [ $EXP_NUMBER -eq 20 ]; then
 
   ###################### Exp 20 ########################################
   model_name="resnet50_timm_pretrained"
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_exp20"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_exp20"
   ckpt_path=$ckpt_dir/checkpoint_80000.pth
   echo "Exp 20 with $model_name"
 
@@ -426,7 +426,7 @@ if [ $EXP_NUMBER -eq 20 ]; then
 
   ###################### Exp 20 ########################################
   model_name="resnet50"
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20"
   ckpt_path=$ckpt_dir/checkpoint_80000.pth
 
   echo "Exp 20 with $model_name"
@@ -447,7 +447,7 @@ if [ $EXP_NUMBER -eq 20 ]; then
 #
 #  ###################### Exp 20 ########################################
   model_name="resnet50_at"
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20"
   ckpt_path=$ckpt_dir/checkpoint_80000.pth
   echo "Exp 20 with $model_name"
 
@@ -476,7 +476,7 @@ if [ $EXP_NUMBER -eq 201 ]; then
 
   ###################### Exp 20 ########################################
   model_name="resnet50"
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_exp20"
   ckpt_path=$ckpt_dir/checkpoint_80000.pth
 
   echo "Exp 20 with $model_name"
@@ -506,7 +506,7 @@ if [ $EXP_NUMBER -eq 202 ]; then
 
   ###################### Exp 20 ########################################
   model_name="resnet50_at"
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_exp20"
   ckpt_path=$ckpt_dir/checkpoint_80000.pth
   echo "Exp 20 with $model_name"
 
@@ -534,7 +534,7 @@ if [ $EXP_NUMBER -eq 24 ]; then
   ###################### Exp 24 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 24 with $model_name"
 
@@ -557,7 +557,7 @@ if [ $EXP_NUMBER -eq 24 ]; then
   ###################### Exp 24 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 24 with $model_name"
 
@@ -585,7 +585,7 @@ if [ $EXP_NUMBER -eq 244 ]; then
   ###################### Exp 244 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp244_with_embedding128"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp244_with_embedding128"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 244 with $model_name"
 
@@ -606,7 +606,7 @@ if [ $EXP_NUMBER -eq 244 ]; then
   ###################### Exp 244 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp244_with_embedding128"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp244_with_embedding128"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
   echo "Exp 244 with $model_name"
 
@@ -632,7 +632,7 @@ if [ $EXP_NUMBER -eq 25 ]; then
   ###################### Exp 25 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 25 with $model_name"
@@ -653,7 +653,7 @@ if [ $EXP_NUMBER -eq 25 ]; then
   ###################### Exp 25 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 25 with $model_name"
@@ -680,7 +680,7 @@ if [ $EXP_NUMBER -eq 26 ]; then
   ###################### Exp 26 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp26_with_embedding768"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp26_with_embedding768"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 26 with $model_name"
@@ -702,7 +702,7 @@ if [ $EXP_NUMBER -eq 26 ]; then
  ###################### Exp 26 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp26_with_embedding768"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp26_with_embedding768"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 26 with $model_name"
@@ -728,7 +728,7 @@ if [ $EXP_NUMBER -eq 27 ]; then
   ###################### Exp 27 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp27_with_embedding1024"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp27_with_embedding1024"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 27 with $model_name"
@@ -748,7 +748,7 @@ if [ $EXP_NUMBER -eq 27 ]; then
   ###################### Exp 27 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp27_with_embedding1024"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp27_with_embedding1024"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 27 with $model_name"
@@ -772,7 +772,7 @@ if [ $EXP_NUMBER -eq 28 ]; then
   ###################### Exp 28 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 28 with $model_name"
@@ -793,7 +793,7 @@ if [ $EXP_NUMBER -eq 28 ]; then
   ###################### Exp 28 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 28 with $model_name"
@@ -813,7 +813,7 @@ if [ $EXP_NUMBER -eq 28 ]; then
     ###################### Exp 28 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_patch_loss_exp28"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 28 with $model_name"
@@ -844,7 +844,7 @@ if [ $EXP_NUMBER -eq 29 ]; then
   ###################### Exp 29 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 29 with $model_name"
@@ -865,7 +865,7 @@ if [ $EXP_NUMBER -eq 29 ]; then
   ###################### Exp 29 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 29 with $model_name"
@@ -887,7 +887,7 @@ if [ $EXP_NUMBER -eq 29 ]; then
     ###################### Exp 29 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp29"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 29 with $model_name"
@@ -912,7 +912,7 @@ if [ $EXP_NUMBER -eq 30 ]; then
   ###################### Exp 30 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 30 with $model_name"
@@ -934,7 +934,7 @@ if [ $EXP_NUMBER -eq 30 ]; then
   ###################### Exp 30 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 30 with $model_name"
@@ -955,7 +955,7 @@ if [ $EXP_NUMBER -eq 30 ]; then
     ###################### Exp 30 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_proj_head_exp30"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 30 with $model_name"
@@ -983,7 +983,7 @@ if [ $EXP_NUMBER -eq 31 ]; then
   ###################### Exp 31 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 31 with $model_name"
@@ -1005,7 +1005,7 @@ if [ $EXP_NUMBER -eq 31 ]; then
    ###################### Exp 31 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 31 with $model_name"
@@ -1027,7 +1027,7 @@ if [ $EXP_NUMBER -eq 31 ]; then
    ###################### Exp 31 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 31 with $model_name"
@@ -1054,7 +1054,7 @@ if [ $EXP_NUMBER -eq 32 ]; then
   ###################### Exp 32 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 32 with $model_name"
@@ -1075,7 +1075,7 @@ if [ $EXP_NUMBER -eq 32 ]; then
    ###################### Exp 32 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 32 with $model_name"
@@ -1098,7 +1098,7 @@ if [ $EXP_NUMBER -eq 32 ]; then
    ###################### Exp 32 ########################################
   model_name="resnet50_at"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 32 with $model_name"
@@ -1126,7 +1126,7 @@ if [ $EXP_NUMBER -eq 33 ]; then
   ###################### Exp 33 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 33 with $model_name"
@@ -1147,7 +1147,7 @@ if [ $EXP_NUMBER -eq 33 ]; then
    ###################### Exp 33 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 33 with $model_name"
@@ -1170,7 +1170,7 @@ if [ $EXP_NUMBER -eq 33 ]; then
 #   ###################### Exp 33 ########################################
 #  model_name="resnet50_at"
 #
-#  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
 #  ckpt_path=$ckpt_dir/checkpoint_40000.pth
 #
 #  echo "Exp 33 with $model_name"
@@ -1196,7 +1196,7 @@ if [ $EXP_NUMBER -eq 34 ]; then
   ###################### Exp 34 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 34 with $model_name"
@@ -1217,7 +1217,7 @@ if [ $EXP_NUMBER -eq 34 ]; then
    ###################### Exp 34 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
   ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
   echo "Exp 34 with $model_name"
@@ -1238,7 +1238,7 @@ if [ $EXP_NUMBER -eq 34 ]; then
   ###################### Exp 34 ########################################
   model_name="resnet50"
 
-  ckpt_dir="Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
   ckpt_path=$ckpt_dir/checkpoint.pth
 
   echo "Exp 34 with $model_name"
@@ -1259,7 +1259,7 @@ if [ $EXP_NUMBER -eq 34 ]; then
    ###################### Exp 34 ########################################
   model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
+  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
   ckpt_path=$ckpt_dir/checkpoint.pth
 
   echo "Exp 34 with $model_name"
@@ -1282,7 +1282,7 @@ if [ $EXP_NUMBER -eq 34 ]; then
 #   ###################### Exp 34 ########################################
 #  model_name="resnet50_at"
 #
-#  ckpt_dir="Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
+#  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
 #  ckpt_path=$ckpt_dir/checkpoint_40000.pth
 #
 #  echo "Exp 33 with $model_name"
@@ -1309,7 +1309,7 @@ fi
 #
 #
 #
-#ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256"
+#ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp24_with_embedding256"
 #
 #echo "ckpt_dir: $ckpt_dir"
 #echo "saving results to: $ckpt_dir/eval_knn_results"
@@ -1327,7 +1327,7 @@ fi
 #
 #
 #
-#ckpt_dir="Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512/"
+#ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp25_with_embedding512/"
 #
 #echo "ckpt_dir: $ckpt_dir"
 #echo "saving results to: $ckpt_dir/eval_knn_results"
