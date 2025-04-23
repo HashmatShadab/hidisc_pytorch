@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATA_PATH=/lustre/mlnvme/data/swasim_hpc-datasets/naseer/Projects/data
+DATA_PATH=/mnt/nvme0n1/Dataset/muzammal/OpenSRH
 EXP_NUMBER=$1
 adv_eval=${2:-"true"}
 epsilon=${3:-8}
