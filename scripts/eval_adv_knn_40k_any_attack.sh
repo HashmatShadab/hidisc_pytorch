@@ -981,25 +981,25 @@ fi
 if [ $EXP_NUMBER -eq 31 ]; then
 
   ###################### Exp 31 ########################################
-  model_name="resnet50"
+  # model_name="resnet50"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
-  echo "Exp 31 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 31 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
    ###################### Exp 31 ########################################
@@ -1025,25 +1025,25 @@ if [ $EXP_NUMBER -eq 31 ]; then
 
 
    ###################### Exp 31 ########################################
-  model_name="resnet50_at"
+  # model_name="resnet50_at"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_at_dynamicaug_true_epsilon_warmup_5000_only_adv_exp31_with_adv_loss_pt"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
-  echo "Exp 31 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 31 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
 fi
@@ -1052,24 +1052,24 @@ fi
 if [ $EXP_NUMBER -eq 32 ]; then
 
   ###################### Exp 32 ########################################
-  model_name="resnet50"
+  # model_name="resnet50"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
-  echo "Exp 32 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 32 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
    ###################### Exp 32 ########################################
@@ -1096,25 +1096,25 @@ if [ $EXP_NUMBER -eq 32 ]; then
 
 
    ###################### Exp 32 ########################################
-  model_name="resnet50_at"
+  # model_name="resnet50_at"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_exp32_with_adv_loss_s_pt"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
-  echo "Exp 32 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 32 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
 fi
@@ -1124,24 +1124,24 @@ fi
 if [ $EXP_NUMBER -eq 33 ]; then
 
   ###################### Exp 33 ########################################
-  model_name="resnet50"
+  # model_name="resnet50"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_patch_exp33"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
-  echo "Exp 33 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 33 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
    ###################### Exp 33 ########################################
@@ -1194,24 +1194,24 @@ fi
 if [ $EXP_NUMBER -eq 34 ]; then
 
   ###################### Exp 34 ########################################
-  model_name="resnet50"
+  # model_name="resnet50"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
-  echo "Exp 34 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 34 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
    ###################### Exp 34 ########################################
@@ -1236,46 +1236,46 @@ if [ $EXP_NUMBER -eq 34 ]; then
       fi
 
   ###################### Exp 34 ########################################
-  model_name="resnet50"
+  # model_name="resnet50"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
-  ckpt_path=$ckpt_dir/checkpoint.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
+  # ckpt_path=$ckpt_dir/checkpoint.pth
 
-  echo "Exp 34 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 34 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
    ###################### Exp 34 ########################################
-  model_name="resnet50_timm_pretrained"
+  # model_name="resnet50_timm_pretrained"
 
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
-  ckpt_path=$ckpt_dir/checkpoint.pth
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Adv/resnet50_timm_pretrained_dynamicaug_true_epsilon_warmup_5000_only_adv_hat_slide_exp34"
+  # ckpt_path=$ckpt_dir/checkpoint.pth
 
-  echo "Exp 34 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path $ckpt_path"
+  # echo "Exp 34 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path $ckpt_path"
 
 
 
-      if [ $adv_eval == "true" ]; then
-        CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
-      else
-        CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
-        --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-      fi
+  #     if [ $adv_eval == "true" ]; then
+  #       CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name     \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #     else
+  #       CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name    \
+  #       --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #     fi
 
 
 
