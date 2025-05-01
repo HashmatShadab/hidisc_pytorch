@@ -12,43 +12,43 @@ GPU=${7:-2}
 ###################### Exp 18 ########################################
 if [ $EXP_NUMBER -eq 18 ]; then
 
-  model_name="resnet50_timm_pretrained"
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet50_timm_pretrained_exp18"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
-  echo "Exp 18 with $model_name"
+  # model_name="resnet50_timm_pretrained"
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet50_timm_pretrained_exp18"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  # echo "Exp 18 with $model_name"
 
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path: $ckpt_path"
 
-  # loop over all the checkpoints in the directory ending with .pth
+  # # loop over all the checkpoints in the directory ending with .pth
 
-    if [ $adv_eval == "true" ]; then
-      CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-      --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-    else
-      CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-      --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-    fi
+  #   if [ $adv_eval == "true" ]; then
+  #     CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+  #     --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+  #   else
+  #     CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+  #     --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  #   fi
 
-    ###################### Exp 18 ########################################
-  model_name="resnet50"
-  ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet50_exp18"
-  ckpt_path=$ckpt_dir/checkpoint_40000.pth
+  #   ###################### Exp 18 ########################################
+  # model_name="resnet50"
+  # ckpt_dir="/mnt/nvme0n1/Dataset/muzammal/hidisc_results/Results/Baseline/resnet50_exp18"
+  # ckpt_path=$ckpt_dir/checkpoint_40000.pth
 
-  echo "Exp 18 with $model_name"
-  echo "ckpt_dir: $ckpt_dir"
-  echo "saving results to: $ckpt_dir/eval_knn_results"
-  echo "ckpt_path: $ckpt_path"
+  # echo "Exp 18 with $model_name"
+  # echo "ckpt_dir: $ckpt_dir"
+  # echo "saving results to: $ckpt_dir/eval_knn_results"
+  # echo "ckpt_path: $ckpt_path"
 
 
-   if [ $adv_eval == "true" ]; then
-    CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
-  else
-    CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
-    --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
-  fi
+  #  if [ $adv_eval == "true" ]; then
+  #   CUDA_VISIBLE_DEVICES=$GPU python adv_eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+  #   --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results --eps $epsilon --steps $steps --eval_predict_batch_size $batch_size --attack_name $attack_name --eval_predict_batch_size $batch_size --attack_name $attack_name
+  # else
+  #   CUDA_VISIBLE_DEVICES=$GPU python eval_knn.py --data_db_root $DATA_PATH  --model_backbone $model_name   \
+  #   --eval_ckpt_path $ckpt_path  --save_results_path $ckpt_dir/eval_knn_results
+  # fi
 
 
     ###################### Exp 18 ########################################
