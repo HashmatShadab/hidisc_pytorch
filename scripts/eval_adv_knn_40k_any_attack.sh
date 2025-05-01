@@ -7,7 +7,7 @@ epsilon=${3:-8}
 steps=${4:-7}
 batch_size=${5:-64}
 attack_name=${6:-"pgd_knn"}
-GPU=${7:-1}
+GPU=${7:-2}
 
 ###################### Exp 18 ########################################
 if [ $EXP_NUMBER -eq 18 ]; then
