@@ -3,7 +3,7 @@
 
 # Default values for arguments
 EXP_NUM=${1:-18}
-EPSILON=${2:-8}
+GPU=${2:-1}
 
 
 # Run evaluation scripts
@@ -22,10 +22,10 @@ EPSILON=${2:-8}
 
 
 # bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 8 10 32 "pgd_knn"
-bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 2 10 32 "pgd_knn"
-bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 12 10 32 "pgd_knn"
-bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 16 10 32 "pgd_knn"
-bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 4 10 32 "pgd_knn"
+bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 2 10 32 "pgd_knn" $GPU
+bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 12 10 32 "pgd_knn" $GPU
+bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 16 10 32 "pgd_knn" $GPU
+bash scripts/eval_adv_knn_40k_any_attack.sh $EXP_NUM true 4 10 32 "pgd_knn" $GPU
 
 
 #
