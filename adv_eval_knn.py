@@ -319,7 +319,7 @@ def get_args():
     parser.add_argument('--model_train_alg', type=str, default='hidisc')
     parser.add_argument('--model_proj_head', default=False, type=lambda x: (str(x).lower() == 'true'))
 
-    parser.add_argument('--eval_predict_batch_size', type=int, default=32)
+    parser.add_argument('--eval_predict_batch_size', type=int, default=64)
     parser.add_argument('--eval_knn_batch_size', type=int, default=1024)
     parser.add_argument('--eval_ckpt_path', type=str, default=r'Results/Baseline/resnet50_exp18/checkpoint_40000.pth')
     parser.add_argument('--save_results_path', type=str, default='delete_eval_knn_results')
@@ -364,13 +364,13 @@ def main():
     setup_seed(cf.seed)
     prediction_path = os.path.join(cf.save_results_path, f"predictions_epoch_{epoch}_adv_eval_{cf.attack_name}_{cf.steps}_eps{cf.eps}.pt")
 
-    # if os.path.exists(prediction_path):
-    #     log.info("loading predictions")
-    #     predictions = torch.load(prediction_path)
-
-    log.info("generating predictions")
-    predictions = get_embeddings(cf, None, log=log)
-    torch.save(predictions, prediction_path)
+    if os.path.exists(prediction_path):
+        log.info("loading predictions")
+        predictions = torch.load(prediction_path)
+    else:
+        log.info("generating predictions")
+        predictions = get_embeddings(cf, None, log=log)
+        torch.save(predictions, prediction_path)
 
     # generate specs
     make_specs(predictions, log=log)
